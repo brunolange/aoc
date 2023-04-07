@@ -8,6 +8,16 @@ enum Floor {
     Down,
 }
 
+fn floors(s: &str) -> Vec<Floor> {
+    s.chars()
+        .map(|char| match char {
+            '(' => Floor::Up,
+            ')' => Floor::Down,
+            _ => panic!("invalid char"),
+        })
+        .collect()
+}
+
 fn par_floors(s: &str) -> Vec<Floor> {
     const CHUNK_SIZE: usize = 1_000;
     let chunks = s.as_bytes().par_chunks(CHUNK_SIZE);
@@ -26,26 +36,6 @@ fn par_floors(s: &str) -> Vec<Floor> {
         })
         .flatten()
         .collect::<Vec<Floor>>()
-}
-
-fn par_floor(s: &str) -> i32 {
-    par_floors(s)
-        .par_iter()
-        .map(|floor| match floor {
-            Floor::Up => 1,
-            Floor::Down => -1,
-        })
-        .sum()
-}
-
-fn floors(s: &str) -> Vec<Floor> {
-    s.chars()
-        .map(|char| match char {
-            '(' => Floor::Up,
-            ')' => Floor::Down,
-            _ => panic!("invalid char"),
-        })
-        .collect()
 }
 
 fn floor_imperative(fs: &Vec<Floor>) -> i32 {
@@ -76,6 +66,16 @@ fn floor_fold(fs: &Vec<Floor>) -> i32 {
         }
         acc
     })
+}
+
+fn par_floor(s: &str) -> i32 {
+    par_floors(s)
+        .par_iter()
+        .map(|floor| match floor {
+            Floor::Up => 1,
+            Floor::Down => -1,
+        })
+        .sum()
 }
 
 fn basement_imperative(fs: &Vec<Floor>) -> Option<usize> {
