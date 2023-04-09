@@ -9,7 +9,7 @@ class Box:
     width: int
     length: int
 
-    def area(self):
+    def area(self) -> int:
         return 2 * (
             self.height * self.width
             + self.height * self.length
