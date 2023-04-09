@@ -17,11 +17,14 @@ class Box:
         )
 
 
+def line_to_box(line: str) -> Box:
+    height, width, length = map(int, line.split("x"))
+    return Box(height=height, width=width, length=length)
+
+
 def read(path: str) -> Iterator[Box]:
     with open(path) as handle:
-        for line in handle.readlines():
-            height, width, length = map(int, line.split("x"))
-            yield Box(height=height, width=width, length=length)
+        yield from map(line_to_box, handle.readlines())
 
 
 def paper_needed(box: Box):
