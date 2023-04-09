@@ -1,27 +1,30 @@
-use std::cmp::min;
-
 #[derive(Debug)]
-pub struct RectangularPrism {
+pub struct GiftBox {
     pub height: u32,
     pub length: u32,
     pub width: u32,
 }
 
-impl RectangularPrism {
+impl GiftBox {
     pub fn area(&self) -> u32 {
         2 * (self.height * self.width + self.height * self.length + self.length * self.width)
     }
 }
 
-pub fn paper_needed(rp: &RectangularPrism) -> u32 {
-    let smallest = min(rp.height, min(rp.length, rp.width));
-    let second_smallest = if smallest == rp.height {
-        min(rp.length, rp.width)
-    } else if smallest == rp.length {
-        min(rp.height, rp.width)
-    } else {
-        min(rp.height, rp.length)
-    };
+pub fn paper_needed(b: &GiftBox) -> u32 {
+    let mut ordered = [b.height, b.length, b.width];
+    ordered.sort();
 
-    rp.area() + smallest * second_smallest
+    let [smallest, second_smallest, ..] = ordered;
+
+    b.area() + smallest * second_smallest
+}
+
+pub fn line_to_box(line: &str) -> GiftBox {
+    let dimensions: Vec<u32> = line.split("x").map(|x| x.parse().unwrap()).collect();
+    GiftBox {
+        height: dimensions[0],
+        length: dimensions[1],
+        width: dimensions[2],
+    }
 }
