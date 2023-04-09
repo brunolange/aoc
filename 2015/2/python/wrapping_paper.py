@@ -27,7 +27,7 @@ def read(path: str) -> Iterator[Box]:
         yield from map(line_to_box, handle.readlines())
 
 
-def paper_needed(box: Box):
+def paper_needed(box: Box) -> int:
     smallest, second_smallest, _ = sorted([box.height, box.width, box.length])
     return box.area() + smallest * second_smallest
 
