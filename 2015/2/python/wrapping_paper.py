@@ -1,6 +1,6 @@
-from typing import Iterator
-from dataclasses import dataclass
 import argparse
+from dataclasses import dataclass
+from typing import Iterator
 
 
 @dataclass
