@@ -2,6 +2,7 @@ from typing import Iterator
 from dataclasses import dataclass
 import argparse
 
+
 @dataclass
 class Box:
     height: int
@@ -9,7 +10,12 @@ class Box:
     length: int
 
     def area(self):
-        return 2 * (self.height*self.width + self.height*self.length + self.width*self.length)
+        return 2 * (
+            self.height * self.width
+            + self.height * self.length
+            + self.width * self.length
+        )
+
 
 def read(path: str) -> Iterator[Box]:
     with open(path) as handle:
@@ -22,6 +28,7 @@ def paper_needed(box: Box):
     smallest, second_smallest, _ = sorted([box.height, box.width, box.length])
     return box.area() + smallest * second_smallest
 
+
 def main(args) -> int:
     order = sum(map(paper_needed, read(args.input)))
     print(f"{order = }")
@@ -32,4 +39,3 @@ if __name__ == "__main__":
     args = argparse.ArgumentParser()
     args.add_argument("input")
     raise SystemExit(main(args.parse_args()))
-
