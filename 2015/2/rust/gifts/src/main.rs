@@ -1,6 +1,6 @@
 mod args;
 
-use wrapping_paper::{line_to_box, paper_needed, GiftBox};
+use gifts::{line_to_box, paper_needed, GiftBox};
 
 use std::fs::File;
 use std::io::{BufRead, BufReader};
