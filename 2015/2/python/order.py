@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 from dataclasses import dataclass
 from typing import Iterator
@@ -16,25 +18,61 @@ class Box:
             + self.width * self.length
         )
 
+    def volume(self) -> int:
+        return self.height * self.width * self.length
 
-def line_to_box(line: str) -> Box:
-    height, width, length = map(int, line.split("x"))
-    return Box(height=height, width=width, length=length)
+    def sorted_dimensions(self) -> tuple[int, int, int]:
+        a, b, c = sorted([self.height, self.width, self.length])
+        return a, b, c
+
+    @staticmethod
+    def from_line(line: str) -> Box:
+        height, width, length = map(int, line.split("x"))
+        return Box(height=height, width=width, length=length)
+
+
+@dataclass
+class Order:
+    wrapping_paper: int
+    ribbon: int
+
+    @staticmethod
+    def from_box(box: Box) -> Order:
+        return Order(
+            wrapping_paper=paper_needed(box),
+            ribbon=ribbon_needed(box),
+        )
+
+    def __add__(self, other: Order) -> Order:
+        return Order(
+            wrapping_paper=self.wrapping_paper + other.wrapping_paper,
+            ribbon=self.ribbon + other.ribbon,
+        )
 
 
 def read(path: str) -> Iterator[Box]:
     with open(path) as handle:
-        yield from map(line_to_box, handle.readlines())
+        yield from map(Box.from_line, handle.readlines())
 
 
 def paper_needed(box: Box) -> int:
-    smallest, second_smallest, _ = sorted([box.height, box.width, box.length])
+    smallest, second_smallest, _ = box.sorted_dimensions()
     return box.area() + smallest * second_smallest
 
 
+def ribbon_needed(box: Box) -> int:
+    smallest, second_smallest, _ = box.sorted_dimensions()
+    return 2 * (smallest + second_smallest) + box.volume()
+
+
 def main(args) -> int:
-    order = sum(map(paper_needed, read(args.input)))
-    print(f"{order = }")
+    from functools import reduce
+    from operator import add
+
+    total = reduce(add, map(Order.from_box, read(args.input)))
+    print(total)
+    # order = sum(map(Order.from_box, read(args.input)))
+    # print(f"{order = }")
     return 0
 
 
