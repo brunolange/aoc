@@ -1,6 +1,6 @@
 import pytest
 
-from wrapping_paper import paper_needed, Box
+from order import paper_needed, Box
 
 
 @pytest.mark.parametrize(
