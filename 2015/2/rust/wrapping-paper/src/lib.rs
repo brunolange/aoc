@@ -9,13 +9,17 @@ impl GiftBox {
     pub fn area(&self) -> u32 {
         2 * (self.height * self.width + self.height * self.length + self.length * self.width)
     }
+
+    pub fn sorted_dimensions(&self) -> [u32; 3] {
+        let mut ordered = [self.height, self.length, self.width];
+        ordered.sort();
+
+        ordered
+    }
 }
 
 pub fn paper_needed(b: &GiftBox) -> u32 {
-    let mut ordered = [b.height, b.length, b.width];
-    ordered.sort();
-
-    let [smallest, second_smallest, ..] = ordered;
+    let [smallest, second_smallest, ..] = b.sorted_dimensions();
 
     b.area() + smallest * second_smallest
 }
