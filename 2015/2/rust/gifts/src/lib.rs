@@ -1,3 +1,5 @@
+use std::iter::Sum;
+
 #[derive(Debug)]
 pub struct GiftBox {
     pub height: u32,
@@ -19,6 +21,30 @@ impl GiftBox {
         ordered.sort();
 
         ordered
+    }
+}
+
+#[derive(Debug)]
+pub struct Order {
+    pub wrapping_paper: u32,
+    pub ribbon: u32,
+}
+
+impl Order {
+    pub fn from_gift_box(b: &GiftBox) -> Order {
+        Order {
+            wrapping_paper: paper_needed(b),
+            ribbon: ribbon_needed(b),
+        }
+    }
+}
+
+impl Sum for Order {
+    fn sum<I: Iterator<Item=Order>>(iter: I) -> Order {
+        iter.fold(Order {wrapping_paper: 0, ribbon: 0}, |acc, curr| Order {
+            wrapping_paper: acc.wrapping_paper + curr.wrapping_paper,
+            ribbon: acc.ribbon + curr.ribbon,
+        })
     }
 }
 

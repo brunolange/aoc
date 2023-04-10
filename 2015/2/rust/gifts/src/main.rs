@@ -1,6 +1,6 @@
 mod args;
 
-use gifts::{line_to_box, paper_needed, GiftBox};
+use gifts::{line_to_box, Order, GiftBox};
 
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -19,14 +19,17 @@ fn main() {
     let args = Args::parse();
     let file = File::open(args.input).expect("Failed to open file");
     let reader = BufReader::new(file);
-    let order: u32 = boxes(reader)
+    let order: Order = boxes(reader)
         .map(|b| match b {
-            Ok(b) => paper_needed(&b),
+            Ok(b) => Order::from_gift_box(&b),
             Err(s) => {
                 println!("Skipping line: {}", s);
-                0
+                Order {
+                    wrapping_paper: 0,
+                    ribbon: 0,
+                }
             }
         })
         .sum();
-    println!("order = {}", order);
+    println!("order = {:?}", order);
 }
