@@ -1,19 +1,17 @@
 use md5;
 
-fn nonce(msg: &str) -> u64 {
-    let mut i = 0;
-    loop {
+fn nonce(msg: &str) -> Option<u64> {
+    for i in 0u64.. {
         let word = std::format!("{}{}", msg, i);
         let digest = md5::compute(word);
         if std::format!("{:x}", digest).starts_with("00000") {
-            break
+            return Some(i)
         }
-        i += 1;
     }
-    i
+    None
 }
 
 fn main() {
     let value = nonce("bgvyzdsv");
-    println!("value = {}", value);
+    println!("value = {:?}", value);
 }
