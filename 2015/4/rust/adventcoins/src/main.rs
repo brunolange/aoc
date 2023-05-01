@@ -1,14 +1,13 @@
 use md5;
 
 fn nonce(msg: &str) -> Option<u64> {
-    for i in 0u64.. {
-        let word = std::format!("{}{}", msg, i);
-        let digest = md5::compute(word);
-        if std::format!("{:x}", digest).starts_with("00000") {
-            return Some(i)
-        }
-    }
-    None
+    (1u64..u64::MAX)
+        .into_iter()
+        .find(|&i| {
+            let word = std::format!("{}{}", msg, i);
+            let digest = md5::compute(word);
+            std::format!("{:x}", digest).starts_with("000000")
+        })
 }
 
 fn main() {
