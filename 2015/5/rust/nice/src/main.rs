@@ -24,7 +24,6 @@ fn does_not_contain_blacklisted_substrings(text: &str) -> bool {
 #[allow(unused)]
 fn is_nice_string(text: &str) -> bool {
     let vowel_count = text.chars().filter(is_vowel).collect::<Vec<_>>().len();
-    println!("{vowel_count}");
 
     vowel_count >= 3
         && has_letter_that_appears_twice_in_a_row(text)
