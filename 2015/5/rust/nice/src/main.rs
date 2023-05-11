@@ -1,5 +1,21 @@
+use std::io::{self, BufRead};
+use std::fs::File;
+
+
+fn lines() -> Box<dyn Iterator<Item=String>> {
+    match std::env::args().nth(1) {
+        None => {
+            Box::new(io::stdin().lock().lines().filter_map(Result::ok))
+        },
+        Some(path) => {
+            let file = File::open(path).expect("error reading file");
+            Box::new(io::BufReader::new(file).lines().filter_map(Result::ok))
+        }
+    }
+}
+
 fn main() {
-    println!("Hello, world!");
+    println!("{}", lines().filter(|y| is_nice_string(y)).collect::<Vec<_>>().len());
 }
 
 fn is_vowel(c: &char) -> bool {
