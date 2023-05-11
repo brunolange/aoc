@@ -45,6 +45,11 @@ fn is_nice_string(text: &str) -> bool {
         && does_not_contain_blacklisted_substrings(text)
 }
 
+#[allow(unused)]
+fn is_nice_string_2(text: &str) -> bool {
+    todo!()
+}
+
 #[test]
 fn test_nice_strings() {
     for nice in vec!["ugknbfddgicrmopn", "aaa"] {
