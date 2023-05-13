@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::{self, BufRead};
 
 fn lines() -> Box<dyn Iterator<Item = String>> {
-    match std::env::args().nth(1) {
+    match std::env::args().nth(2) {
         None => Box::new(io::stdin().lock().lines().filter_map(Result::ok)),
         Some(path) => {
             let file = File::open(path).expect("error reading file");
@@ -13,10 +13,15 @@ fn lines() -> Box<dyn Iterator<Item = String>> {
 }
 
 fn main() {
+    let fun = match std::env::args().nth(1).map(|s| s.parse::<usize>()) {
+        Some(Ok(1)) => is_nice_string,
+        Some(Ok(2)) => is_nice_string_2,
+        _ => panic!("invalid option. choose 1 or 2"),
+    };
     println!(
         "{}",
         lines()
-            .filter(|y| is_nice_string(y))
+            .filter(|y| fun(y))
             .collect::<Vec<_>>()
             .len()
     );
@@ -49,7 +54,6 @@ fn is_nice_string(text: &str) -> bool {
         && does_not_contain_blacklisted_substrings(text)
 }
 
-#[allow(unused)]
 fn is_nice_string_2(text: &str) -> bool {
     has_two_pairs_with_no_overlapping(text) && has_letter_sandwich(text)
 }
