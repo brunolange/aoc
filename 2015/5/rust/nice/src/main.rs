@@ -18,13 +18,7 @@ fn main() {
         Some(Ok(2)) => is_nice_string_2,
         _ => panic!("invalid option. choose 1 or 2"),
     };
-    println!(
-        "{}",
-        lines()
-            .filter(|y| fun(y))
-            .collect::<Vec<_>>()
-            .len()
-    );
+    println!("{}", lines().filter(|y| fun(y)).collect::<Vec<_>>().len());
 }
 
 fn is_vowel(c: &char) -> bool {
@@ -78,9 +72,9 @@ fn has_two_pairs_with_no_overlapping(txt: &str) -> bool {
 }
 
 fn has_letter_sandwich(text: &str) -> bool {
-    text.chars().zip(text.chars().skip(1).zip(text.chars().skip(2))).any(|(left, (_, right))| {
-        left == right
-    })
+    text.chars()
+        .zip(text.chars().skip(1).zip(text.chars().skip(2)))
+        .any(|(left, (_, right))| left == right)
 }
 
 #[test]
