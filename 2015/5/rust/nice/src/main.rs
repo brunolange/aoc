@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufRead};
 
@@ -50,7 +51,32 @@ fn is_nice_string(text: &str) -> bool {
 
 #[allow(unused)]
 fn is_nice_string_2(text: &str) -> bool {
-    todo!()
+    has_two_pairs_with_no_overlapping(text) && has_letter_sandwich(text)
+}
+
+fn has_two_pairs_with_no_overlapping(txt: &str) -> bool {
+    let pairs = txt.chars().zip(txt.chars().skip(1));
+    let pair_map: HashMap<(char, char), Vec<usize>> = HashMap::new();
+    let indices_map = pairs.enumerate().fold(pair_map, |mut acc, curr| {
+        let (index, pair) = curr;
+        let s = acc.entry(pair).or_insert(Vec::new());
+        s.push(index);
+        acc
+    });
+
+    indices_map.iter().any(|(_, indices)| {
+        indices.len() > 2
+            || indices
+                .iter()
+                .zip(indices.iter().skip(1))
+                .any(|(curr, succ)| curr.abs_diff(*succ) > 1)
+    })
+}
+
+fn has_letter_sandwich(text: &str) -> bool {
+    text.chars().zip(text.chars().skip(1).zip(text.chars().skip(2))).any(|(left, (_, right))| {
+        left == right
+    })
 }
 
 #[test]
@@ -64,5 +90,19 @@ fn test_nice_strings() {
 fn test_naughty_strings() {
     for naughty in vec!["jchzalrnumimnmhp", "haegwjzuvuyypxyu", "dvszwmarrgswjxmb"] {
         assert_eq!(is_nice_string(naughty), false);
+    }
+}
+
+#[test]
+fn test_nice_strings2() {
+    for nice in vec!["qjhvhtzxzqqjkmpb", "xxyxx"] {
+        assert!(is_nice_string_2(nice));
+    }
+}
+
+#[test]
+fn test_naughty_strings_2() {
+    for naughty in vec!["uurcxstgmygtbstg", "ieodomkazucvgmuy"] {
+        assert_eq!(is_nice_string_2(naughty), false);
     }
 }
