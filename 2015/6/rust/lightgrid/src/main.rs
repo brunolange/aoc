@@ -19,7 +19,10 @@ fn parse_tag<'i: 't, 't>(tag: &'t str) -> impl Parser<&'i str, &'i str, ()> + 't
 #[test]
 fn test() {
     assert_eq!(parse_hello("Hello, World!").unwrap(), (", World!", "Hello"));
-    assert_eq!(parse_tag("Hello").parse("Hello, World!").unwrap(), (", World!", "Hello"));
+    assert_eq!(
+        parse_tag("Hello").parse("Hello, World!").unwrap(),
+        (", World!", "Hello")
+    );
 }
 
 fn main() {
