@@ -98,6 +98,7 @@ fn take_word(input: &str) -> IResult<&str, &str> {
     preceded(space0, recognize(take_till1(|c| c == ' ')))(input)
 }
 
+#[allow(unused)]
 fn take_words<const N: usize>(input: &str) -> IResult<&str, [&str; N]> {
     map_res(count(take_word, N), |words| words.try_into())(input)
 }
