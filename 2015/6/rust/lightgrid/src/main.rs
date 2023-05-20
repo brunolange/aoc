@@ -23,7 +23,7 @@ impl FromStr for Op {
         match s {
             "toggle" => Ok(Op::Toggle),
             "turn on" => Ok(Op::Turn(true)),
-            "turn off" => Ok(Op::Turn(true)),
+            "turn off" => Ok(Op::Turn(false)),
             _ => Err(ParseOpError(std::format!("invalid token: {}", s))),
         }
     }
