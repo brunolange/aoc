@@ -93,21 +93,16 @@ fn take_word(input: &str) -> IResult<&str, &str> {
     preceded(space0, recognize(take_till1(|c| c == ' ')))(input)
 }
 
-// fn take_words<'i>(_n: usize) -> impl Parser<&'i str, &'i str, ()> {
-//     move |input: &'i str| {
-//         take_till1(|c| c == ' ')(input)
-//     }
-// }
+fn take_words<const N: usize>(input: &str) -> IResult<&str, [&str; N]> {
+    map_res(count(take_word, N), |words| words.try_into())(input)
+}
 
 // fn join_array_with_whitespace<const N: usize>(arr: [&str; N]) -> &str {
 //     let joined_string: String = arr.iter().cloned().collect::<Vec<&str>>().join(" ");
 //     &joined_string // cannot return reference to local variable `joined_string`
 // }
 
-fn take_words<const N: usize>(input: &str) -> IResult<&str, [&str; N]> {
-    map_res(count(take_word, N), |words| words.try_into())(input)
-}
-
+// This doesn't work! Some hairy meddling with string slices!
 // fn take_words<const N: usize>(input: &str) -> IResult<&str, &str> {
 //     map_res(
 //         count(take_word, N),
@@ -121,20 +116,12 @@ fn take_words<const N: usize>(input: &str) -> IResult<&str, [&str; N]> {
 // }
 
 fn parse_coords(input: &str) -> IResult<&str, Coords> {
-    // map_res(take_till1(|c| c == ' '), |s: &str| s.parse())(input)
-    // map(take_word, |s| s.parse()) // this doesn't work, I think because of Err mismatches
+    // map(take_word, |s| s.parse())(input) // this doesn't work, I think because of Err mismatches
     map_res(take_word, |s| s.parse())(input)
-}
-
-fn parse_nothing(_input: &str) -> IResult<&str, ()> {
-    Ok(("", ()))
 }
 
 fn main() {
     println!("hello, nom!");
-
-    let x = parse_nothing("hello world");
-    println!("x = {:?}", x);
 
     let op: Op = "toggle".parse().unwrap();
     println!("op = {:?}", op);
