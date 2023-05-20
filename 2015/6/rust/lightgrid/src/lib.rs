@@ -9,6 +9,36 @@ use nom::multi::count;
 use nom::sequence::{preceded, separated_pair, tuple};
 use nom::IResult;
 
+#[derive(Debug, PartialEq)]
+pub struct Coords {
+    pub x: usize,
+    pub y: usize,
+}
+
+#[derive(Debug)]
+pub struct ParseCoordsError(String);
+
+impl FromStr for Coords {
+    type Err = ParseCoordsError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut parser = all_consuming(separated_pair(
+            digit1::<_, nom::error::Error<&str>>,
+            char(','),
+            digit1,
+        ));
+
+        let (_, (x, y)) = parser(s).map_err(|_| ParseCoordsError("bigode".to_string()))?;
+
+        let x = x.parse();
+        let y = y.parse();
+
+        Ok(Coords {
+            x: x.unwrap(),
+            y: y.unwrap(),
+        })
+    }
+}
 
 #[derive(Debug, PartialEq)]
 pub struct Rect {
@@ -64,38 +94,6 @@ impl FromStr for Op {
     }
 }
 
-#[derive(Debug, PartialEq)]
-pub struct Coords {
-    pub x: usize,
-    pub y: usize,
-}
-
-#[derive(Debug)]
-pub struct ParseCoordsError(String);
-
-impl FromStr for Coords {
-    type Err = ParseCoordsError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let mut parser = all_consuming(separated_pair(
-            digit1::<_, nom::error::Error<&str>>,
-            char(','),
-            digit1,
-        ));
-
-        let (_, (x, y)) = parser(s).map_err(|_| ParseCoordsError("bigode".to_string()))?;
-
-        let x = x.parse();
-        let y = y.parse();
-
-        Ok(Coords {
-            x: x.unwrap(),
-            y: y.unwrap(),
-        })
-    }
-}
-
-
 pub fn parse_coords(input: &str) -> IResult<&str, Coords> {
     // map(take_word, |s| s.parse())(input) // this doesn't work, I think because of Err mismatches
     map_res(take_word, |s| s.parse())(input)
@@ -105,11 +103,9 @@ pub fn take_word(input: &str) -> IResult<&str, &str> {
     preceded(space0, recognize(take_till1(|c| c == ' ')))(input)
 }
 
-#[allow(unused)]
 pub fn take_words<const N: usize>(input: &str) -> IResult<&str, [&str; N]> {
     map_res(count(take_word, N), |words| words.try_into())(input)
 }
-
 
 #[cfg(test)]
 mod tests {
