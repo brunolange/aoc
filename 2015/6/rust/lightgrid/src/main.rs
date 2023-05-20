@@ -1,14 +1,11 @@
 use std::str::FromStr;
 
-use nom::branch::alt;
 use nom::bytes::complete::tag;
-use nom::bytes::complete::{take_till, take_till1};
-use nom::character::complete::{alpha1, char, space1};
-use nom::combinator::map;
-use nom::error::Error;
+use nom::bytes::complete::take_till1;
+use nom::character::complete::char;
 use nom::multi::count;
+use nom::sequence::pair;
 use nom::sequence::tuple;
-use nom::Parser;
 use nom::{combinator::map_res, IResult};
 
 #[derive(Debug)]
@@ -60,9 +57,8 @@ impl FromStr for Coords {
     }
 }
 
-use nom::sequence::pair;
-
 fn parse_op(input: &str) -> IResult<&str, Op> {
+    // This one makes npm intrude in the specifics of Op. I'm not a fan...
     // map_res(
     //     alt((tag("toggle"), tag("turn on"), tag("turn off"))),
     //     |s: &str| s.parse(),
@@ -82,11 +78,11 @@ fn parse_op(input: &str) -> IResult<&str, Op> {
     let parser = |s: &str| s.parse::<Op>();
 
     let x1 = map_res(take_word, parser)(input);
-    if x1.is_ok() {
-        return x1;
+
+    match x1 {
+        Ok(_) => x1,
+        Err(_) => map_res(recognize(take_words::<2>), parser)(input),
     }
-    
-    map_res(recognize(take_words::<2>), parser)(input)
 }
 
 use nom::character::complete::space0;
