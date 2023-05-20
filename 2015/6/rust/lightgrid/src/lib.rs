@@ -8,7 +8,7 @@ use nom::sequence::{separated_pair, tuple};
 use nom::IResult;
 
 mod parsers;
-use parsers::{parse_usize,take_word};
+use parsers::{parse_usize, take_word};
 
 #[derive(Debug, PartialEq)]
 pub struct Coords(usize, usize);
@@ -16,15 +16,14 @@ pub struct Coords(usize, usize);
 #[derive(Debug)]
 pub struct ParseCoordsError(String);
 
-
-
 impl FromStr for Coords {
     type Err = ParseCoordsError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut parser = all_consuming(separated_pair(parse_usize, char(','), parse_usize));
 
-        let (_, (x, y)) = parser(s).map_err(|_| ParseCoordsError("Unable to parse coordinates".to_string()))?;
+        let (_, (x, y)) =
+            parser(s).map_err(|_| ParseCoordsError("Unable to parse coordinates".to_string()))?;
 
         Ok(Coords(x, y))
     }
@@ -82,7 +81,6 @@ pub fn parse_coords(input: &str) -> IResult<&str, Coords> {
     // map(take_word, |s| s.parse())(input) // this doesn't work, I think because of Err mismatches
     map_res(take_word, |s| s.parse())(input)
 }
-
 
 #[cfg(test)]
 mod tests {

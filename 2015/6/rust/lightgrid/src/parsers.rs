@@ -1,14 +1,13 @@
-use nom::IResult;
 use nom::bytes::complete::take_till1;
-use nom::combinator::{map_res, recognize};
 use nom::character::complete::{digit1, space0};
+use nom::combinator::{map_res, recognize};
 use nom::multi::count;
 use nom::sequence::preceded;
+use nom::IResult;
 
 pub fn parse_usize(input: &str) -> IResult<&str, usize> {
     map_res(digit1, str::parse)(input)
 }
-
 
 pub fn take_word(input: &str) -> IResult<&str, &str> {
     preceded(space0, recognize(take_till1(|c| c == ' ')))(input)
@@ -22,7 +21,7 @@ pub fn take_words<const N: usize>(input: &str) -> IResult<&str, [&str; N]> {
 #[cfg(test)]
 mod tests {
     use super::*;
-        
+
     #[test]
     fn test_take_word() {
         assert_eq!(take_word("hello").unwrap(), ("", "hello"));
@@ -68,5 +67,4 @@ mod tests {
         assert!(take_words::<2>("   hello").is_err());
         assert!(take_words::<2>("   hello   ").is_err());
     }
-
 }
