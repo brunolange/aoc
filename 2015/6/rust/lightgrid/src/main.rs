@@ -1,6 +1,7 @@
 use std::num::ParseIntError;
 use std::str::FromStr;
 
+use nom::branch::alt;
 use nom::bytes::complete::tag;
 use nom::bytes::complete::take_till1;
 use nom::character::complete::char;
@@ -9,17 +10,46 @@ use nom::combinator::all_consuming;
 use nom::combinator::complete;
 use nom::combinator::map;
 use nom::multi::count;
-use nom::number::complete::be_u32;
-use nom::number::complete::be_u64;
 use nom::sequence::pair;
 use nom::sequence::separated_pair;
 use nom::sequence::tuple;
 use nom::{combinator::map_res, IResult};
 
 #[derive(Debug, PartialEq)]
+struct Rect {
+    bottom_left_corner: Coords,
+    top_right_corner: Coords,
+}
+
+impl Rect {
+    fn new(p: Coords, q: Coords) -> Self {
+        let (x0, y0) = (p.x, p.y);
+        let (x1, y1) = (q.x, q.y);
+
+        Rect {
+            bottom_left_corner: Coords {
+                x: x0.min(x1),
+                y: y0.min(y1),
+            },
+            top_right_corner: Coords {
+                x: x0.max(x1),
+                y: y0.max(y1),
+            },
+        }
+
+        // let (bottom_left_corner, top_right_corner) = match (x1 > x0, y1 > y0) {
+        //     (true, true) => (p, q),
+        //     (true, false) => (Coords { x: p.x, y: q.y }, Coords { x: q.x, y: p.y }),
+        //     (false, true) => (Coords { x: q.x, y: p.y }, Coords { x: p.x, y: q.y }),
+        //     (false, false) => (q, p),
+        // };
+    }
+}
+
+#[derive(Debug, PartialEq)]
 enum Op {
-    Toggle,
-    Turn(bool),
+    Toggle(Rect),
+    Turn(bool, Rect),
 }
 
 #[derive(Debug)]
@@ -28,12 +58,27 @@ struct ParseOpError(String);
 impl FromStr for Op {
     type Err = ParseOpError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "toggle" => Ok(Op::Toggle),
-            "turn on" => Ok(Op::Turn(true)),
-            "turn off" => Ok(Op::Turn(false)),
-            _ => Err(ParseOpError(std::format!("invalid token: {}", s))),
+        let (_, (action, _, from, _, to)) = all_consuming(tuple((
+            alt((tag("toggle"), tag("turn on"), tag("turn off"))),
+            char(' '),
+            parse_coords,
+            tag(" through "),
+            parse_coords,
+        )))(s)
+        .map_err(|_| ParseOpError("unable to parse line".to_string()))?;
+        let rect = Rect::new(from, to);
+        match action {
+            "toggle" => Ok(Op::Toggle(rect)),
+            "turn on" => Ok(Op::Turn(true, rect)),
+            "turn off" => Ok(Op::Turn(false, rect)),
+            _ => return Err(ParseOpError(std::format!("invalid token: {}", s))),
         }
+        // match s {
+        //     "toggle" => Ok(Op::Toggle),
+        //     "turn on" => Ok(Op::Turn(true)),
+        //     "turn off" => Ok(Op::Turn(false)),
+        //     _ => Err(ParseOpError(std::format!("invalid token: {}", s))),
+        // }
     }
 }
 
@@ -148,11 +193,90 @@ fn main() {
 }
 
 #[test]
-fn test_op_parse() {
-    assert_eq!("toggle".parse::<Op>().unwrap(), Op::Toggle);
-    assert_eq!("turn on".parse::<Op>().unwrap(), Op::Turn(true));
-    assert_eq!("turn off".parse::<Op>().unwrap(), Op::Turn(false));
-    assert!("".parse::<Op>().is_err());
+fn test_rect() {
+    assert_eq!(
+        Rect::new(Coords { x: 10, y: 10 }, Coords { x: 11, y: 11 }),
+        Rect {
+            bottom_left_corner: Coords { x: 10, y: 10 },
+            top_right_corner: Coords { x: 11, y: 11 }
+        }
+    );
+    assert_eq!(
+        Rect::new(Coords { x: 11, y: 11 }, Coords { x: 10, y: 10 }),
+        Rect {
+            bottom_left_corner: Coords { x: 10, y: 10 },
+            top_right_corner: Coords { x: 11, y: 11 }
+        }
+    );
+
+    assert_eq!(
+        Rect::new(Coords { x: 10, y: 10 }, Coords { x: 11, y: 9 }),
+        Rect {
+            bottom_left_corner: Coords { x: 10, y: 9 },
+            top_right_corner: Coords { x: 11, y: 10 }
+        }
+    );
+    assert_eq!(
+        Rect::new(Coords { x: 11, y: 9 }, Coords { x: 10, y: 10 }),
+        Rect {
+            bottom_left_corner: Coords { x: 10, y: 9 },
+            top_right_corner: Coords { x: 11, y: 10 }
+        }
+    );
+}
+
+#[test]
+fn test_toggle_parse() {
+    assert_eq!(
+        "toggle 1,2 through 3,4".parse::<Op>().unwrap(),
+        Op::Toggle(Rect {
+            bottom_left_corner: Coords { x: 1, y: 2 },
+            top_right_corner: Coords { x: 3, y: 4 }
+        })
+    );
+
+    assert!("toggle 1,2 through 3,4 ".parse::<Op>().is_err());
+    assert!(" toggle 1,2 through 3,4".parse::<Op>().is_err());
+    assert!("toggle 1,2,3 through 4,5".parse::<Op>().is_err());
+    assert!("toggle 1,2,3 through 4,5".parse::<Op>().is_err());
+}
+
+#[test]
+fn test_turn_on_parse() {
+    assert_eq!(
+        "turn on 1,2 through 3,4".parse::<Op>().unwrap(),
+        Op::Turn(
+            true,
+            Rect {
+                bottom_left_corner: Coords { x: 1, y: 2 },
+                top_right_corner: Coords { x: 3, y: 4 }
+            }
+        )
+    );
+
+    assert!("turn on 1,2 through 3,4 ".parse::<Op>().is_err());
+    assert!(" turn on 1,2 through 3,4".parse::<Op>().is_err());
+    assert!("turn on 1,2,3 through 4,5".parse::<Op>().is_err());
+    assert!("turn on 1,2,3 through 4,5".parse::<Op>().is_err());
+}
+
+#[test]
+fn test_turn_off_parse() {
+    assert_eq!(
+        "turn off 1,2 through 3,4".parse::<Op>().unwrap(),
+        Op::Turn(
+            false,
+            Rect {
+                bottom_left_corner: Coords { x: 1, y: 2 },
+                top_right_corner: Coords { x: 3, y: 4 }
+            }
+        )
+    );
+
+    assert!("turn on 1,2 through 3,4 ".parse::<Op>().is_err());
+    assert!(" turn on 1,2 through 3,4".parse::<Op>().is_err());
+    assert!("turn on 1,2,3 through 4,5".parse::<Op>().is_err());
+    assert!("turn on 1,2,3 through 4,5".parse::<Op>().is_err());
 }
 
 #[test]
@@ -215,6 +339,7 @@ fn test_parse_coords() {
     assert!("-1,1".parse::<Coords>().is_err());
     assert!("2,-10".parse::<Coords>().is_err());
 }
+
 //     let op = recognize(take_words::<2>)("turn off");
 //     println!("opX = {:?}", op);
 
