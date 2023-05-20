@@ -2,13 +2,13 @@ use std::str::FromStr;
 
 use nom::branch::alt;
 use nom::bytes::complete::tag;
-use nom::bytes::complete::take_till1;
-use nom::character::complete::{char, digit1, space0};
-use nom::combinator::{all_consuming, map_res, recognize};
-use nom::multi::count;
-use nom::sequence::{preceded, separated_pair, tuple};
+use nom::character::complete::char;
+use nom::combinator::{all_consuming, map_res};
+use nom::sequence::{separated_pair, tuple};
 use nom::IResult;
-use nom::Parser;
+
+mod parsers;
+use parsers::{parse_usize,take_word};
 
 #[derive(Debug, PartialEq)]
 pub struct Coords(usize, usize);
@@ -16,9 +16,7 @@ pub struct Coords(usize, usize);
 #[derive(Debug)]
 pub struct ParseCoordsError(String);
 
-fn parse_usize(input: &str) -> IResult<&str, usize> {
-    map_res(digit1, str::parse)(input)
-}
+
 
 impl FromStr for Coords {
     type Err = ParseCoordsError;
@@ -85,13 +83,6 @@ pub fn parse_coords(input: &str) -> IResult<&str, Coords> {
     map_res(take_word, |s| s.parse())(input)
 }
 
-pub fn take_word(input: &str) -> IResult<&str, &str> {
-    preceded(space0, recognize(take_till1(|c| c == ' ')))(input)
-}
-
-pub fn take_words<const N: usize>(input: &str) -> IResult<&str, [&str; N]> {
-    map_res(count(take_word, N), |words| words.try_into())(input)
-}
 
 #[cfg(test)]
 mod tests {
@@ -182,52 +173,6 @@ mod tests {
         assert!(" turn on 1,2 through 3,4".parse::<Op>().is_err());
         assert!("turn on 1,2,3 through 4,5".parse::<Op>().is_err());
         assert!("turn on 1,2,3 through 4,5".parse::<Op>().is_err());
-    }
-
-    #[test]
-    fn test_take_word() {
-        assert_eq!(take_word("hello").unwrap(), ("", "hello"));
-        assert_eq!(take_word("hello ").unwrap(), (" ", "hello"));
-        assert_eq!(take_word(" hello").unwrap(), ("", "hello"));
-        assert_eq!(take_word(" hello ").unwrap(), (" ", "hello"));
-        assert_eq!(take_word("hello world").unwrap(), (" world", "hello"));
-        assert_eq!(take_word(" hello world").unwrap(), (" world", "hello"));
-        assert_eq!(take_word("  hello world").unwrap(), (" world", "hello"));
-    }
-
-    #[test]
-    fn test_take_words() {
-        assert_eq!(take_words::<1>("hello").unwrap(), ("", ["hello"]));
-        assert_eq!(
-            take_words::<1>("hello world").unwrap(),
-            (" world", ["hello"])
-        );
-        assert_eq!(
-            take_words::<2>("hello world").unwrap(),
-            ("", ["hello", "world"])
-        );
-        assert_eq!(
-            take_words::<2>("hello hello world").unwrap(),
-            (" world", ["hello", "hello"])
-        );
-        assert_eq!(
-            take_words::<3>("hello hello world").unwrap(),
-            ("", ["hello", "hello", "world"])
-        );
-        assert_eq!(
-            take_words::<3>("    hello hello world").unwrap(),
-            ("", ["hello", "hello", "world"])
-        );
-        assert_eq!(
-            take_words::<3>("    hello hello world ").unwrap(),
-            (" ", ["hello", "hello", "world"])
-        );
-        assert!(take_words::<1>("").is_err());
-        assert!(take_words::<1>("   ").is_err());
-        assert!(take_words::<2>("hello").is_err());
-        assert!(take_words::<2>("hello  ").is_err());
-        assert!(take_words::<2>("   hello").is_err());
-        assert!(take_words::<2>("   hello   ").is_err());
     }
 
     #[test]
