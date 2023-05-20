@@ -1,14 +1,22 @@
+use std::num::ParseIntError;
 use std::str::FromStr;
 
 use nom::bytes::complete::tag;
 use nom::bytes::complete::take_till1;
 use nom::character::complete::char;
+use nom::character::complete::digit1;
+use nom::combinator::all_consuming;
+use nom::combinator::complete;
+use nom::combinator::map;
 use nom::multi::count;
+use nom::number::complete::be_u32;
+use nom::number::complete::be_u64;
 use nom::sequence::pair;
+use nom::sequence::separated_pair;
 use nom::sequence::tuple;
 use nom::{combinator::map_res, IResult};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 enum Op {
     Toggle,
     Turn(bool),
@@ -29,7 +37,7 @@ impl FromStr for Op {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 struct Coords {
     x: usize,
     y: usize,
@@ -42,18 +50,33 @@ impl FromStr for Coords {
     type Err = ParseCoordsError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let parts: Vec<&str> = s.split(",").collect();
-        if parts.len() != 2 {
-            return Err(ParseCoordsError("expected two parsts".to_string()));
-        }
-        let x = parts[0]
-            .parse()
-            .map_err(|_e| ParseCoordsError("error parsing x coordinate".to_string()))?;
-        let y = parts[0]
-            .parse()
-            .map_err(|_e| ParseCoordsError("error parsing y coordinate".to_string()))?;
+        let mut parser = all_consuming(separated_pair(
+            digit1::<_, nom::error::Error<&str>>,
+            char(','),
+            digit1,
+        ));
 
-        Ok(Coords { x: x, y: y })
+        let (_, (x, y)) = parser(s).map_err(|_| ParseCoordsError("bigode".to_string()))?;
+
+        let x = x.parse();
+        let y = y.parse();
+        Ok(Coords {
+            x: x.unwrap(),
+            y: y.unwrap(),
+        })
+
+        // let parts: Vec<&str> = s.split(",").collect();
+        // if parts.len() != 2 {
+        //     return Err(ParseCoordsError("expected two parsts".to_string()));
+        // }
+        // let x = parts[0]
+        //     .parse()
+        //     .map_err(|_e| ParseCoordsError("error parsing x coordinate".to_string()))?;
+        // let y = parts[1]
+        //     .parse()
+        //     .map_err(|_e| ParseCoordsError("error parsing y coordinate".to_string()))?;
+
+        // Ok(Coords { x: x, y: y })
     }
 }
 
@@ -122,52 +145,115 @@ fn parse_coords(input: &str) -> IResult<&str, Coords> {
 
 fn main() {
     println!("hello, nom!");
-
-    let op: Op = "toggle".parse().unwrap();
-    println!("op = {:?}", op);
-
-    let op = parse_op("turn off");
-    println!("op = {:?}", op);
-
-    let op = recognize(take_words::<2>)("turn off");
-    println!("opX = {:?}", op);
-
-    let coords = "100,101".parse::<Coords>();
-    println!("coords = {:?}", coords);
-
-    let result =
-        tuple((parse_op, nom::character::complete::multispace0, parse_op))("turn on    toggle");
-    println!("result = {:?}", result);
-
-    let result = tuple((
-        parse_op,
-        char(' '),
-        parse_coords,
-        tag(" through "),
-        parse_coords,
-    ))("turn on 100,200 through 180,220");
-    println!("result = {:?}", result);
-
-    let result = take_word("hello world foo bar");
-    println!("RESULT = {:?}", result);
-
-    let result = take_word("hello");
-    println!("RESULT = {:?}", result);
-
-    let result = take_word(" foo");
-    println!("RESULT = {:?}", result);
-
-    let result = take_words::<2>("hello world");
-    println!("RESULT = {:?}", result);
-
-    let r = pair(take_word, take_word)("foo bar");
-    println!("r = {:?}", r);
-
-    let r = recognize(pair(take_word, take_word))("foo bar baz");
-    println!("r = {:?}", r);
-
-    let r = recognize(take_words::<2>)("foo bar baz");
-    println!("r = {:?}", r);
 }
 
-// TODO: parser ensures that rectangle corners are bottom left and top right
+#[test]
+fn test_op_parse() {
+    assert_eq!("toggle".parse::<Op>().unwrap(), Op::Toggle);
+    assert_eq!("turn on".parse::<Op>().unwrap(), Op::Turn(true));
+    assert_eq!("turn off".parse::<Op>().unwrap(), Op::Turn(false));
+    assert!("".parse::<Op>().is_err());
+}
+
+#[test]
+fn test_take_word() {
+    assert_eq!(take_word("hello").unwrap(), ("", "hello"));
+    assert_eq!(take_word("hello ").unwrap(), (" ", "hello"));
+    assert_eq!(take_word(" hello").unwrap(), ("", "hello"));
+    assert_eq!(take_word(" hello ").unwrap(), (" ", "hello"));
+    assert_eq!(take_word("hello world").unwrap(), (" world", "hello"));
+    assert_eq!(take_word(" hello world").unwrap(), (" world", "hello"));
+    assert_eq!(take_word("  hello world").unwrap(), (" world", "hello"));
+}
+
+#[test]
+fn test_take_words() {
+    assert_eq!(take_words::<1>("hello").unwrap(), ("", ["hello"]));
+    assert_eq!(
+        take_words::<1>("hello world").unwrap(),
+        (" world", ["hello"])
+    );
+    assert_eq!(
+        take_words::<2>("hello world").unwrap(),
+        ("", ["hello", "world"])
+    );
+    assert_eq!(
+        take_words::<2>("hello hello world").unwrap(),
+        (" world", ["hello", "hello"])
+    );
+    assert_eq!(
+        take_words::<3>("hello hello world").unwrap(),
+        ("", ["hello", "hello", "world"])
+    );
+    assert_eq!(
+        take_words::<3>("    hello hello world").unwrap(),
+        ("", ["hello", "hello", "world"])
+    );
+    assert_eq!(
+        take_words::<3>("    hello hello world ").unwrap(),
+        (" ", ["hello", "hello", "world"])
+    );
+    assert!(take_words::<1>("").is_err());
+    assert!(take_words::<1>("   ").is_err());
+    assert!(take_words::<2>("hello").is_err());
+    assert!(take_words::<2>("hello  ").is_err());
+    assert!(take_words::<2>("   hello").is_err());
+    assert!(take_words::<2>("   hello   ").is_err());
+}
+
+#[test]
+fn test_parse_coords() {
+    assert_eq!(
+        "100,101".parse::<Coords>().unwrap(),
+        Coords { x: 100, y: 101 }
+    );
+    assert_eq!(
+        "999999,0".parse::<Coords>().unwrap(),
+        Coords { x: 999999, y: 0 }
+    );
+    assert!("1,2,3".parse::<Coords>().is_err());
+    assert!("-1,1".parse::<Coords>().is_err());
+    assert!("2,-10".parse::<Coords>().is_err());
+}
+//     let op = recognize(take_words::<2>)("turn off");
+//     println!("opX = {:?}", op);
+
+//     let coords = "100,101".parse::<Coords>();
+//     println!("coords = {:?}", coords);
+
+//     let result =
+//         tuple((parse_op, nom::character::complete::multispace0, parse_op))("turn on    toggle");
+//     println!("result = {:?}", result);
+
+//     let result = tuple((
+//         parse_op,
+//         char(' '),
+//         parse_coords,
+//         tag(" through "),
+//         parse_coords,
+//     ))("turn on 100,200 through 180,220");
+//     println!("result = {:?}", result);
+
+//     let result = take_word("hello world foo bar");
+//     println!("RESULT = {:?}", result);
+
+//     let result = take_word("hello");
+//     println!("RESULT = {:?}", result);
+
+//     let result = take_word(" foo");
+//     println!("RESULT = {:?}", result);
+
+//     let result = take_words::<2>("hello world");
+//     println!("RESULT = {:?}", result);
+
+//     let r = pair(take_word, take_word)("foo bar");
+//     println!("r = {:?}", r);
+
+//     let r = recognize(pair(take_word, take_word))("foo bar baz");
+//     println!("r = {:?}", r);
+
+//     let r = recognize(take_words::<2>)("foo bar baz");
+//     println!("r = {:?}", r);
+// }
+
+// // TODO: parser ensures that rectangle corners are bottom left and top right
