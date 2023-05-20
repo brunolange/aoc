@@ -1,15 +1,15 @@
 use std::str::FromStr;
 
-use nom::Parser;
 use nom::branch::alt;
 use nom::bytes::complete::tag;
-use nom::character::complete::{char, space1, alpha1};
+use nom::bytes::complete::{take_till, take_till1};
+use nom::character::complete::{alpha1, char, space1};
 use nom::combinator::map;
 use nom::error::Error;
-use nom::sequence::tuple;
-use nom::{combinator::map_res, IResult};
-use nom::bytes::complete::{take_till1, take_till};
 use nom::multi::count;
+use nom::sequence::tuple;
+use nom::Parser;
+use nom::{combinator::map_res, IResult};
 
 #[derive(Debug)]
 enum Op {
@@ -66,14 +66,13 @@ fn parse_op(input: &str) -> IResult<&str, Op> {
         |s: &str| s.parse(),
     )(input)
 
-
     // map_res(alt((take_word, take_words::<2>)), |s| s.parse())(input)
     // map_res(alt((take_words(1), take_words(2))), |s| s.parse())(input)
 }
 
-use nom::sequence::preceded;
-use nom::combinator::recognize;
 use nom::character::complete::space0;
+use nom::combinator::recognize;
+use nom::sequence::preceded;
 
 fn take_word(input: &str) -> IResult<&str, &str> {
     preceded(space0, recognize(take_till1(|c| c == ' ')))(input)
@@ -91,10 +90,7 @@ fn take_word(input: &str) -> IResult<&str, &str> {
 // }
 
 fn take_words<const N: usize>(input: &str) -> IResult<&str, [&str; N]> {
-    map_res(
-        count(take_word, N),
-        |words| words.try_into()
-    )(input)
+    map_res(count(take_word, N), |words| words.try_into())(input)
 }
 
 // fn take_words<const N: usize>(input: &str) -> IResult<&str, &str> {
@@ -108,7 +104,6 @@ fn take_words<const N: usize>(input: &str) -> IResult<&str, [&str; N]> {
 //         }
 //     )(input)
 // }
-
 
 fn parse_coords(input: &str) -> IResult<&str, Coords> {
     // map_res(take_till1(|c| c == ' '), |s: &str| s.parse())(input)
@@ -139,11 +134,14 @@ fn main() {
         tuple((parse_op, nom::character::complete::multispace0, parse_op))("turn on    toggle");
     println!("result = {:?}", result);
 
-    let result = tuple((parse_op, char(' '), parse_coords, tag(" through "), parse_coords))(
-        "turn on 100,200 through 180,220",
-    );
+    let result = tuple((
+        parse_op,
+        char(' '),
+        parse_coords,
+        tag(" through "),
+        parse_coords,
+    ))("turn on 100,200 through 180,220");
     println!("result = {:?}", result);
-
 
     let result = take_word("hello world foo bar");
     println!("RESULT = {:?}", result);
