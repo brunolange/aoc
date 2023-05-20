@@ -86,23 +86,11 @@ impl FromStr for Coords {
 
         let x = x.parse();
         let y = y.parse();
+
         Ok(Coords {
             x: x.unwrap(),
             y: y.unwrap(),
         })
-
-        // let parts: Vec<&str> = s.split(",").collect();
-        // if parts.len() != 2 {
-        //     return Err(ParseCoordsError("expected two parsts".to_string()));
-        // }
-        // let x = parts[0]
-        //     .parse()
-        //     .map_err(|_e| ParseCoordsError("error parsing x coordinate".to_string()))?;
-        // let y = parts[1]
-        //     .parse()
-        //     .map_err(|_e| ParseCoordsError("error parsing y coordinate".to_string()))?;
-
-        // Ok(Coords { x: x, y: y })
     }
 }
 
