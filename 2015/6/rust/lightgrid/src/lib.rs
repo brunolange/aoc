@@ -1,6 +1,5 @@
 use std::str::FromStr;
 
-use nom::Parser;
 use nom::branch::alt;
 use nom::bytes::complete::tag;
 use nom::bytes::complete::take_till1;
@@ -9,6 +8,7 @@ use nom::combinator::{all_consuming, map_res, recognize};
 use nom::multi::count;
 use nom::sequence::{preceded, separated_pair, tuple};
 use nom::IResult;
+use nom::Parser;
 
 #[derive(Debug, PartialEq)]
 pub struct Coords(usize, usize);
@@ -16,22 +16,15 @@ pub struct Coords(usize, usize);
 #[derive(Debug)]
 pub struct ParseCoordsError(String);
 
-
 fn parse_usize(input: &str) -> IResult<&str, usize> {
-    map_res(digit1,str::parse)(input)
+    map_res(digit1, str::parse)(input)
 }
 
 impl FromStr for Coords {
     type Err = ParseCoordsError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-
-
-        let mut parser = all_consuming(separated_pair(
-            parse_usize,
-            char(','),
-            parse_usize,
-        ));
+        let mut parser = all_consuming(separated_pair(parse_usize, char(','), parse_usize));
 
         let (_, (x, y)) = parser(s).map_err(|_| ParseCoordsError("bigode".to_string()))?;
 
