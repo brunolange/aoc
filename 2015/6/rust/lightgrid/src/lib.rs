@@ -11,7 +11,7 @@ mod parsers;
 use parsers::{parse_usize, take_word};
 
 #[derive(Debug, PartialEq)]
-pub struct Coords(usize, usize);
+pub struct Coords(pub usize, pub usize);
 
 #[derive(Debug)]
 pub struct ParseCoordsError(String);
@@ -19,6 +19,18 @@ pub struct ParseCoordsError(String);
 impl FromStr for Coords {
     type Err = ParseCoordsError;
 
+    /// Parses the input into a point in the first quadrant of a cartesian grid.
+    ///
+    /// # Example
+    /// ```rust
+    /// use lightgrid::Coords;
+    ///
+    /// assert_eq!("100,101".parse::<Coords>().unwrap(), Coords(100, 101));
+    /// assert_eq!("999999,0".parse::<Coords>().unwrap(), Coords(999999, 0));
+    /// assert!("1,2,3".parse::<Coords>().is_err());
+    /// assert!("-1,1".parse::<Coords>().is_err());
+    /// assert!("2,-10".parse::<Coords>().is_err());
+    /// ```
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut parser = all_consuming(separated_pair(parse_usize, char(','), parse_usize));
 
@@ -171,14 +183,5 @@ mod tests {
         assert!(" turn on 1,2 through 3,4".parse::<Op>().is_err());
         assert!("turn on 1,2,3 through 4,5".parse::<Op>().is_err());
         assert!("turn on 1,2,3 through 4,5".parse::<Op>().is_err());
-    }
-
-    #[test]
-    fn test_parse_coords() {
-        assert_eq!("100,101".parse::<Coords>().unwrap(), Coords(100, 101));
-        assert_eq!("999999,0".parse::<Coords>().unwrap(), Coords(999999, 0));
-        assert!("1,2,3".parse::<Coords>().is_err());
-        assert!("-1,1".parse::<Coords>().is_err());
-        assert!("2,-10".parse::<Coords>().is_err());
     }
 }
