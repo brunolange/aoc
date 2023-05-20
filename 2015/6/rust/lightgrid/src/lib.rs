@@ -72,7 +72,7 @@ impl FromStr for Op {
             "toggle" => Ok(Op::Toggle(rect)),
             "turn on" => Ok(Op::Turn(true, rect)),
             "turn off" => Ok(Op::Turn(false, rect)),
-            _ => return Err(ParseOpError(std::format!("invalid token: {}", s))),
+            _ => Err(ParseOpError(std::format!("invalid token: {}", s))),
         }
     }
 }
