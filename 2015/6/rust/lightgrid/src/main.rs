@@ -259,45 +259,4 @@ fn test_parse_coords() {
     assert!("2,-10".parse::<Coords>().is_err());
 }
 
-//     let op = recognize(take_words::<2>)("turn off");
-//     println!("opX = {:?}", op);
-
-//     let coords = "100,101".parse::<Coords>();
-//     println!("coords = {:?}", coords);
-
-//     let result =
-//         tuple((parse_op, nom::character::complete::multispace0, parse_op))("turn on    toggle");
-//     println!("result = {:?}", result);
-
-//     let result = tuple((
-//         parse_op,
-//         char(' '),
-//         parse_coords,
-//         tag(" through "),
-//         parse_coords,
-//     ))("turn on 100,200 through 180,220");
-//     println!("result = {:?}", result);
-
-//     let result = take_word("hello world foo bar");
-//     println!("RESULT = {:?}", result);
-
-//     let result = take_word("hello");
-//     println!("RESULT = {:?}", result);
-
-//     let result = take_word(" foo");
-//     println!("RESULT = {:?}", result);
-
-//     let result = take_words::<2>("hello world");
-//     println!("RESULT = {:?}", result);
-
-//     let r = pair(take_word, take_word)("foo bar");
-//     println!("r = {:?}", r);
-
-//     let r = recognize(pair(take_word, take_word))("foo bar baz");
-//     println!("r = {:?}", r);
-
-//     let r = recognize(take_words::<2>)("foo bar baz");
-//     println!("r = {:?}", r);
-// }
-
 // // TODO: parser ensures that rectangle corners are bottom left and top right
