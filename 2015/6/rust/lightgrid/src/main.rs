@@ -60,14 +60,21 @@ impl FromStr for Coords {
     }
 }
 
-fn parse_op(input: &str) -> IResult<&str, Op> {
-    map_res(
-        alt((tag("toggle"), tag("turn on"), tag("turn off"))),
-        |s: &str| s.parse(),
-    )(input)
+use nom::sequence::pair;
 
-    // map_res(alt((take_word, take_words::<2>)), |s| s.parse())(input)
-    // map_res(alt((take_words(1), take_words(2))), |s| s.parse())(input)
+fn parse_op(input: &str) -> IResult<&str, Op> {
+    // map_res(
+    //     alt((tag("toggle"), tag("turn on"), tag("turn off"))),
+    //     |s: &str| s.parse(),
+    // )(input)
+
+    map_res(
+        alt((
+            take_word,
+            recognize(take_words::<2>)
+        )),
+        |s| s.parse()
+    )(input)
 }
 
 use nom::character::complete::space0;
@@ -127,6 +134,9 @@ fn main() {
     let op = parse_op("turn off");
     println!("op = {:?}", op);
 
+    let op = recognize(take_words::<2>)("turn off");
+    println!("opX = {:?}", op);
+
     let coords = "100,101".parse::<Coords>();
     println!("coords = {:?}", coords);
 
@@ -154,6 +164,15 @@ fn main() {
 
     let result = take_words::<2>("hello world");
     println!("RESULT = {:?}", result);
+
+    let r = pair(take_word, take_word)("foo bar");
+    println!("r = {:?}", r);
+
+    let r = recognize(pair(take_word, take_word))("foo bar baz");
+    println!("r = {:?}", r);
+
+    let r = recognize(take_words::<2>)("foo bar baz");
+    println!("r = {:?}", r);
 }
 
 // TODO: parser ensures that rectangle corners are bottom left and top right
