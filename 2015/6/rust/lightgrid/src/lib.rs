@@ -26,7 +26,7 @@ impl FromStr for Coords {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut parser = all_consuming(separated_pair(parse_usize, char(','), parse_usize));
 
-        let (_, (x, y)) = parser(s).map_err(|_| ParseCoordsError("bigode".to_string()))?;
+        let (_, (x, y)) = parser(s).map_err(|_| ParseCoordsError("Unable to parse coordinates".to_string()))?;
 
         Ok(Coords(x, y))
     }
