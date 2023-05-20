@@ -1,19 +1,13 @@
-use std::num::ParseIntError;
 use std::str::FromStr;
 
 use nom::branch::alt;
 use nom::bytes::complete::tag;
 use nom::bytes::complete::take_till1;
-use nom::character::complete::char;
-use nom::character::complete::digit1;
-use nom::combinator::all_consuming;
-use nom::combinator::complete;
-use nom::combinator::map;
+use nom::character::complete::{char, digit1, space0};
+use nom::combinator::{all_consuming, map_res, recognize};
 use nom::multi::count;
-use nom::sequence::pair;
-use nom::sequence::separated_pair;
-use nom::sequence::tuple;
-use nom::{combinator::map_res, IResult};
+use nom::sequence::{preceded, separated_pair, tuple};
+use nom::IResult;
 
 #[derive(Debug, PartialEq)]
 struct Rect {
@@ -125,38 +119,6 @@ impl FromStr for Coords {
     }
 }
 
-fn parse_op(input: &str) -> IResult<&str, Op> {
-    // This one makes npm intrude in the specifics of Op. I'm not a fan...
-    // map_res(
-    //     alt((tag("toggle"), tag("turn on"), tag("turn off"))),
-    //     |s: &str| s.parse(),
-    // )(input)
-
-    // This doesn't work because we actually if we can take 2 words, we could always have take just 1!
-    // alt tries the first, take_word, which does yield a word and it just returns that.
-    // that word ("turn") happens to not be parseable into an Op, so we get an error here...
-    // map_res(
-    //     alt((
-    //         take_word,
-    //         recognize(take_words::<2>)
-    //     )),
-    //     |s| s.parse()
-    // )(input)
-
-    let parser = |s: &str| s.parse::<Op>();
-
-    let x1 = map_res(take_word, parser)(input);
-
-    match x1 {
-        Ok(_) => x1,
-        Err(_) => map_res(recognize(take_words::<2>), parser)(input),
-    }
-}
-
-use nom::character::complete::space0;
-use nom::combinator::recognize;
-use nom::sequence::preceded;
-
 fn take_word(input: &str) -> IResult<&str, &str> {
     preceded(space0, recognize(take_till1(|c| c == ' ')))(input)
 }
@@ -164,24 +126,6 @@ fn take_word(input: &str) -> IResult<&str, &str> {
 fn take_words<const N: usize>(input: &str) -> IResult<&str, [&str; N]> {
     map_res(count(take_word, N), |words| words.try_into())(input)
 }
-
-// fn join_array_with_whitespace<const N: usize>(arr: [&str; N]) -> &str {
-//     let joined_string: String = arr.iter().cloned().collect::<Vec<&str>>().join(" ");
-//     &joined_string // cannot return reference to local variable `joined_string`
-// }
-
-// This doesn't work! Some hairy meddling with string slices!
-// fn take_words<const N: usize>(input: &str) -> IResult<&str, &str> {
-//     map_res(
-//         count(take_word, N),
-//         |words| {
-//             words.try_into().map(join_array_with_whitespace::<N>)
-//             // let r = words.try_into();
-//             // let s = r.map(join_array_with_whitespace);
-//             // s
-//         }
-//     )(input)
-// }
 
 fn parse_coords(input: &str) -> IResult<&str, Coords> {
     // map(take_word, |s| s.parse())(input) // this doesn't work, I think because of Err mismatches
