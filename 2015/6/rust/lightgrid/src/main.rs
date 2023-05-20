@@ -259,4 +259,4 @@ fn test_parse_coords() {
     assert!("2,-10".parse::<Coords>().is_err());
 }
 
-// // TODO: parser ensures that rectangle corners are bottom left and top right
+// TODO: parser ensures that rectangle corners are bottom left and top right
