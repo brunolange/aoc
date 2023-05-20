@@ -30,13 +30,6 @@ impl Rect {
                 y: y0.max(y1),
             },
         }
-
-        // let (bottom_left_corner, top_right_corner) = match (x1 > x0, y1 > y0) {
-        //     (true, true) => (p, q),
-        //     (true, false) => (Coords { x: p.x, y: q.y }, Coords { x: q.x, y: p.y }),
-        //     (false, true) => (Coords { x: q.x, y: p.y }, Coords { x: p.x, y: q.y }),
-        //     (false, false) => (q, p),
-        // };
     }
 }
 
