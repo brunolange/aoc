@@ -68,13 +68,25 @@ fn parse_op(input: &str) -> IResult<&str, Op> {
     //     |s: &str| s.parse(),
     // )(input)
 
-    map_res(
-        alt((
-            take_word,
-            recognize(take_words::<2>)
-        )),
-        |s| s.parse()
-    )(input)
+    // This doesn't work because we actually if we can take 2 words, we could always have take just 1!
+    // alt tries the first, take_word, which does yield a word and it just returns that.
+    // that word ("turn") happens to not be parseable into an Op, so we get an error here...
+    // map_res(
+    //     alt((
+    //         take_word,
+    //         recognize(take_words::<2>)
+    //     )),
+    //     |s| s.parse()
+    // )(input)
+
+    let parser = |s: &str| s.parse::<Op>();
+
+    let x1 = map_res(take_word, parser)(input);
+    if x1.is_ok() {
+        return x1;
+    }
+    
+    map_res(recognize(take_words::<2>), parser)(input)
 }
 
 use nom::character::complete::space0;
