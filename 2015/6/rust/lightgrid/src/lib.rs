@@ -12,7 +12,10 @@ use parsers::{parse_usize, take_word};
 
 /// Stores x and y coordinates of a grid that extends only to the first quadrant.
 #[derive(Debug, PartialEq)]
-pub struct GridPoint(pub usize, pub usize);
+pub struct GridPoint {
+    pub x: usize,
+    pub y: usize,
+}
 
 #[derive(Debug)]
 pub struct ParseGridPointError(String);
@@ -26,8 +29,8 @@ impl FromStr for GridPoint {
     /// ```rust
     /// use lightgrid::GridPoint;
     ///
-    /// assert_eq!("100,101".parse::<GridPoint>().unwrap(), GridPoint(100, 101));
-    /// assert_eq!("999999,0".parse::<GridPoint>().unwrap(), GridPoint(999999, 0));
+    /// assert_eq!("100,101".parse::<GridPoint>().unwrap(), GridPoint{x:100, y:101});
+    /// assert_eq!("999999,0".parse::<GridPoint>().unwrap(), GridPoint{x:999999, y:0});
     /// assert!("1,2,3".parse::<GridPoint>().is_err());
     /// assert!("-1,1".parse::<GridPoint>().is_err());
     /// assert!("2,-10".parse::<GridPoint>().is_err());
@@ -38,7 +41,7 @@ impl FromStr for GridPoint {
         let (_, (x, y)) = parser(s)
             .map_err(|_| ParseGridPointError("Unable to parse coordinates".to_string()))?;
 
-        Ok(GridPoint(x, y))
+        Ok(GridPoint { x, y })
     }
 }
 
@@ -50,12 +53,18 @@ pub struct Rect {
 
 impl Rect {
     pub fn new(p: GridPoint, q: GridPoint) -> Self {
-        let (x0, y0) = (p.0, p.1);
-        let (x1, y1) = (q.0, q.1);
+        let (x0, y0) = (p.x, p.y);
+        let (x1, y1) = (q.x, q.y);
 
         Rect {
-            bottom_left_corner: GridPoint(x0.min(x1), y0.min(y1)),
-            top_right_corner: GridPoint(x0.max(x1), y0.max(y1)),
+            bottom_left_corner: GridPoint {
+                x: x0.min(x1),
+                y: y0.min(y1),
+            },
+            top_right_corner: GridPoint {
+                x: x0.max(x1),
+                y: y0.max(y1),
+            },
         }
     }
 }
@@ -102,32 +111,32 @@ mod tests {
     #[test]
     fn test_rect() {
         assert_eq!(
-            Rect::new(GridPoint(10, 10), GridPoint(11, 11)),
+            Rect::new(GridPoint { x: 10, y: 10 }, GridPoint { x: 11, y: 11 }),
             Rect {
-                bottom_left_corner: GridPoint(10, 10),
-                top_right_corner: GridPoint(11, 11),
+                bottom_left_corner: GridPoint { x: 10, y: 10 },
+                top_right_corner: GridPoint { x: 11, y: 11 },
             }
         );
         assert_eq!(
-            Rect::new(GridPoint(11, 11), GridPoint(10, 10)),
+            Rect::new(GridPoint { x: 11, y: 11 }, GridPoint { x: 10, y: 10 }),
             Rect {
-                bottom_left_corner: GridPoint(10, 10),
-                top_right_corner: GridPoint(11, 11),
+                bottom_left_corner: GridPoint { x: 10, y: 10 },
+                top_right_corner: GridPoint { x: 11, y: 11 },
             }
         );
 
         assert_eq!(
-            Rect::new(GridPoint(10, 10), GridPoint(11, 9)),
+            Rect::new(GridPoint { x: 10, y: 10 }, GridPoint { x: 11, y: 9 }),
             Rect {
-                bottom_left_corner: GridPoint(10, 9),
-                top_right_corner: GridPoint(11, 10),
+                bottom_left_corner: GridPoint { x: 10, y: 9 },
+                top_right_corner: GridPoint { x: 11, y: 10 },
             }
         );
         assert_eq!(
-            Rect::new(GridPoint(11, 9), GridPoint(10, 10)),
+            Rect::new(GridPoint { x: 11, y: 9 }, GridPoint { x: 10, y: 10 }),
             Rect {
-                bottom_left_corner: GridPoint(10, 9),
-                top_right_corner: GridPoint(11, 10),
+                bottom_left_corner: GridPoint { x: 10, y: 9 },
+                top_right_corner: GridPoint { x: 11, y: 10 },
             }
         );
     }
@@ -137,8 +146,8 @@ mod tests {
         assert_eq!(
             "toggle 1,2 through 3,4".parse::<Op>().unwrap(),
             Op::Toggle(Rect {
-                bottom_left_corner: GridPoint(1, 2),
-                top_right_corner: GridPoint(3, 4),
+                bottom_left_corner: GridPoint { x: 1, y: 2 },
+                top_right_corner: GridPoint { x: 3, y: 4 },
             })
         );
 
@@ -155,8 +164,8 @@ mod tests {
             Op::Turn(
                 true,
                 Rect {
-                    bottom_left_corner: GridPoint(1, 2),
-                    top_right_corner: GridPoint(3, 4),
+                    bottom_left_corner: GridPoint { x: 1, y: 2 },
+                    top_right_corner: GridPoint { x: 3, y: 4 },
                 }
             )
         );
@@ -174,8 +183,8 @@ mod tests {
             Op::Turn(
                 false,
                 Rect {
-                    bottom_left_corner: GridPoint(1, 2),
-                    top_right_corner: GridPoint(3, 4),
+                    bottom_left_corner: GridPoint { x: 1, y: 2 },
+                    top_right_corner: GridPoint { x: 3, y: 4 },
                 }
             )
         );
