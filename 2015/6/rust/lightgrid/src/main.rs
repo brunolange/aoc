@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::HashMap;
 
 use lightgrid::{GridPoint, Op};
 
@@ -16,49 +16,44 @@ fn lines() -> Box<dyn Iterator<Item = String>> {
 }
 
 fn main() {
-    let mut lit: HashSet<GridPoint> = HashSet::new();
+    let mut brightness_map: HashMap<GridPoint, usize> = HashMap::new();
 
     for line in lines() {
         let op = line.parse::<Op>();
         match op {
-            Ok(op) => execute(&mut lit, op),
+            Ok(op) => execute(&mut brightness_map, op),
             Err(_) => panic!("Error parsing line: {}", line),
         }
     }
 
-    println!("{}", lit.len());
+    let total_brightness: usize = brightness_map.values().sum();
+    println!("{}", total_brightness);
 }
 
-fn execute(lit: &mut HashSet<GridPoint>, op: Op) {
-    _ = match op {
+fn execute(brightness_map: &mut HashMap<GridPoint, usize>, op: Op) {
+    match op {
         Op::Toggle(mut rect) => {
-            // println!("Gotta toggle!");
             for grid_point in rect.iter() {
-                if lit.contains(&grid_point) {
-                    // println!("  OFF {:?}", grid_point);
-                    lit.remove(&grid_point);
-                } else {
-                    // println!("  ON  {:?}", grid_point);
-                    lit.insert(grid_point);
-                }
+                *brightness_map.entry(grid_point).or_insert(0) += 2;
             }
-            // println!("");
         }
         Op::Turn(true, mut rect) => {
-            // println!("Gotta turn on!");
             for grid_point in rect.iter() {
-                // println!("  ON  {:?}", grid_point);
-                lit.insert(grid_point);
+                *brightness_map.entry(grid_point).or_insert(0) += 1;
             }
-            // println!("");
         }
         Op::Turn(false, mut rect) => {
-            // println!("Gotta turn off!");
             for grid_point in rect.iter() {
-                // println!("  OFF {:?}", grid_point);
-                lit.remove(&grid_point);
+                let _ = *brightness_map
+                    .entry(grid_point)
+                    .and_modify(|v| {
+                        if *v == 0 {
+                            return;
+                        }
+                        *v -= 1;
+                    })
+                    .or_insert(0);
             }
-            // println!("");
         }
     }
 }

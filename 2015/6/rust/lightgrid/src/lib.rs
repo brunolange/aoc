@@ -76,7 +76,7 @@ impl Rect {
     pub fn iter(&mut self) -> RectIterator {
         RectIterator {
             rect: self,
-            current: self.bottom_left_corner.clone(),
+            current: self.bottom_left_corner,
         }
     }
 }
@@ -85,8 +85,8 @@ impl<'a> Iterator for RectIterator<'a> {
     type Item = GridPoint;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let [x, y] = [self.current.x, self.current.y];
-        let [max_x, max_y] = [self.rect.top_right_corner.x, self.rect.top_right_corner.y];
+        let (x, y) = (self.current.x, self.current.y);
+        let (max_x, max_y) = (self.rect.top_right_corner.x, self.rect.top_right_corner.y);
 
         if y > max_y {
             return None;
