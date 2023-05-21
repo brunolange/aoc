@@ -52,7 +52,7 @@ pub struct Rect {
 }
 
 impl Rect {
-    pub fn new(p: GridPoint, q: GridPoint) -> Self {
+    pub fn new(p: &GridPoint, q: &GridPoint) -> Self {
         let (x0, y0) = (p.x, p.y);
         let (x1, y1) = (q.x, q.y);
 
@@ -89,7 +89,7 @@ impl FromStr for Op {
             parse_grid_point,
         )))(s)
         .map_err(|_| ParseOpError("unable to parse line".to_string()))?;
-        let rect = Rect::new(from, to);
+        let rect = Rect::new(&from, &to);
         match action {
             "toggle" => Ok(Op::Toggle(rect)),
             "turn on" => Ok(Op::Turn(true, rect)),
@@ -111,14 +111,14 @@ mod tests {
     #[test]
     fn test_rect() {
         assert_eq!(
-            Rect::new(GridPoint { x: 10, y: 10 }, GridPoint { x: 11, y: 11 }),
+            Rect::new(&GridPoint { x: 10, y: 10 }, &GridPoint { x: 11, y: 11 }),
             Rect {
                 bottom_left_corner: GridPoint { x: 10, y: 10 },
                 top_right_corner: GridPoint { x: 11, y: 11 },
             }
         );
         assert_eq!(
-            Rect::new(GridPoint { x: 11, y: 11 }, GridPoint { x: 10, y: 10 }),
+            Rect::new(&GridPoint { x: 11, y: 11 }, &GridPoint { x: 10, y: 10 }),
             Rect {
                 bottom_left_corner: GridPoint { x: 10, y: 10 },
                 top_right_corner: GridPoint { x: 11, y: 11 },
@@ -126,14 +126,14 @@ mod tests {
         );
 
         assert_eq!(
-            Rect::new(GridPoint { x: 10, y: 10 }, GridPoint { x: 11, y: 9 }),
+            Rect::new(&GridPoint { x: 10, y: 10 }, &GridPoint { x: 11, y: 9 }),
             Rect {
                 bottom_left_corner: GridPoint { x: 10, y: 9 },
                 top_right_corner: GridPoint { x: 11, y: 10 },
             }
         );
         assert_eq!(
-            Rect::new(GridPoint { x: 11, y: 9 }, GridPoint { x: 10, y: 10 }),
+            Rect::new(&GridPoint { x: 11, y: 9 }, &GridPoint { x: 10, y: 10 }),
             Rect {
                 bottom_left_corner: GridPoint { x: 10, y: 9 },
                 top_right_corner: GridPoint { x: 11, y: 10 },
