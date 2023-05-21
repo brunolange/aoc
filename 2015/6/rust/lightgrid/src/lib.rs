@@ -11,7 +11,7 @@ mod parsers;
 use parsers::{parse_usize, take_word};
 
 /// Stores x and y coordinates of a grid that extends only to the first quadrant.
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct GridPoint {
     pub x: usize,
     pub y: usize,
@@ -51,6 +51,11 @@ pub struct Rect {
     pub top_right_corner: GridPoint,
 }
 
+pub struct RectIterator<'a> {
+    pub rect: &'a Rect,
+    pub current: GridPoint,
+}
+
 impl Rect {
     pub fn new(p: &GridPoint, q: &GridPoint) -> Self {
         let (x0, y0) = (p.x, p.y);
@@ -66,6 +71,44 @@ impl Rect {
                 y: y0.max(y1),
             },
         }
+    }
+
+    pub fn iter(&mut self) -> RectIterator {
+        RectIterator {
+            rect: self,
+            current: self.bottom_left_corner.clone(),
+        }
+    }
+}
+
+impl<'a> Iterator for RectIterator<'a> {
+    type Item = GridPoint;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let [x, y] = [self.current.x, self.current.y];
+        let [max_x, max_y] = [self.rect.top_right_corner.x, self.rect.top_right_corner.y];
+
+        if y > max_y {
+            return None;
+        }
+
+        let grid_point = GridPoint {
+            x: self.current.x,
+            y: self.current.y,
+        };
+
+        let next_grid_point = if x >= max_x {
+            GridPoint {
+                x: self.rect.bottom_left_corner.x,
+                y: y + 1,
+            }
+        } else {
+            GridPoint { x: x + 1, y }
+        };
+
+        self.current = next_grid_point;
+
+        Some(grid_point)
     }
 }
 
