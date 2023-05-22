@@ -121,6 +121,17 @@ pub struct ParseOpError(String);
 
 impl FromStr for Op {
     type Err = ParseOpError;
+
+    /// Parses this string slice into an Op (operation) instance.
+    ///
+    /// # Example
+    /// ```rust
+    /// use std::str::FromStr;
+    /// use lightgrid::models::{GridPoint, Op, Rect};
+    ///
+    /// let op: Op = "turn on 0,0 through 1,1".parse().unwrap();
+    /// assert_eq!(op,Op::Turn(true, Rect { bottom_left_corner: GridPoint { x: 0, y: 0 }, top_right_corner: GridPoint { x: 1, y: 1 } }));
+    /// ```
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let (_, (action, _, from, _, to)) = all_consuming(tuple((
             alt((tag("toggle"), tag("turn on"), tag("turn off"))),
