@@ -1,28 +1,21 @@
 use std::collections::HashMap;
 
 use lightgrid::{GridPoint, Op};
+use log::warn;
 
-use std::fs::File;
-use std::io::{self, BufRead};
-
-fn lines() -> Box<dyn Iterator<Item = String>> {
-    match std::env::args().nth(1) {
-        None => Box::new(io::stdin().lock().lines().filter_map(Result::ok)),
-        Some(path) => {
-            let file = File::open(path).expect("error reading file");
-            Box::new(io::BufReader::new(file).lines().filter_map(Result::ok))
-        }
-    }
-}
+mod io;
 
 fn main() {
+    env_logger::init();
     let mut brightness_map: HashMap<GridPoint, usize> = HashMap::new();
 
-    for line in lines() {
+    for (i, line) in crate::io::lines().enumerate() {
         let op = line.parse::<Op>();
         match op {
             Ok(op) => execute(&mut brightness_map, op),
-            Err(_) => panic!("Error parsing line: {}", line),
+            Err(_) => {
+                warn!("Ignoring line {}: [{}]", i + 1, line);
+            }
         }
     }
 
