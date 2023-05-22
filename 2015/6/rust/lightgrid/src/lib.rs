@@ -1,3 +1,5 @@
+use log::warn;
+use std::collections::HashMap;
 use std::str::FromStr;
 
 use nom::branch::alt;
@@ -143,8 +145,51 @@ impl FromStr for Op {
 }
 
 pub fn parse_grid_point(input: &str) -> IResult<&str, GridPoint> {
-    // map(take_word, |s| s.parse())(input) // this doesn't work, I think because of Err mismatches
-    map_res(take_word, |s| s.parse())(input)
+    map_res(take_word, str::parse)(input)
+}
+
+pub fn total_brightness(lines: impl Iterator<Item = String>) -> usize {
+    let mut brightness_map: HashMap<GridPoint, usize> = HashMap::new();
+
+    for (i, line) in lines.enumerate() {
+        let op = line.parse::<Op>();
+        match op {
+            Ok(op) => execute(&mut brightness_map, op),
+            Err(_) => {
+                warn!("Ignoring line {}: [{}]", i + 1, line);
+            }
+        }
+    }
+
+    brightness_map.values().sum()
+}
+
+fn execute(brightness_map: &mut HashMap<GridPoint, usize>, op: Op) {
+    match op {
+        Op::Toggle(mut rect) => {
+            for grid_point in rect.iter() {
+                *brightness_map.entry(grid_point).or_insert(0) += 2;
+            }
+        }
+        Op::Turn(true, mut rect) => {
+            for grid_point in rect.iter() {
+                *brightness_map.entry(grid_point).or_insert(0) += 1;
+            }
+        }
+        Op::Turn(false, mut rect) => {
+            for grid_point in rect.iter() {
+                let _ = *brightness_map
+                    .entry(grid_point)
+                    .and_modify(|v| {
+                        if *v == 0 {
+                            return;
+                        }
+                        *v -= 1;
+                    })
+                    .or_insert(0);
+            }
+        }
+    }
 }
 
 #[cfg(test)]
