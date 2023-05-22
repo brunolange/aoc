@@ -73,10 +73,7 @@ fn execute(brightness_map: &mut HashMap<GridPoint, usize>, op: Op) {
                 let _ = *brightness_map
                     .entry(grid_point)
                     .and_modify(|v| {
-                        if *v == 0 {
-                            return;
-                        }
-                        *v -= 1;
+                        *v -= if *v == 0 { 0 } else { 1 };
                     })
                     .or_insert(0);
             }
