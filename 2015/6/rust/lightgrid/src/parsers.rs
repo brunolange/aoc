@@ -5,12 +5,18 @@ use nom::multi::count;
 use nom::sequence::preceded;
 use nom::IResult;
 
+use crate::models::GridPoint;
+
 pub fn parse_usize(input: &str) -> IResult<&str, usize> {
     map_res(digit1, str::parse)(input)
 }
 
 pub fn take_word(input: &str) -> IResult<&str, &str> {
     preceded(space0, recognize(take_till1(|c| c == ' ')))(input)
+}
+
+pub fn parse_grid_point(input: &str) -> IResult<&str, GridPoint> {
+    map_res(take_word, str::parse)(input)
 }
 
 #[allow(unused)]
