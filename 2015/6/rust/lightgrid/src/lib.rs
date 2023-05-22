@@ -55,6 +55,7 @@ pub fn total_brightness(lines: impl Iterator<Item = String>) -> usize {
     brightness_map.values().sum()
 }
 
+/// Carries out the operation on the light grid, mutating the brightness map as it goes.
 fn execute(brightness_map: &mut HashMap<GridPoint, usize>, op: Op) {
     match op {
         Op::Toggle(mut rect) => {
