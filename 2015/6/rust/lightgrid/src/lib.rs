@@ -47,10 +47,10 @@ mod parsers;
 /// ].into_iter().map(str::to_string);
 /// assert_eq!(total_brightness(commands), 1);
 /// ```
-pub fn total_brightness(lines: impl Iterator<Item = String>) -> usize {
+pub fn total_brightness(commands: impl Iterator<Item = String>) -> usize {
     let mut brightness_map: HashMap<GridPoint, usize> = HashMap::new();
 
-    for (i, line) in lines.enumerate() {
+    for (i, line) in commands.enumerate() {
         let op = line.parse::<Op>();
         match op {
             Ok(op) => execute(&mut brightness_map, op),
