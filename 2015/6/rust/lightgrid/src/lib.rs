@@ -6,6 +6,39 @@ use models::{GridPoint, Op};
 
 mod parsers;
 
+/// Sum all of brightnesses. Very informative description!
+///
+/// # Example
+/// ```rust
+/// use lightgrid::total_brightness;
+///
+/// let commands = vec!["turn on 0,0 through 1,1".to_string()].into_iter();
+/// assert_eq!(total_brightness(commands), 4);
+///
+/// let commands = vec![
+///     "turn on 0,0 through 1,1",
+///     "turn on 0,0 through 1,1",
+/// ].into_iter().map(str::to_string);
+/// assert_eq!(total_brightness(commands), 8);
+///
+/// let commands = vec![
+///     "toggle 0,0 through 99,99",
+/// ].into_iter().map(str::to_string);
+/// assert_eq!(total_brightness(commands), 20000);
+///
+/// let commands = vec![
+///     "toggle 0,0 through 99,99",
+///     "turn off 0,0 through 99,99",
+/// ].into_iter().map(str::to_string);
+/// assert_eq!(total_brightness(commands), 10000);
+///
+/// let commands = vec![
+///     "toggle 0,0 through 99,99",
+///     "turn off 0,0 through 99,99",
+///     "turn on 100,100 through 100,100",
+/// ].into_iter().map(str::to_string);
+/// assert_eq!(total_brightness(commands), 10001);
+/// ```
 pub fn total_brightness(lines: impl Iterator<Item = String>) -> usize {
     let mut brightness_map: HashMap<GridPoint, usize> = HashMap::new();
 
