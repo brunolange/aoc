@@ -49,11 +49,6 @@ pub struct Rect {
     pub top_right_corner: GridPoint,
 }
 
-pub struct RectIterator<'a> {
-    pub rect: &'a Rect,
-    pub current: GridPoint,
-}
-
 impl Rect {
     pub fn new(p: &GridPoint, q: &GridPoint) -> Self {
         let (x0, y0) = (p.x, p.y);
@@ -70,7 +65,14 @@ impl Rect {
             },
         }
     }
+}
 
+pub struct RectIterator<'a> {
+    pub rect: &'a Rect,
+    pub current: GridPoint,
+}
+
+impl Rect {
     pub fn iter(&mut self) -> RectIterator {
         RectIterator {
             rect: self,
