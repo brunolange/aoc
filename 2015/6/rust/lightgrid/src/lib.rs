@@ -8,6 +8,8 @@ mod parsers;
 
 /// Sum all of brightnesses. Very informative description!
 ///
+/// If a command can't be parsed, it is ignored.
+///
 /// # Example
 /// ```rust
 /// use lightgrid::total_brightness;
@@ -38,6 +40,12 @@ mod parsers;
 ///     "turn on 100,100 through 100,100",
 /// ].into_iter().map(str::to_string);
 /// assert_eq!(total_brightness(commands), 10001);
+///
+/// let commands = vec![
+///     "some invalid command",
+///     "turn on 0,0 through 0,0",
+/// ].into_iter().map(str::to_string);
+/// assert_eq!(total_brightness(commands), 1);
 /// ```
 pub fn total_brightness(lines: impl Iterator<Item = String>) -> usize {
     let mut brightness_map: HashMap<GridPoint, usize> = HashMap::new();
