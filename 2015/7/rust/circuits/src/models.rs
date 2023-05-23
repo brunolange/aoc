@@ -205,4 +205,31 @@ mod tests {
             ))
         );
     }
+
+    #[test]
+    fn test_expr_lshift() {
+        assert_eq!(
+            "x LSHIFT y".parse::<Expr>(),
+            Ok(Expr::LShift(
+                Box::new(Expr::Symbol(Wire::from("x"))),
+                Box::new(Expr::Symbol(Wire::from("y")))
+            ))
+        );
+
+        assert_eq!(
+            "x LSHIFT 42".parse::<Expr>(),
+            Ok(Expr::LShift(
+                Box::new(Expr::Symbol(Wire::from("x"))),
+                Box::new(Expr::Value(42))
+            ))
+        );
+
+        assert_eq!(
+            "100 LSHIFT 42".parse::<Expr>(),
+            Ok(Expr::LShift(
+                Box::new(Expr::Value(100)),
+                Box::new(Expr::Value(42))
+            ))
+        );
+    }
 }
