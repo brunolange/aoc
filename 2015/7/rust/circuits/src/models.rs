@@ -232,4 +232,31 @@ mod tests {
             ))
         );
     }
+
+    #[test]
+    fn test_expr_rshift() {
+        assert_eq!(
+            "x RSHIFT y".parse::<Expr>(),
+            Ok(Expr::RShift(
+                Box::new(Expr::Symbol(Wire::from("x"))),
+                Box::new(Expr::Symbol(Wire::from("y")))
+            ))
+        );
+
+        assert_eq!(
+            "x RSHIFT 42".parse::<Expr>(),
+            Ok(Expr::RShift(
+                Box::new(Expr::Symbol(Wire::from("x"))),
+                Box::new(Expr::Value(42))
+            ))
+        );
+
+        assert_eq!(
+            "100 RSHIFT 42".parse::<Expr>(),
+            Ok(Expr::RShift(
+                Box::new(Expr::Value(100)),
+                Box::new(Expr::Value(42))
+            ))
+        );
+    }
 }
