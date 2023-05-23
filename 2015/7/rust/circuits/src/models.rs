@@ -177,14 +177,6 @@ mod tests {
                 Box::new(Expr::Value(42))
             ))
         );
-
-        // assert_eq!(
-        //     "x AND (NOT y)".parse::<Expr>(),
-        //     Ok(Expr::And(
-        //         Box::new(Expr::Symbol(Wire::from("x"))),
-        //         Box::new(Expr::Not(Box::new(Expr::Symbol(Wire::from("y")))))
-        //     ))
-        // );
     }
     #[test]
 
