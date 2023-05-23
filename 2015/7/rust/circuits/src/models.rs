@@ -1,10 +1,6 @@
-use nom::branch::alt;
-use nom::bytes::complete::{tag, take_till1};
-use nom::character::complete::{alpha1, digit1, multispace1, space0};
-use nom::combinator::{all_consuming, map_res, recognize};
-use nom::sequence::{preceded, separated_pair, tuple};
-use nom::IResult;
 use std::str::FromStr;
+
+use crate::parsers::{parse_connection, parse_expr};
 
 pub type Wire = String;
 
@@ -34,73 +30,12 @@ pub struct Connection {
     pub target: Wire,
 }
 
-fn take_word(input: &str) -> IResult<&str, &str> {
-    preceded(space0, recognize(take_till1(|c| c == ' ')))(input)
-}
-
-fn parse_value(input: &str) -> IResult<&str, Expr> {
-    let (remaining, value) = all_consuming(map_res(digit1, str::parse))(input)?;
-    Ok((remaining, Expr::Value(value)))
-}
-
-fn parse_symbol(input: &str) -> IResult<&str, Expr> {
-    // TODO: reject protected symbols
-    let (remaining, value) = all_consuming(alpha1)(input)?;
-    Ok((remaining, Expr::Symbol(Wire::from(value))))
-}
-
-fn parse_not(input: &str) -> IResult<&str, Expr> {
-    let (remaining, expr) = preceded(tag("NOT "), parse_expr)(input)?;
-    Ok((remaining, Expr::Not(Box::new(expr))))
-}
-
-/// TODO: review leaves and nodes. leaves are symbols and values. maximally reduced. others are nodes.
-
-fn parse_binary_gate<'a, F>(
-    marker: &'a str,
-    binary_gate: F,
-) -> impl Fn(&str) -> IResult<&str, Expr> + 'a
-where
-    F: Fn(Expr, Expr) -> Expr + 'a,
-{
-    move |input| {
-        let (remaining, (left, right)) = separated_pair(
-            take_word,
-            tuple((multispace1, tag(marker), multispace1)),
-            take_word,
-        )(input)?;
-
-        let left = left.parse::<Expr>().unwrap(); // TODO: map_err + ?
-        let right = right.parse::<Expr>().unwrap();
-
-        Ok((remaining, binary_gate(left, right)))
-    }
-}
-
-fn parse_expr(input: &str) -> IResult<&str, Expr> {
-    alt((
-        parse_value,
-        parse_symbol,
-        parse_not,
-        parse_binary_gate("AND", |l, r| Expr::And(Box::new(l), Box::new(r))),
-        parse_binary_gate("OR", |l, r| Expr::Or(Box::new(l), Box::new(r))),
-        parse_binary_gate("LSHIFT", |l, r| Expr::LShift(Box::new(l), Box::new(r))),
-        parse_binary_gate("RSHIFT", |l, r| Expr::RShift(Box::new(l), Box::new(r))),
-    ))(input)
-}
-
 impl FromStr for Connection {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let parse_wire = take_word;
-        let mut parser = all_consuming(separated_pair(parse_expr, tag(" -> "), parse_wire));
-
-        let (_, (expr, wire)) = parser(s).unwrap(); // TODO: convert to nom's error
-        Ok(Connection {
-            source: expr,
-            target: Wire::from(wire),
-        })
+        let (_, expr) = parse_connection(s).map_err(|_| ())?;
+        Ok(expr)
     }
 }
 

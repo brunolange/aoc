@@ -1,4 +1,5 @@
 mod models;
+mod parsers;
 use std::collections::HashMap;
 
 use models::{Connection, Expr, Wire};
