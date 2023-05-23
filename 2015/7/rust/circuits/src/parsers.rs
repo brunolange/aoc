@@ -24,8 +24,8 @@ pub fn parse_expr(input: &str) -> IResult<&str, Expr> {
         parse_value,
         parse_symbol,
         parse_not,
-        parse_binary_gate("AND", |l, r| Expr::And(Box::new(l), Box::new(r))),
         parse_binary_gate("OR", |l, r| Expr::Or(Box::new(l), Box::new(r))),
+        parse_binary_gate("AND", |l, r| Expr::And(Box::new(l), Box::new(r))),
         parse_binary_gate("LSHIFT", |l, r| Expr::LShift(Box::new(l), Box::new(r))),
         parse_binary_gate("RSHIFT", |l, r| Expr::RShift(Box::new(l), Box::new(r))),
     ))(input)
