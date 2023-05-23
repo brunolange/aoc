@@ -1,6 +1,6 @@
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take_till1};
-use nom::character::complete::{alpha1, digit1, space0};
+use nom::character::complete::{alpha1, digit1, multispace1, space0};
 use nom::combinator::{all_consuming, map_res, recognize};
 use nom::sequence::{preceded, separated_pair, tuple};
 use nom::IResult;
@@ -38,56 +38,55 @@ fn take_word(input: &str) -> IResult<&str, &str> {
     preceded(space0, recognize(take_till1(|c| c == ' ')))(input)
 }
 
-fn parse_value(input: &str) -> IResult<&str, u16> {
-    all_consuming(map_res(digit1, str::parse))(input)
+fn parse_value(input: &str) -> IResult<&str, Expr> {
+    let (remaining, value) = all_consuming(map_res(digit1, str::parse))(input)?;
+    Ok((remaining, Expr::Value(value)))
 }
 
-fn parse_symbol(input: &str) -> IResult<&str, &str> {
+fn parse_symbol(input: &str) -> IResult<&str, Expr> {
     // TODO: reject protected symbols
-    all_consuming(alpha1)(input)
+    let (remaining, value) = all_consuming(alpha1)(input)?;
+    Ok((remaining, Expr::Symbol(Wire::from(value))))
 }
 
 fn parse_not(input: &str) -> IResult<&str, Expr> {
-    preceded(tag("NOT "), parse_expr)(input)
+    let (remaining, expr) = preceded(tag("NOT "), parse_expr)(input)?;
+    Ok((remaining, Expr::Not(Box::new(expr))))
 }
 
-fn parse_binary_op(input: &str) -> IResult<&str, Expr> {
-    let mut parser = tuple((
-        take_word,
-        alt((tag(" AND "), tag(" OR "), tag(" LSHIFT "), tag(" RSHIFT "))), // TODO: map from array
-        take_word,
-    ));
+/// TODO: review leaves and nodes. leaves are symbols and values. maximally reduced. others are nodes.
 
-    let (_, (left, op, right)) = parser(input)?;
-    let left = left.parse::<Expr>().unwrap(); // TODO: convert to nom's error
-    let right = right.parse::<Expr>().unwrap(); // TODO: convert to nom's error
-    let binary_op = match op.trim() {
-        "AND" => Expr::And,
-        "OR" => Expr::Or,
-        "LSHIFT" => Expr::LShift,
-        "RSHIFT" => Expr::LShift,
-        _ => panic!("TODO: convert to nom's error"),
-    };
-    let expr = binary_op(Box::new(left), Box::new(right));
+fn parse_binary_gate<'a, F>(
+    marker: &'a str,
+    binary_gate: F,
+) -> impl Fn(&str) -> IResult<&str, Expr> + 'a
+where
+    F: Fn(Expr, Expr) -> Expr + 'a,
+{
+    move |input| {
+        let (remaining, (left, right)) = separated_pair(
+            take_word,
+            tuple((multispace1, tag(marker), multispace1)),
+            take_word,
+        )(input)?;
 
-    Ok((input, expr))
+        let left = left.parse::<Expr>().unwrap(); // TODO: map_err + ?
+        let right = right.parse::<Expr>().unwrap();
+
+        Ok((remaining, binary_gate(left, right)))
+    }
 }
 
 fn parse_expr(input: &str) -> IResult<&str, Expr> {
-    if let Ok((input, value)) = parse_value(input) {
-        return Ok((input, Expr::Value(value)));
-    }
-
-    if let Ok((input, value)) = parse_symbol(input) {
-        return Ok((input, Expr::Symbol(Wire::from(value))));
-    }
-
-    if let Ok((input, expr)) = parse_not(input) {
-        // let expr = expr.parse::<Expr>().unwrap(); // TODO: convert to nom's error
-        return Ok((input, Expr::Not(Box::new(expr))));
-    }
-
-    parse_binary_op(input)
+    alt((
+        parse_value,
+        parse_symbol,
+        parse_not,
+        parse_binary_gate("AND", |l, r| Expr::And(Box::new(l), Box::new(r))),
+        parse_binary_gate("OR", |l, r| Expr::And(Box::new(l), Box::new(r))),
+        parse_binary_gate("LSHIFT", |l, r| Expr::And(Box::new(l), Box::new(r))),
+        parse_binary_gate("RSHIFT", |l, r| Expr::And(Box::new(l), Box::new(r))),
+    ))(input)
 }
 
 impl FromStr for Connection {
@@ -104,37 +103,6 @@ impl FromStr for Connection {
         })
     }
 }
-
-// fn _t() {
-//     let _conn = Connection {
-//         source: Expr::Value(123),
-//         target: Wire::from("x"),
-//     };
-
-//     let _conn = Connection {
-//         source: Expr::And(
-//             Box::new(Expr::Symbol(Wire::from("x"))),
-//             Box::new(Expr::Symbol(Wire::from("y"))),
-//         ),
-//         target: Wire::from("d"),
-//     };
-// }
-
-// a circuit is an ordered list of connections
-// 123 -> x
-// 456 -> x
-// is not the same as
-// 456 -> x
-// 123 -> x
-
-// what if I want to support connections coming in any order
-// for full parallelization
-// transform connections into a dependency graph where I can run a topological sort
-// to see if its even solvable.
-// x AND y -> z
-// 123 -> x
-// ...
-// 456 -> y  // which resolves z
 
 #[cfg(test)]
 mod tests {
