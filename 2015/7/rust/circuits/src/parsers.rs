@@ -62,7 +62,7 @@ where
 {
     move |input| {
         let (remaining, (left, right)) = separated_pair(
-            take_word,
+            take_word, // TODO: turn this into take anything, recurse, profit
             tuple((multispace1, tag(marker), multispace1)),
             take_word,
         )(input)?;
