@@ -1,8 +1,8 @@
 use nom::branch::alt;
-use nom::bytes::complete::{tag, take_till1};
+use nom::bytes::complete::{tag, take_till1, take_until};
 use nom::character::complete::{alpha1, digit1, multispace1, space0};
-use nom::combinator::{all_consuming, map_res, recognize};
-use nom::sequence::{preceded, separated_pair, tuple};
+use nom::combinator::{all_consuming, map_res, recognize, rest};
+use nom::sequence::{delimited, preceded, separated_pair};
 use nom::IResult;
 
 use crate::models::{Connection, Expr, Wire};
@@ -62,8 +62,8 @@ where
 {
     move |input| {
         let (remaining, (left, right)) = separated_pair(
-            take_word, // TODO: turn this into take anything, recurse, profit
-            tuple((multispace1, tag(marker), multispace1)),
+            take_word,
+            delimited(multispace1, tag(marker), multispace1),
             take_word,
         )(input)?;
 
