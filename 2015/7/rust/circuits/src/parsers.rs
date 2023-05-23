@@ -53,6 +53,15 @@ fn parse_not(input: &str) -> IResult<&str, Expr> {
 
 /// TODO: review leaves and nodes. leaves are symbols and values. maximally reduced. others are nodes.
 
+fn _parse_left_right(marker: &str) -> impl Fn(&str) -> IResult<&str, (&str, &str)> + '_ {
+    move |input: &str| {
+        let (input, left) = take_until(marker)(input)?;
+        let (input, _) = tag(marker)(input)?;
+        let (input, right) = rest(input)?;
+        Ok((input, (left, right)))
+    }
+}
+
 fn parse_binary_gate<'a, F>(
     marker: &'a str,
     binary_gate: F,
