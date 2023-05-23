@@ -17,7 +17,7 @@ pub fn reduce<'a>(connections: impl Iterator<Item = &'a Connection>) -> HashMap<
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    // use super::*;
 
     #[test]
     fn test_circuit() {
