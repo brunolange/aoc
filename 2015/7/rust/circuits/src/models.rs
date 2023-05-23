@@ -179,11 +179,38 @@ mod tests {
         );
 
         // assert_eq!(
-        //     "x AND NOT y".parse::<Expr>(),
+        //     "x AND (NOT y)".parse::<Expr>(),
         //     Ok(Expr::And(
         //         Box::new(Expr::Symbol(Wire::from("x"))),
         //         Box::new(Expr::Not(Box::new(Expr::Symbol(Wire::from("y")))))
         //     ))
         // );
+    }
+    #[test]
+
+    fn test_expr_or() {
+        assert_eq!(
+            "x OR y".parse::<Expr>(),
+            Ok(Expr::Or(
+                Box::new(Expr::Symbol(Wire::from("x"))),
+                Box::new(Expr::Symbol(Wire::from("y")))
+            ))
+        );
+
+        assert_eq!(
+            "x OR 42".parse::<Expr>(),
+            Ok(Expr::Or(
+                Box::new(Expr::Symbol(Wire::from("x"))),
+                Box::new(Expr::Value(42))
+            ))
+        );
+
+        assert_eq!(
+            "100 OR 42".parse::<Expr>(),
+            Ok(Expr::Or(
+                Box::new(Expr::Value(100)),
+                Box::new(Expr::Value(42))
+            ))
+        );
     }
 }
