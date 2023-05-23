@@ -67,8 +67,8 @@ where
             take_word,
         )(input)?;
 
-        let left = left.parse::<Expr>().unwrap(); // TODO: map_err + ?
-        let right = right.parse::<Expr>().unwrap();
+        let (_, left) = parse_expr(left)?;
+        let (_, right) = parse_expr(right)?;
 
         Ok((remaining, binary_gate(left, right)))
     }
