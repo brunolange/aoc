@@ -21,13 +21,13 @@ pub fn parse_connection(input: &str) -> IResult<&str, Connection> {
 
 pub fn parse_expr(input: &str) -> IResult<&str, Expr> {
     alt((
-        parse_value,
-        parse_symbol,
-        parse_not,
         parse_binary_gate("OR", |l, r| Expr::Or(Box::new(l), Box::new(r))),
         parse_binary_gate("AND", |l, r| Expr::And(Box::new(l), Box::new(r))),
         parse_binary_gate("LSHIFT", |l, r| Expr::LShift(Box::new(l), Box::new(r))),
         parse_binary_gate("RSHIFT", |l, r| Expr::RShift(Box::new(l), Box::new(r))),
+        parse_not,
+        parse_value,
+        parse_symbol,
     ))(input)
 }
 
@@ -36,13 +36,13 @@ pub fn take_word(input: &str) -> IResult<&str, &str> {
 }
 
 fn parse_value(input: &str) -> IResult<&str, Expr> {
-    let (remaining, value) = all_consuming(map_res(digit1, str::parse))(input)?;
+    let (remaining, value) = map_res(digit1, str::parse)(input)?;
     Ok((remaining, Expr::Value(value)))
 }
 
 fn parse_symbol(input: &str) -> IResult<&str, Expr> {
     // TODO: reject protected symbols
-    let (remaining, value) = all_consuming(alpha1)(input)?;
+    let (remaining, value) = alpha1(input)?;
     Ok((remaining, Expr::Symbol(Wire::from(value))))
 }
 
