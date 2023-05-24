@@ -85,19 +85,41 @@ where
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
 
     #[test]
     fn test_parse_connection() {
-        let conn: Connection = "123 -> x".parse().unwrap();
         assert_eq!(
-            conn,
+            "123 -> x".parse::<Connection>().unwrap(),
             Connection {
                 source: Expr::Value(123),
                 target: Wire::from("x")
             }
-        )
+        );
+
+        assert_eq!(
+            "x AND y -> d".parse::<Connection>().unwrap(),
+            Connection {
+                source: Expr::And(
+                    Box::new(Expr::Symbol(Wire::from("x"))),
+                    Box::new(Expr::Symbol(Wire::from("y")))
+                ),
+                target: Wire::from("d")
+            }
+        );
+
+        assert_eq!(
+            "y RSHIFT 2 -> g".parse::<Connection>().unwrap(),
+            Connection {
+                source: Expr::RShift(
+                    Box::new(Expr::Symbol(Wire::from("y"))),
+                    Box::new(Expr::Value(2))
+                ),
+                target: Wire::from("g")
+            }
+        );
+
+        assert!("NOT x -> 2".parse::<Connection>().is_err());
     }
 
     #[test]
