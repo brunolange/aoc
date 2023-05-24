@@ -1,6 +1,8 @@
+use circuits::run;
+
 mod io;
+
 fn main() {
-    for line in io::lines() {
-        println!("{}", line);
-    }
+    let wire_map = run(io::lines());
+    println!("{:?}", wire_map);
 }
