@@ -273,4 +273,23 @@ mod tests {
             ))
         );
     }
+
+    // #[test]
+    // fn test_parens() {
+    //     assert_eq!(
+    //         "(NOT x) AND y".parse::<Expr>(),
+    //         Ok(Expr::And(
+    //             Box::new(Expr::Not(Box::new(Expr::Symbol(Wire::from("x"))))),
+    //             Box::new(Expr::Symbol(Wire::from("y")))
+    //         ))
+    //     );
+
+    //     assert_eq!(
+    //         "NOT (x AND y)".parse::<Expr>(),
+    //         Ok(Expr::Not(Box::new(Expr::And(
+    //             Box::new(Expr::Symbol(Wire::from("x"))),
+    //             Box::new(Expr::Symbol(Wire::from("y")))
+    //         ))))
+    //     );
+    // }
 }
