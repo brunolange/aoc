@@ -85,7 +85,20 @@ where
 
 #[cfg(test)]
 mod tests {
+
     use super::*;
+
+    #[test]
+    fn test_parse_connection() {
+        let conn: Connection = "123 -> x".parse().unwrap();
+        assert_eq!(
+            conn,
+            Connection {
+                source: Expr::Value(123),
+                target: Wire::from("x")
+            }
+        )
+    }
 
     #[test]
     fn test_expr_symbol() {

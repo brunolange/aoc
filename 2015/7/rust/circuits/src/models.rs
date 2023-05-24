@@ -1,5 +1,7 @@
 use std::str::FromStr;
 
+use nom::combinator::all_consuming;
+
 use crate::parsers::{parse_connection, parse_expr};
 
 pub type Wire = String;
@@ -19,12 +21,12 @@ impl FromStr for Expr {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (_, expr) = parse_expr(s).map_err(|_| ())?;
+        let (_, expr) = all_consuming(parse_expr)(s).map_err(|_| ())?;
         Ok(expr)
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Connection {
     pub source: Expr,
     pub target: Wire,
