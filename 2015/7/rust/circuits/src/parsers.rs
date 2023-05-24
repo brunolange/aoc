@@ -9,7 +9,7 @@ use crate::models::{Connection, Expr, Wire};
 
 pub fn parse_connection(input: &str) -> IResult<&str, Connection> {
     let (remaining, (expr, wire)) =
-        all_consuming(separated_pair(parse_expr, tag(" -> "), take_word))(input)?;
+        all_consuming(separated_pair(parse_expr, tag(" -> "), alpha1))(input)?;
     Ok((
         remaining,
         Connection {
