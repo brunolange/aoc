@@ -1,13 +1,13 @@
+use crate::parsers::{parse_connection, parse_expr};
+use nom::combinator::all_consuming;
 use std::{
     collections::{HashMap, HashSet},
     str::FromStr,
 };
 
-use nom::combinator::all_consuming;
-
-use crate::parsers::{parse_connection, parse_expr};
-
 pub type Wire = String;
+pub type WireMap = HashMap<Wire, u16>;
+pub type Graph = HashMap<Wire, Node>;
 
 #[derive(Debug, PartialEq)]
 pub enum Expr {
@@ -44,12 +44,8 @@ impl FromStr for Connection {
     }
 }
 
-pub type WireMap = HashMap<Wire, u16>;
-
 #[derive(Debug)]
 pub struct Node {
     pub expr: Expr,
     pub dependencies: HashSet<Wire>,
 }
-
-pub type Graph = HashMap<Wire, Node>;
