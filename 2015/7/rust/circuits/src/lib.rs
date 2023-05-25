@@ -90,7 +90,7 @@ fn dfs<'a>(
     node: &'a String,
     temp: &mut HashSet<&'a String>,
     perm: &mut HashSet<&'a String>,
-    tlist: &mut Vec<String>,
+    path: &mut Vec<String>,
 ) -> Result<(), CycleError> {
     if perm.contains(node) {
         return Ok(());
@@ -103,11 +103,11 @@ fn dfs<'a>(
     temp.insert(node);
     let dependencies = &graph.get(node).unwrap().dependencies;
     for dependency in dependencies.iter() {
-        dfs(graph, dependency, temp, perm, tlist)?;
+        dfs(graph, dependency, temp, perm, path)?;
     }
     perm.insert(node);
 
-    tlist.push(node.clone());
+    path.push(node.clone());
 
     Ok(())
 }
