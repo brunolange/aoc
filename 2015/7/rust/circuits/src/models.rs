@@ -39,6 +39,30 @@ pub struct Connection {
 impl FromStr for Connection {
     type Err = ();
 
+    /// Parses a string into a Connection
+    ///
+    /// # Example
+    /// ```rust
+    /// use circuits::models::{Connection, Expr, Wire};
+    ///
+    /// assert_eq!(
+    ///     "123 -> x".parse::<Connection>().unwrap(),
+    ///     Connection { source: Expr::Value(123), target: Wire::from("x")}
+    /// );
+    ///
+    /// assert_eq!(
+    ///     "foo AND 100 -> bar".parse::<Connection>().unwrap(),
+    ///     Connection {
+    ///         source: Expr::And(
+    ///             Box::new(Expr::Symbol("foo".to_string())),
+    ///             Box::new(Expr::Value(100)),
+    ///         ),
+    ///         target: Wire::from("bar")
+    ///     }
+    /// );
+    ///
+    /// assert!("x <- y".parse::<Connection>().is_err())
+    /// ```
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let (_, expr) = parse_connection(s).map_err(|_| ())?;
         Ok(expr)
