@@ -12,10 +12,7 @@ fn main() {
 
     let output = wire_map.map(|wm| match wire {
         Err(_) => Output::AllWires(wm),
-        Ok(w) => match wm.get(&w) {
-            None => Output::Error,
-            Some(v) => Output::SingleWire(*v),
-        },
+        Ok(w) => wm.get(&w).map_or(Output::Error, |v| Output::SingleWire(*v)),
     });
 
     println!("{:?}", output);
