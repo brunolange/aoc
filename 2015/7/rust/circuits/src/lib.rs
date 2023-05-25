@@ -150,7 +150,13 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_circuit() {
+    fn test_simple_circuit() {
+        let result = run(vec!["123 -> a".to_string()].into_iter()).unwrap();
+        assert_eq!(result, HashMap::from([("a".to_string(), 123)]));
+    }
+
+    #[test]
+    fn test_sample_circuit() {
         let connections = vec![
             "123 -> x",
             "456 -> y",
@@ -183,5 +189,11 @@ mod tests {
         );
 
         assert_eq!(wire_map.unwrap(), expected);
+    }
+
+    #[test]
+    fn test_dag() {
+        let result = run(vec!["a -> a".to_string()].into_iter());
+        assert!(result.is_none());
     }
 }
