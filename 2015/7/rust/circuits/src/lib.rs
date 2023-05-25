@@ -22,18 +22,20 @@ fn from_connections(connections: impl Iterator<Item = Connection>) -> Connection
 }
 
 pub fn run(lines: impl Iterator<Item = String>) -> Option<SignalMap> {
-    reduce(lines.map(|line| {
+    signal_map(lines.map(|line| {
         let parts: Vec<&str> = line.splitn(2, '#').map(|l| l.trim()).collect();
 
         let connection = parts[0]
             .parse::<Connection>()
             .unwrap_or_else(|_| panic!("Error parsing line: {}", line));
+
         debug!("Parsed connection: {:?}", connection);
+
         connection
     }))
 }
 
-pub fn reduce(connections: impl Iterator<Item = Connection>) -> Option<SignalMap> {
+pub fn signal_map(connections: impl Iterator<Item = Connection>) -> Option<SignalMap> {
     let graph = from_connections(connections);
     let ts = topological_sort(&graph)?;
     debug!(
@@ -41,16 +43,14 @@ pub fn reduce(connections: impl Iterator<Item = Connection>) -> Option<SignalMap
         ts
     );
 
-    let mut wire_map = HashMap::new();
+    let mut output = HashMap::new();
     for wire in ts {
-        // wire_map.insert(node)
         let node = graph.get(&wire).unwrap();
-        let value = evaluate(&wire_map, &node.expr);
-        // let value = evaluate(&wire_map, )
-        wire_map.insert(wire, value);
+        let value = evaluate(&output, &node.expr);
+        output.insert(wire, value);
     }
 
-    Some(wire_map)
+    Some(output)
 }
 
 fn resolve_dependencies(expr: &Expr) -> HashSet<Wire> {
@@ -95,16 +95,20 @@ fn dfs<'a>(
     if perm.contains(node) {
         return Ok(());
     }
+
     if temp.contains(node) {
         return Err(CycleError);
     }
+
     temp.insert(node);
     let dependencies = &graph.get(node).unwrap().dependencies;
     for dependency in dependencies.iter() {
         dfs(graph, dependency, temp, perm, tlist)?;
     }
     perm.insert(node);
+
     tlist.push(node.clone());
+
     Ok(())
 }
 
@@ -168,7 +172,7 @@ mod tests {
             "NOT y -> i",
         ];
 
-        let wire_map = reduce(
+        let wire_map = signal_map(
             connections
                 .into_iter()
                 .map(|s| s.parse::<Connection>().unwrap()),
