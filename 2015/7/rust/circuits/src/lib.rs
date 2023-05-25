@@ -3,9 +3,9 @@ mod parsers;
 use std::collections::{HashMap, HashSet};
 
 use log::{debug, error};
-use models::{Connection, CycleError, Expr, Graph, Node, Wire, WireMap};
+use models::{Connection, ConnectionGraph, CycleError, Expr, Node, SignalMap, Wire};
 
-fn from_connections(connections: impl Iterator<Item = Connection>) -> Graph {
+fn from_connections(connections: impl Iterator<Item = Connection>) -> ConnectionGraph {
     let mut graph = HashMap::new();
     for connection in connections {
         let target = connection.target;
@@ -21,7 +21,7 @@ fn from_connections(connections: impl Iterator<Item = Connection>) -> Graph {
     graph
 }
 
-pub fn run(lines: impl Iterator<Item = String>) -> Option<WireMap> {
+pub fn run(lines: impl Iterator<Item = String>) -> Option<SignalMap> {
     reduce(lines.map(|line| {
         let parts: Vec<&str> = line.splitn(2, '#').map(|l| l.trim()).collect();
 
@@ -33,7 +33,7 @@ pub fn run(lines: impl Iterator<Item = String>) -> Option<WireMap> {
     }))
 }
 
-pub fn reduce(connections: impl Iterator<Item = Connection>) -> Option<WireMap> {
+pub fn reduce(connections: impl Iterator<Item = Connection>) -> Option<SignalMap> {
     let graph = from_connections(connections);
     let ts = topological_sort(&graph)?;
     debug!(
@@ -69,7 +69,7 @@ fn resolve_dependencies(expr: &Expr) -> HashSet<Wire> {
     }
 }
 
-fn topological_sort(graph: &Graph) -> Option<Vec<Wire>> {
+fn topological_sort(graph: &ConnectionGraph) -> Option<Vec<Wire>> {
     let mut unmarked: HashSet<_> = graph.keys().collect();
     let mut temp: HashSet<&String> = HashSet::new();
     let mut perm: HashSet<&String> = HashSet::new();
@@ -86,7 +86,7 @@ fn topological_sort(graph: &Graph) -> Option<Vec<Wire>> {
 }
 
 fn dfs<'a>(
-    graph: &'a Graph,
+    graph: &'a ConnectionGraph,
     node: &'a String,
     temp: &mut HashSet<&'a String>,
     perm: &mut HashSet<&'a String>,
@@ -108,7 +108,7 @@ fn dfs<'a>(
     Ok(())
 }
 
-fn evaluate(wire_map: &WireMap, expr: &Expr) -> u16 {
+fn evaluate(wire_map: &SignalMap, expr: &Expr) -> u16 {
     match expr {
         Expr::Value(v) => *v,
         Expr::Not(v) => {
@@ -174,7 +174,7 @@ mod tests {
                 .map(|s| s.parse::<Connection>().unwrap()),
         );
 
-        let expected: WireMap = HashMap::from(
+        let expected: SignalMap = HashMap::from(
             [
                 ("d", 72),
                 ("e", 507),

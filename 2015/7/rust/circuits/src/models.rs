@@ -6,8 +6,8 @@ use std::{
 };
 
 pub type Wire = String;
-pub type WireMap = HashMap<Wire, u16>;
-pub type Graph = HashMap<Wire, Node>;
+pub type SignalMap = HashMap<Wire, u16>;
+pub type ConnectionGraph = HashMap<Wire, Node>;
 pub struct CycleError;
 
 #[derive(Debug, PartialEq)]

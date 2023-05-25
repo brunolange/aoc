@@ -2,7 +2,7 @@ use std::env::VarError;
 use std::fs::File;
 use std::io::{self, BufRead};
 
-use circuits::models::WireMap;
+use circuits::models::SignalMap;
 
 pub fn lines() -> Box<dyn Iterator<Item = String>> {
     match std::env::args().nth(1) {
@@ -27,6 +27,6 @@ pub fn wire() -> Result<String, VarError> {
 #[derive(Debug)]
 pub enum Output {
     SingleWire(u16),
-    AllWires(WireMap),
+    AllWires(SignalMap),
     Error,
 }
