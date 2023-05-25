@@ -5,5 +5,6 @@ NOT 7 -> k
 x AND p -> w
 3 -> p
 NOT w -> b
-1000 -> x
-# NOT b -> p
+1000 -> x # reassigning x is valid
+2000      ->  x   # weird spacing is ok too
+# NOT b -> p # uncomment for cycle

@@ -37,8 +37,12 @@ impl Graph {
 }
 
 pub fn run(lines: impl Iterator<Item = String>) -> Option<WireMap> {
-    reduce(lines.map(|s| {
-        let connection = s.parse::<Connection>().expect("Error parsing line");
+    reduce(lines.map(|line| {
+        let parts: Vec<&str> = line.splitn(2, "#").into_iter().map(|l| l.trim()).collect();
+
+        let connection = parts[0]
+            .parse::<Connection>()
+            .expect(std::format!("Error parsing line: {}", line).as_str());
         debug!("Parsed connection: {:?}", connection);
         connection
     }))
@@ -48,7 +52,7 @@ pub fn reduce(connections: impl Iterator<Item = Connection>) -> Option<WireMap> 
     let graph = Graph::from_connections(connections);
     let ts = topological_sort(&graph)?;
     debug!(
-        "Found the following topological sorting for the connection graph: {:?}",
+        "Found a following topological sorting for the connection graph: {:?}",
         ts
     );
 

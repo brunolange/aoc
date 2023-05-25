@@ -1,15 +1,18 @@
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take_till1, take_until};
-use nom::character::complete::{alpha1, digit1, multispace1, space0};
+use nom::character::complete::{alpha1, digit1, multispace0, multispace1, space0};
 use nom::combinator::{all_consuming, map_res, recognize, rest};
-use nom::sequence::{delimited, preceded, separated_pair};
+use nom::sequence::{delimited, preceded, separated_pair, tuple};
 use nom::IResult;
 
 use crate::models::{Connection, Expr, Wire};
 
 pub fn parse_connection(input: &str) -> IResult<&str, Connection> {
-    let (remaining, (expr, wire)) =
-        all_consuming(separated_pair(parse_expr, tag(" -> "), alpha1))(input)?;
+    let (remaining, (expr, wire)) = all_consuming(separated_pair(
+        parse_expr,
+        tuple((multispace0, tag("->"), multispace0)),
+        alpha1,
+    ))(input)?;
     Ok((
         remaining,
         Connection {
