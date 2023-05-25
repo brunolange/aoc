@@ -13,27 +13,22 @@ struct Node {
     dependencies: HashSet<Wire>,
 }
 
-#[derive(Debug)]
-struct Graph {
-    adj: HashMap<Wire, Node>,
-}
+type Graph = HashMap<Wire, Node>;
 
-impl Graph {
-    fn from_connections(connections: impl Iterator<Item = Connection>) -> Self {
-        let mut adj = HashMap::new();
-        for connection in connections {
-            let target = connection.target;
-            let dependencies = resolve_dependencies(&connection.source);
-            adj.insert(
-                target.clone(),
-                Node {
-                    dependencies,
-                    expr: connection.source,
-                },
-            );
-        }
-        Graph { adj }
+fn from_connections(connections: impl Iterator<Item = Connection>) -> Graph {
+    let mut graph = HashMap::new();
+    for connection in connections {
+        let target = connection.target;
+        let dependencies = resolve_dependencies(&connection.source);
+        graph.insert(
+            target.clone(),
+            Node {
+                dependencies,
+                expr: connection.source,
+            },
+        );
     }
+    graph
 }
 
 pub fn run(lines: impl Iterator<Item = String>) -> Option<WireMap> {
@@ -49,7 +44,7 @@ pub fn run(lines: impl Iterator<Item = String>) -> Option<WireMap> {
 }
 
 pub fn reduce(connections: impl Iterator<Item = Connection>) -> Option<WireMap> {
-    let graph = Graph::from_connections(connections);
+    let graph = from_connections(connections);
     let ts = topological_sort(&graph)?;
     debug!(
         "Found a following topological sorting for the connection graph: {:?}",
@@ -59,7 +54,7 @@ pub fn reduce(connections: impl Iterator<Item = Connection>) -> Option<WireMap> 
     let mut wire_map = HashMap::new();
     for wire in ts {
         // wire_map.insert(node)
-        let node = graph.adj.get(&wire).unwrap();
+        let node = graph.get(&wire).unwrap();
         let value = evaluate(&wire_map, &node.expr);
         // let value = evaluate(&wire_map, )
         wire_map.insert(wire, value);
@@ -85,7 +80,7 @@ fn resolve_dependencies(expr: &Expr) -> HashSet<Wire> {
 }
 
 fn topological_sort(graph: &Graph) -> Option<Vec<Wire>> {
-    let mut unmarked: HashSet<_> = graph.adj.keys().collect();
+    let mut unmarked: HashSet<_> = graph.keys().collect();
     let mut temp: HashSet<&String> = HashSet::new();
     let mut perm: HashSet<&String> = HashSet::new();
     let mut path: Vec<String> = Vec::new();
@@ -116,7 +111,7 @@ fn dfs<'a>(
         return Err(CycleError);
     }
     temp.insert(node);
-    let dependencies = &graph.adj.get(node).unwrap().dependencies;
+    let dependencies = &graph.get(node).unwrap().dependencies;
     for dependency in dependencies.iter() {
         dfs(graph, dependency, temp, perm, tlist)?;
     }
