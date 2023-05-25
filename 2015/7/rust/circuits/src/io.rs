@@ -2,7 +2,7 @@ use std::env::VarError;
 use std::fs::File;
 use std::io::{self, BufRead};
 
-use circuits::WireMap;
+use circuits::models::WireMap;
 
 pub fn lines() -> Box<dyn Iterator<Item = String>> {
     match std::env::args().nth(1) {

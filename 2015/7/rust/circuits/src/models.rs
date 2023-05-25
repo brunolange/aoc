@@ -1,4 +1,7 @@
-use std::str::FromStr;
+use std::{
+    collections::{HashMap, HashSet},
+    str::FromStr,
+};
 
 use nom::combinator::all_consuming;
 
@@ -40,3 +43,13 @@ impl FromStr for Connection {
         Ok(expr)
     }
 }
+
+pub type WireMap = HashMap<Wire, u16>;
+
+#[derive(Debug)]
+pub struct Node {
+    pub expr: Expr,
+    pub dependencies: HashSet<Wire>,
+}
+
+pub type Graph = HashMap<Wire, Node>;

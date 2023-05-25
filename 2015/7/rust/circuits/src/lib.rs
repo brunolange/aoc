@@ -1,19 +1,9 @@
-mod models;
+pub mod models;
 mod parsers;
 use std::collections::{HashMap, HashSet};
 
 use log::{debug, error};
-use models::{Connection, Expr, Wire};
-
-pub type WireMap = HashMap<Wire, u16>;
-
-#[derive(Debug)]
-struct Node {
-    expr: Expr,
-    dependencies: HashSet<Wire>,
-}
-
-type Graph = HashMap<Wire, Node>;
+use models::{Connection, Expr, Graph, Node, Wire, WireMap};
 
 fn from_connections(connections: impl Iterator<Item = Connection>) -> Graph {
     let mut graph = HashMap::new();
