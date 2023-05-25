@@ -33,11 +33,11 @@ fn from_connections(connections: impl Iterator<Item = Connection>) -> Graph {
 
 pub fn run(lines: impl Iterator<Item = String>) -> Option<WireMap> {
     reduce(lines.map(|line| {
-        let parts: Vec<&str> = line.splitn(2, "#").into_iter().map(|l| l.trim()).collect();
+        let parts: Vec<&str> = line.splitn(2, '#').map(|l| l.trim()).collect();
 
         let connection = parts[0]
             .parse::<Connection>()
-            .expect(std::format!("Error parsing line: {}", line).as_str());
+            .unwrap_or_else(|_| panic!("Error parsing line: {}", line));
         debug!("Parsed connection: {:?}", connection);
         connection
     }))
