@@ -5,38 +5,57 @@ use std::collections::{HashMap, HashSet};
 use models::{Connection, Expr, Wire};
 
 type WireMap = HashMap<Wire, u16>;
-type G = HashMap<Wire, HashSet<Wire>>;
 
-pub fn run(lines: impl Iterator<Item = String>) -> WireMap {
+#[derive(Debug)]
+struct Node {
+    expr: Expr,
+    dependencies: HashSet<Wire>,
+}
+
+#[derive(Debug)]
+struct Graph {
+    adj: HashMap<Wire, Node>,
+}
+
+impl Graph {
+    fn from_connections(connections: impl Iterator<Item = Connection>) -> Self {
+        let mut adj = HashMap::new();
+        for connection in connections {
+            let target = connection.target;
+            let dependencies = resolve_dependencies(&connection.source);
+            adj.insert(
+                target.clone(),
+                Node {
+                    dependencies,
+                    expr: connection.source,
+                },
+            );
+        }
+        Graph { adj }
+    }
+}
+
+pub fn run(lines: impl Iterator<Item = String>) -> Option<WireMap> {
     reduce(lines.map(|s| s.parse::<Connection>().unwrap()))
 }
 
-pub fn reduce(connections: impl Iterator<Item = Connection>) -> WireMap {
-    let mut graph: G = HashMap::new();
-    // let mut co_graph: G = HashMap::new();
+pub fn reduce(connections: impl Iterator<Item = Connection>) -> Option<WireMap> {
+    let graph = Graph::from_connections(connections);
+    println!("graph = {:?}", graph);
+    let ts = topological_sort(&graph)?;
+    println!("Found a topological sorting for this graph!");
+    println!("{:?}", ts);
 
-    for connection in connections {
-        println!("evaluating connection: {:?}", connection);
-        let target = connection.target;
-        let dependencies = resolve_dependencies(&connection.source);
-
-        println!(
-            "target {} has these dependencies: {:?}",
-            target, dependencies
-        );
-
-        graph.insert(target, dependencies);
-        // for d in dependencies.into_iter() {
-        //     co_graph.entry(d.clone()).or_default().insert(target);
-        // }
-        // let value = evaluate(&wire_map, connection.source);
-        // wire_map.insert(connection.target, value);
-
-        println!("graph = {:?}", graph);
+    let mut wire_map = HashMap::new();
+    for wire in ts {
+        // wire_map.insert(node)
+        let node = graph.adj.get(&wire).unwrap();
+        let value = evaluate(&wire_map, &node.expr);
+        // let value = evaluate(&wire_map, )
+        wire_map.insert(wire, value);
     }
 
-    // graph
-    HashMap::new()
+    Some(wire_map)
 }
 
 fn resolve_dependencies(expr: &Expr) -> HashSet<Wire> {
@@ -55,42 +74,83 @@ fn resolve_dependencies(expr: &Expr) -> HashSet<Wire> {
     }
 }
 
-// fn evaluate(wire_map: &WireMap, expr: Expr) -> u16 {
-//     match expr {
-//         Expr::Value(v) => v,
-//         Expr::Not(v) => {
-//             let a = evaluate(wire_map, *v);
-//             !a
-//         }
-//         Expr::And(left, right) => {
-//             let a = evaluate(wire_map, *left);
-//             let b = evaluate(wire_map, *right);
-//             a & b
-//         }
-//         Expr::Or(left, right) => {
-//             let a = evaluate(wire_map, *left);
-//             let b = evaluate(wire_map, *right);
-//             a | b
-//         }
-//         Expr::LShift(left, right) => {
-//             let a = evaluate(wire_map, *left);
-//             let b = evaluate(wire_map, *right);
-//             a << b
-//         }
-//         Expr::RShift(left, right) => {
-//             let a = evaluate(wire_map, *left);
-//             let b = evaluate(wire_map, *right);
-//             a >> b
-//         }
-//         Expr::Symbol(s) => {
-//             let value = wire_map.get(&s);
-//             match value {
-//                 None => panic!("Could not evaluate symbol {}", s),
-//                 Some(v) => *v,
-//             }
-//         }
-//     }
-// }
+fn topological_sort(graph: &Graph) -> Option<Vec<Wire>> {
+    let mut unmarked: HashSet<_> = graph.adj.keys().collect();
+    let mut temp: HashSet<&String> = HashSet::new();
+    let mut perm: HashSet<&String> = HashSet::new();
+    let mut path: Vec<String> = Vec::new();
+
+    for node in unmarked.drain() {
+        if dfs(graph, node, &mut temp, &mut perm, &mut path).is_err() {
+            println!("Detected cycle in dependency graph. Circuit is not realizable.");
+            return None;
+        }
+    }
+
+    Some(path)
+}
+
+struct CycleError;
+
+fn dfs<'a>(
+    graph: &'a Graph,
+    node: &'a String,
+    temp: &mut HashSet<&'a String>,
+    perm: &mut HashSet<&'a String>,
+    tlist: &mut Vec<String>,
+) -> Result<(), CycleError> {
+    if perm.contains(node) {
+        return Ok(());
+    }
+    if temp.contains(node) {
+        return Err(CycleError);
+    }
+    temp.insert(node);
+    let dependencies = &graph.adj.get(node).unwrap().dependencies;
+    for dependency in dependencies.iter() {
+        dfs(graph, dependency, temp, perm, tlist)?;
+    }
+    perm.insert(node);
+    tlist.push(node.clone());
+    Ok(())
+}
+
+fn evaluate(wire_map: &WireMap, expr: &Expr) -> u16 {
+    match expr {
+        Expr::Value(v) => *v,
+        Expr::Not(v) => {
+            let a = evaluate(wire_map, v);
+            !a
+        }
+        Expr::And(left, right) => {
+            let a = evaluate(wire_map, left);
+            let b = evaluate(wire_map, right);
+            a & b
+        }
+        Expr::Or(left, right) => {
+            let a = evaluate(wire_map, left);
+            let b = evaluate(wire_map, right);
+            a | b
+        }
+        Expr::LShift(left, right) => {
+            let a = evaluate(wire_map, left);
+            let b = evaluate(wire_map, right);
+            a << b
+        }
+        Expr::RShift(left, right) => {
+            let a = evaluate(wire_map, left);
+            let b = evaluate(wire_map, right);
+            a >> b
+        }
+        Expr::Symbol(s) => {
+            let value = wire_map.get(s);
+            match value {
+                None => panic!("Could not evaluate symbol {}", s),
+                Some(v) => *v,
+            }
+        }
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -129,6 +189,6 @@ mod tests {
             .map(|(s, v)| (Wire::from(s), v)),
         );
 
-        assert_eq!(wire_map, expected);
+        assert_eq!(wire_map.unwrap(), expected);
     }
 }
