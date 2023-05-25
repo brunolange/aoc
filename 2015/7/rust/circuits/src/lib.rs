@@ -3,7 +3,7 @@ mod parsers;
 use std::collections::{HashMap, HashSet};
 
 use log::{debug, error};
-use models::{Connection, Expr, Graph, Node, Wire, WireMap};
+use models::{Connection, CycleError, Expr, Graph, Node, Wire, WireMap};
 
 fn from_connections(connections: impl Iterator<Item = Connection>) -> Graph {
     let mut graph = HashMap::new();
@@ -84,8 +84,6 @@ fn topological_sort(graph: &Graph) -> Option<Vec<Wire>> {
 
     Some(path)
 }
-
-struct CycleError;
 
 fn dfs<'a>(
     graph: &'a Graph,
