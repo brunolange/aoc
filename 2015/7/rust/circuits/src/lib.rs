@@ -2,6 +2,7 @@ mod models;
 mod parsers;
 use std::collections::{HashMap, HashSet};
 
+use log::{debug, error};
 use models::{Connection, Expr, Wire};
 
 type WireMap = HashMap<Wire, u16>;
@@ -36,15 +37,20 @@ impl Graph {
 }
 
 pub fn run(lines: impl Iterator<Item = String>) -> Option<WireMap> {
-    reduce(lines.map(|s| s.parse::<Connection>().unwrap()))
+    reduce(lines.map(|s| {
+        let connection = s.parse::<Connection>().expect("Error parsing line");
+        debug!("Parsed connection: {:?}", connection);
+        connection
+    }))
 }
 
 pub fn reduce(connections: impl Iterator<Item = Connection>) -> Option<WireMap> {
     let graph = Graph::from_connections(connections);
-    println!("graph = {:?}", graph);
     let ts = topological_sort(&graph)?;
-    println!("Found a topological sorting for this graph!");
-    println!("{:?}", ts);
+    debug!(
+        "Found the following topological sorting for the connection graph: {:?}",
+        ts
+    );
 
     let mut wire_map = HashMap::new();
     for wire in ts {
@@ -82,7 +88,7 @@ fn topological_sort(graph: &Graph) -> Option<Vec<Wire>> {
 
     for node in unmarked.drain() {
         if dfs(graph, node, &mut temp, &mut perm, &mut path).is_err() {
-            println!("Detected cycle in dependency graph. Circuit is not realizable.");
+            error!("Detected cycle in dependency graph. Circuit is not realizable.");
             return None;
         }
     }

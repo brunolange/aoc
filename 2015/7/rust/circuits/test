@@ -5,3 +5,5 @@ NOT 7 -> k
 x AND p -> w
 3 -> p
 NOT w -> b
+1000 -> x
+# NOT b -> p
