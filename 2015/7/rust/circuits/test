@@ -1,0 +1,7 @@
+123 -> x
+456 -> y
+x AND y -> z
+NOT 7 -> k
+x AND p -> w
+3 -> p
+NOT w -> b
