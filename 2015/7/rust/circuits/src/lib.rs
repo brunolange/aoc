@@ -5,7 +5,7 @@ use std::collections::{HashMap, HashSet};
 use log::{debug, error};
 use models::{Connection, Expr, Wire};
 
-type WireMap = HashMap<Wire, u16>;
+pub type WireMap = HashMap<Wire, u16>;
 
 #[derive(Debug)]
 struct Node {

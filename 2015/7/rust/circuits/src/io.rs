@@ -2,6 +2,8 @@ use std::env::VarError;
 use std::fs::File;
 use std::io::{self, BufRead};
 
+use circuits::WireMap;
+
 pub fn lines() -> Box<dyn Iterator<Item = String>> {
     match std::env::args().nth(1) {
         None => Box::new(
@@ -20,4 +22,11 @@ pub fn lines() -> Box<dyn Iterator<Item = String>> {
 
 pub fn wire() -> Result<String, VarError> {
     std::env::var("WIRE")
+}
+
+#[derive(Debug)]
+pub enum Output {
+    SingleWire(u16),
+    AllWires(WireMap),
+    Error,
 }

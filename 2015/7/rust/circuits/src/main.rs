@@ -2,16 +2,18 @@ use circuits::run;
 
 mod io;
 
+use io::Output;
+
 fn main() {
     env_logger::init();
     let wire_map = run(io::lines());
     let wire = io::wire();
-    let output = match wire {
-        Ok(w) => match &wire_map {
-            Some(wp) => wp.get(&w),
-            _ => None,
+    let output = wire_map.map(|wm| match wire {
+        Err(_) => Output::AllWires(wm),
+        Ok(w) => match wm.get(&w) {
+            None => Output::Error,
+            Some(v) => Output::SingleWire(*v),
         },
-        _ => None,
-    };
+    });
     println!("{:?}", output);
 }
