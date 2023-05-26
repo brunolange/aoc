@@ -15,3 +15,6 @@ b <- 2
 
 b AND (c OR (NOT (LSHIFT w 3)) <- a, resolve b, c, and w and then finally a.
 ```
+
+- if the wire is provided, I could truncate the ts soon as the wire shows up.
+- does work but savings are negligible for those input sizes.
