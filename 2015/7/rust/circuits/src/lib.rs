@@ -5,22 +5,6 @@ use std::collections::{HashMap, HashSet};
 use log::{debug, error};
 use models::{Connection, ConnectionGraph, CycleError, Expr, Node, SignalMap, Wire};
 
-fn from_connections(connections: impl Iterator<Item = Connection>) -> ConnectionGraph {
-    let mut graph = HashMap::new();
-    for connection in connections {
-        let target = connection.target;
-        let dependencies = resolve_dependencies(&connection.source);
-        graph.insert(
-            target.clone(),
-            Node {
-                dependencies,
-                expr: connection.source,
-            },
-        );
-    }
-    graph
-}
-
 pub fn run(lines: impl Iterator<Item = String>) -> Option<SignalMap> {
     signal_map(lines.map(|line| {
         let parts: Vec<&str> = line.splitn(2, '#').map(|l| l.trim()).collect();
@@ -51,6 +35,22 @@ pub fn signal_map(connections: impl Iterator<Item = Connection>) -> Option<Signa
     }
 
     Some(output)
+}
+
+fn from_connections(connections: impl Iterator<Item = Connection>) -> ConnectionGraph {
+    let mut graph = HashMap::new();
+    for connection in connections {
+        let target = connection.target;
+        let dependencies = resolve_dependencies(&connection.source);
+        graph.insert(
+            target.clone(),
+            Node {
+                dependencies,
+                expr: connection.source,
+            },
+        );
+    }
+    graph
 }
 
 fn resolve_dependencies(expr: &Expr) -> HashSet<Wire> {

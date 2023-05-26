@@ -11,8 +11,8 @@ fn main() {
     let wire = io::wire();
 
     let output = signal_map.map(|wm| match wire {
-        Err(_) => Output::AllWires(wm),
         Ok(w) => wm.get(&w).map_or(Output::Error, |v| Output::SingleWire(*v)),
+        Err(_) => Output::AllWires(wm),
     });
 
     println!("{:?}", output);
