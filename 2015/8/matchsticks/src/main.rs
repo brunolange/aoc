@@ -11,9 +11,12 @@ mod io;
 use io::lines;
 
 fn main() {
-    for line in lines() {
-        println!("{}: {:?}", line, counts(&line));
-    }
+    println!(
+        "{}",
+        lines()
+            .map(|line| counts(&line))
+            .fold(0, |acc, (l, r)| acc + l - r)
+    );
 }
 
 fn is_hex_digit(c: char) -> bool {
