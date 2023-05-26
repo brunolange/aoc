@@ -33,6 +33,11 @@ fn parse_quote(input: &str) -> IResult<&str, usize> {
     Ok((remaining, 1))
 }
 
+fn parse_backslash(input: &str) -> IResult<&str, usize> {
+    let (remaining, _) = tag(r"\\")(input)?;
+    Ok((remaining, 1))
+}
+
 fn parse_seq(input: &str) -> IResult<&str, usize> {
     let (remaining, seq) = alphanumeric1(input)?;
     Ok((remaining, seq.len()))
@@ -40,7 +45,7 @@ fn parse_seq(input: &str) -> IResult<&str, usize> {
 
 fn parse_count(input: &str) -> IResult<&str, usize> {
     let (input, _) = tag("\"")(input)?;
-    let (input, xs) = many0(alt((parse_hex, parse_quote, parse_seq)))(input)?;
+    let (input, xs) = many0(alt((parse_hex, parse_quote, parse_backslash, parse_seq)))(input)?;
     let _ = all_consuming(tag("\""))(input)?;
 
     Ok((input, xs.iter().sum()))
