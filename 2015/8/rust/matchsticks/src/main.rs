@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use nom::branch::alt;
 use nom::bytes::complete::{tag, take_while_m_n};
 use nom::character::complete::alphanumeric1;
@@ -10,11 +12,24 @@ mod io;
 
 use io::lines;
 
+fn encode_counts(input: &str) -> (usize, usize) {
+    let to_escape = HashSet::from(['"', '\\']);
+    let extra = input.chars().filter(|c| to_escape.contains(c)).count();
+    return (input.len() + 2 + extra, input.len());
+}
+
 fn main() {
+    let x = std::env::var("PART").unwrap_or("1".to_owned());
+    let mapper = match x.as_str() {
+        "1" => counts,
+        "2" => encode_counts,
+        _ => panic!("Invalid PART"),
+    };
+
     println!(
         "{}",
         lines()
-            .map(|line| counts(&line))
+            .map(|line| mapper(&line))
             .fold(0, |acc, (l, r)| acc + l - r)
     );
 }
