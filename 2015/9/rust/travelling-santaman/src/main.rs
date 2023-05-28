@@ -15,12 +15,12 @@ struct Edge {
 }
 
 #[derive(Debug)]
-struct Graph {
-    adj: HashMap<Node, HashMap<Edge, Node>>,
+struct Graph<'a> {
+    adj: HashMap<&'a Node, HashMap<&'a Edge, &'a Node>>,
 }
 
-impl Graph {
-    fn add_edge(&mut self, start: Node, edge: Edge, destination: Node) {
+impl<'a> Graph<'a> {
+    fn add_edge(&mut self, start: &'a Node, edge: &'a Edge, destination: &'a Node) {
         self.adj
             .entry(start)
             .or_insert(HashMap::new())
@@ -67,9 +67,14 @@ fn main() {
     let mut graph = Graph {
         adj: HashMap::new(),
     };
-    for line in lines() {
-        let (start, edge, destination) = parse_line(line.as_ref()).expect("Error parsing line");
+    let xs = lines()
+        .map(|line| parse_line(line.as_ref()).expect("Error parsing line"))
+        .collect::<Vec<(Node, Edge, Node)>>();
+
+    for (start, edge, destination) in xs.iter() {
         graph.add_edge(start, edge, destination);
-        println!("graph = {:?}", graph);
+        graph.add_edge(destination, edge, start);
     }
+
+    println!("graph = {:?}", graph);
 }
