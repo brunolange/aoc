@@ -1,3 +1,9 @@
+mod io;
+
+use crate::io::lines;
+
 fn main() {
-    println!("Hello, world!");
+    for line in lines() {
+        println!("{}", line);
+    }
 }
