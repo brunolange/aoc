@@ -67,7 +67,7 @@ fn parse_count(input: &str) -> IResult<&str, usize> {
 }
 
 fn counts(line: &str) -> (usize, usize) {
-    let (_, count) = parse_count(line).unwrap();
+    let (_, count) = parse_count(line).expect("Invalid input");
     (line.len(), count)
 }
 
