@@ -96,26 +96,30 @@ fn main() {
         })
         .collect();
 
-    let (optimal_path, distance) = hamiltonian_paths
-        .iter()
-        .map(|hp| {
-            (
-                hp.clone(),
-                hp.iter()
-                    .tuple_windows()
-                    .fold(0, |acc, (source, destination)| {
-                        acc + graph
-                            .adj
-                            .get(**source)
-                            .unwrap()
-                            .get(**destination)
-                            .unwrap()
-                            .distance
-                    }),
-            )
-        })
-        .min_by_key(|(_, total_distance)| *total_distance)
-        .unwrap();
+    let result = hamiltonian_paths.iter().map(|hp| {
+        (
+            hp.clone(),
+            hp.iter()
+                .tuple_windows()
+                .fold(0, |acc, (source, destination)| {
+                    acc + graph
+                        .adj
+                        .get(**source)
+                        .unwrap()
+                        .get(**destination)
+                        .unwrap()
+                        .distance
+                }),
+        )
+    });
+
+    let result = if io::part() == "2" {
+        result.max_by_key(|(_, distance)| *distance)
+    } else {
+        result.min_by_key(|(_, distance)| *distance)
+    };
+
+    let (optimal_path, distance) = result.unwrap();
 
     println!(
         "optimal_path = {:?}",

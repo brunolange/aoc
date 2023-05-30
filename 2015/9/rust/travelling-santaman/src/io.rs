@@ -9,3 +9,11 @@ pub fn lines() -> Box<dyn Iterator<Item = String>> {
         }
     }
 }
+
+pub fn part() -> String {
+    let part = std::env::var("PART").ok();
+    match part {
+        None => "1".to_owned(),
+        Some(part) => part,
+    }
+}
