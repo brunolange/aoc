@@ -83,42 +83,46 @@ fn main() {
     let nodes = graph.adj.keys();
     let n = nodes.len();
 
-    let hamiltonian_paths = nodes.permutations(n).filter(|permutation| {
-        permutation
-            .iter()
-            .tuple_windows()
-            .all(|(source, destination)| {
-                let neighbors = graph.adj.get(**source).unwrap();
-                neighbors.contains_key(**destination)
-            })
-    });
-
-    let mut min_total_distance = usize::MAX;
-    let mut optimal_path = vec![];
-    for hamiltonian_path in hamiltonian_paths {
-        let total_distance =
-            hamiltonian_path
+    let hamiltonian_paths: Vec<Vec<&&Node>> = nodes
+        .permutations(n)
+        .filter(|permutation| {
+            permutation
                 .iter()
                 .tuple_windows()
-                .fold(0, |acc, (source, destination)| {
-                    acc + graph
-                        .adj
-                        .get(**source)
-                        .unwrap()
-                        .get(**destination)
-                        .unwrap()
-                        .distance
-                });
-        debug!(
-            "Hamiltonian path: {:?} has total distance: {}",
-            hamiltonian_path, total_distance
-        );
-        if total_distance < min_total_distance {
-            optimal_path = hamiltonian_path;
-            min_total_distance = total_distance;
-        }
-    }
+                .all(|(source, destination)| {
+                    let neighbors = graph.adj.get(**source).unwrap();
+                    neighbors.contains_key(**destination)
+                })
+        })
+        .collect();
 
-    println!("optimal_path = {:?}", optimal_path);
-    println!("min_total_distance = {:?}", min_total_distance);
+    let (optimal_path, distance) = hamiltonian_paths
+        .iter()
+        .map(|hp| {
+            (
+                hp.clone(),
+                hp.iter()
+                    .tuple_windows()
+                    .fold(0, |acc, (source, destination)| {
+                        acc + graph
+                            .adj
+                            .get(**source)
+                            .unwrap()
+                            .get(**destination)
+                            .unwrap()
+                            .distance
+                    }),
+            )
+        })
+        .min_by_key(|(_, total_distance)| *total_distance)
+        .unwrap();
+
+    println!(
+        "optimal_path = {:?}",
+        optimal_path
+            .iter()
+            .map(|node| { &node.city })
+            .collect::<Vec<&String>>()
+    );
+    println!("distance = {:?}", distance);
 }
