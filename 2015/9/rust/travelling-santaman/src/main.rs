@@ -1,6 +1,7 @@
 mod io;
 use crate::io::lines;
 use itertools::Itertools;
+use log::debug;
 use std::collections::HashMap;
 
 #[derive(Debug, Hash, Eq, PartialEq)]
@@ -63,6 +64,8 @@ fn parse_line(input: &str) -> Option<(Node, Edge, Node)> {
 }
 
 fn main() {
+    env_logger::init();
+
     let mut graph = Graph {
         adj: HashMap::new(),
     };
@@ -74,6 +77,8 @@ fn main() {
         graph.add_edge(start, destination, edge);
         graph.add_edge(destination, start, edge);
     }
+
+    debug!("graph = {:?}", graph);
 
     let nodes = graph.adj.keys();
     let n = nodes.len();
@@ -104,7 +109,7 @@ fn main() {
                         .unwrap()
                         .distance
                 });
-        println!(
+        debug!(
             "Hamiltonian path: {:?} has total distance: {}",
             hamiltonian_path, total_distance
         );
@@ -114,7 +119,6 @@ fn main() {
         }
     }
 
-    // println!("graph = {:?}", graph);
     println!("optimal_path = {:?}", optimal_path);
     println!("min_total_distance = {:?}", min_total_distance);
 }
