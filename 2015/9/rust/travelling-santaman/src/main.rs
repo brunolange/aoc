@@ -69,11 +69,11 @@ fn main() {
     let mut graph = Graph {
         adj: HashMap::new(),
     };
-    let xs = lines()
+    let connections = lines()
         .map(|line| parse_line(line.as_ref()).expect("Error parsing line"))
         .collect::<Vec<(Node, Edge, Node)>>();
 
-    for (start, edge, destination) in xs.iter() {
+    for (start, edge, destination) in connections.iter() {
         graph.add_edge(start, destination, edge);
         graph.add_edge(destination, start, edge);
     }
