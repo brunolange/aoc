@@ -1,8 +1,6 @@
 mod io;
-
-use std::collections::HashMap;
-
 use crate::io::lines;
+use std::collections::HashMap;
 
 #[derive(Debug, Hash, Eq, PartialEq)]
 struct Node {
@@ -16,15 +14,15 @@ struct Edge {
 
 #[derive(Debug)]
 struct Graph<'a> {
-    adj: HashMap<&'a Node, HashMap<&'a Edge, &'a Node>>,
+    adj: HashMap<&'a Node, HashMap<&'a Node, &'a Edge>>,
 }
 
 impl<'a> Graph<'a> {
-    fn add_edge(&mut self, start: &'a Node, edge: &'a Edge, destination: &'a Node) {
+    fn add_edge(&mut self, start: &'a Node, destination: &'a Node, edge: &'a Edge) {
         self.adj
             .entry(start)
             .or_insert(HashMap::new())
-            .insert(edge, destination);
+            .insert(destination, edge);
     }
 }
 
@@ -72,8 +70,8 @@ fn main() {
         .collect::<Vec<(Node, Edge, Node)>>();
 
     for (start, edge, destination) in xs.iter() {
-        graph.add_edge(start, edge, destination);
-        graph.add_edge(destination, edge, start);
+        graph.add_edge(start, destination, edge);
+        graph.add_edge(destination, start, edge);
     }
 
     println!("graph = {:?}", graph);
