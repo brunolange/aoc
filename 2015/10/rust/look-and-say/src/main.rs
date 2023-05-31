@@ -1,36 +1,45 @@
-struct LookAndSay<'a> {
-    seed: &'a str,
+use itertools::Itertools;
+
+struct LookAndSay {
+    seed: String,
 }
 
-impl LookAndSay<'_> {
+impl LookAndSay {
     fn iter(&mut self) -> LookAndSayIter {
-        LookAndSayIter { curr: self.seed }
+        LookAndSayIter {
+            curr: self.seed.clone(),
+        }
     }
 }
 
-struct LookAndSayIter<'a> {
-    curr: &'a str,
+struct LookAndSayIter {
+    curr: String,
 }
 
-impl<'a> Iterator for LookAndSayIter<'a> {
-    type Item = &'a str;
+impl Iterator for LookAndSayIter {
+    type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let response = Some(self.curr);
-        self.curr = "and then";
+        let response = Some(self.curr.clone());
+        self.curr = look_and_say(self.curr.clone());
         response
     }
 }
 
+fn look_and_say(input: String) -> String {
+    input
+        .chars()
+        .group_by(|c| *c)
+        .into_iter()
+        .map(|(c, grp)| (grp.collect::<Vec<_>>().len().to_string(), c))
+        .map(|(count, c)| format!("{}{}", count, c))
+        .join("")
+}
+
 fn main() {
-    let mut i = 0;
-    let mut las = LookAndSay { seed: "hello" };
-    for s in las.iter() {
-        println!("s = {}", s);
-        i += 1;
-        if i == 5 {
-            break;
-        }
-    }
-    println!("Hello, world!");
+    let mut las = LookAndSay {
+        seed: "1113122113".to_owned(),
+    };
+    let last = las.iter().take(41).last().unwrap();
+    println!("{}", last.len());
 }
