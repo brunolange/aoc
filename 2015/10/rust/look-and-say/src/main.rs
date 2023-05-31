@@ -5,7 +5,7 @@ fn look_and_say(input: String) -> String {
         .chars()
         .group_by(|c| *c)
         .into_iter()
-        .map(|(c, grp)| format!("{}{}", grp.collect::<Vec<_>>().len().to_string(), c))
+        .map(|(c, grp)| format!("{}{}", grp.collect::<Vec<_>>().len(), c))
         .join("")
 }
 
