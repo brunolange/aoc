@@ -1,31 +1,5 @@
 use itertools::Itertools;
 
-struct LookAndSay {
-    seed: String,
-}
-
-impl LookAndSay {
-    fn iter(&mut self) -> LookAndSayIter {
-        LookAndSayIter {
-            curr: self.seed.clone(),
-        }
-    }
-}
-
-struct LookAndSayIter {
-    curr: String,
-}
-
-impl Iterator for LookAndSayIter {
-    type Item = String;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let response = Some(self.curr.clone());
-        self.curr = look_and_say(self.curr.clone());
-        response
-    }
-}
-
 fn look_and_say(input: String) -> String {
     input
         .chars()
@@ -36,10 +10,23 @@ fn look_and_say(input: String) -> String {
         .join("")
 }
 
+struct LookAndSay {
+    curr: String,
+}
+
+impl Iterator for LookAndSay {
+    type Item = String;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.curr = look_and_say(self.curr.clone());
+        Some(self.curr.clone())
+    }
+}
+
 fn main() {
-    let mut las = LookAndSay {
-        seed: "1113122113".to_owned(),
+    let las = LookAndSay {
+        curr: "1113122113".to_owned(),
     };
-    let last = las.iter().take(41).last().unwrap();
-    println!("{}", last.len());
+    let last = las.take(40).last().unwrap();
+    println!("{}: {}", last, last.len());
 }
