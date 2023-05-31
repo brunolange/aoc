@@ -23,9 +23,13 @@ impl Iterator for LookAndSay {
 }
 
 fn main() {
-    let las = LookAndSay {
-        curr: "1113122113".to_owned(),
-    };
-    let last = las.take(40).last().unwrap();
+    let seed = std::env::args().nth(1).unwrap_or("1113122113".to_owned());
+    let iterations: usize = std::env::args()
+        .nth(2)
+        .unwrap_or("40".to_owned())
+        .parse()
+        .unwrap();
+    let las = LookAndSay { curr: seed };
+    let last = las.take(iterations).last().unwrap();
     println!("{}: {}", last, last.len());
 }
