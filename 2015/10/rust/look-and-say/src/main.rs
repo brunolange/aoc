@@ -1,5 +1,7 @@
 use itertools::Itertools;
 
+mod io;
+
 fn look_and_say(input: String) -> String {
     input
         .chars()
@@ -23,13 +25,7 @@ impl Iterator for LookAndSay {
 }
 
 fn main() {
-    let seed = std::env::args().nth(1).unwrap_or("1113122113".to_owned());
-    let iterations: usize = std::env::args()
-        .nth(2)
-        .unwrap_or("40".to_owned())
-        .parse()
-        .unwrap();
-    let las = LookAndSay { curr: seed };
-    let last = las.take(iterations).last().unwrap();
+    let las = LookAndSay { curr: io::seed() };
+    let last = las.take(io::iterations()).last().unwrap();
     println!("{}: {}", last, last.len());
 }
