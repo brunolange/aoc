@@ -11,21 +11,11 @@ fn look_and_say(input: String) -> String {
         .join("")
 }
 
-struct LookAndSay {
-    curr: String,
-}
-
-impl Iterator for LookAndSay {
-    type Item = String;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        self.curr = look_and_say(self.curr.clone());
-        Some(self.curr.clone())
-    }
-}
-
 fn main() {
-    let las = LookAndSay { curr: io::seed() };
-    let last = las.take(io::iterations()).last().unwrap();
+    let mut last = io::seed();
+    for _ in 0..io::iterations() {
+        last = look_and_say(last);
+    }
+
     println!("{}: {}", last, last.len());
 }
