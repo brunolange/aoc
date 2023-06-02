@@ -33,7 +33,7 @@ fn encode_counts(input: &str) -> (usize, usize) {
 }
 
 fn is_hex_digit(c: char) -> bool {
-    c.is_digit(16)
+    c.is_ascii_hexdigit()
 }
 
 fn parse_hex(input: &str) -> IResult<&str, usize> {
