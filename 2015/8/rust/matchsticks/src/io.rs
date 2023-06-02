@@ -16,3 +16,21 @@ pub fn lines() -> Box<dyn Iterator<Item = String>> {
         }
     }
 }
+
+pub enum Part {
+    ONE,
+    TWO,
+}
+
+pub fn part() -> Part {
+    let part = std::env::var("PART")
+        .unwrap_or("1".to_owned())
+        .parse()
+        .expect("invalid PART");
+
+    match part {
+        1 => Part::ONE,
+        2 => Part::TWO,
+        _ => panic!("invalid PART"),
+    }
+}

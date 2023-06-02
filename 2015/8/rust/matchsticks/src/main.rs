@@ -19,11 +19,9 @@ fn encode_counts(input: &str) -> (usize, usize) {
 }
 
 fn main() {
-    let x = std::env::var("PART").unwrap_or("1".to_owned());
-    let mapper = match x.as_str() {
-        "1" => counts,
-        "2" => encode_counts,
-        _ => panic!("Invalid PART"),
+    let mapper = match io::part() {
+        io::Part::ONE => counts,
+        io::Part::TWO => encode_counts,
     };
 
     println!(
