@@ -12,12 +12,6 @@ mod io;
 
 use io::lines;
 
-fn encode_counts(input: &str) -> (usize, usize) {
-    let to_escape = HashSet::from(['"', '\\']);
-    let extra = input.chars().filter(|c| to_escape.contains(c)).count();
-    return (input.len() + 2 + extra, input.len());
-}
-
 fn main() {
     let mapper = match io::part() {
         io::Part::ONE => counts,
@@ -30,6 +24,12 @@ fn main() {
             .map(|line| mapper(&line))
             .fold(0, |acc, (l, r)| acc + l - r)
     );
+}
+
+fn encode_counts(input: &str) -> (usize, usize) {
+    let to_escape = HashSet::from(['"', '\\']);
+    let extra = input.chars().filter(|c| to_escape.contains(c)).count();
+    return (input.len() + 2 + extra, input.len());
 }
 
 fn is_hex_digit(c: char) -> bool {
