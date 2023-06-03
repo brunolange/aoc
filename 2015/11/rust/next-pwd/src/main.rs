@@ -10,13 +10,14 @@ impl Iterator for PasswordIterator {
         let mut nxt = self.pwd.clone();
 
         let mut carry = true;
-        let mut i = 7;
-        while carry {
-            (nxt[i], carry) = inc(nxt[i]);
+        let mut i: i32 = 7;
+        while carry && i >= 0 {
+            let idx = i as usize;
+            (nxt[idx], carry) = inc(nxt[idx]);
             i -= 1;
         }
 
-        let n = if carry && i == 0 { None } else { Some(nxt) };
+        let n = if carry && i == -1 { None } else { Some(nxt) };
 
         self.pwd = nxt;
 
