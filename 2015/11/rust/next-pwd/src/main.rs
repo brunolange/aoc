@@ -1,5 +1,7 @@
 use nom::{bytes::complete::take_while_m_n, combinator::all_consuming, IResult};
 
+mod io;
+
 fn parse_pwd<const N: usize>(input: &str) -> IResult<&str, &str> {
     let (remaining, pwd) = all_consuming(take_while_m_n(N, N, |c: char| c.is_lowercase()))(input)?;
     Ok((remaining, pwd))
@@ -59,7 +61,9 @@ fn inc(c: char) -> (char, bool) {
 }
 
 fn main() {
-    let pwd: Password<8> = Password::from_str("hxbxwxba").expect("invalid password");
+    let pwd: Password<8> =
+        Password::from_str(io::read_password().as_str()).expect("invalid password");
+
     let pi = PasswordIterator { pwd };
     let mut counter = 0;
     for n in pi {
