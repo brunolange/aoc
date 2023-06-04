@@ -4,8 +4,7 @@ mod io;
 
 fn main() {
     env_logger::init();
-    let password = io::read_password();
-    match next_password(&password) {
+    match next_password(&io::read_password()) {
         None => panic!("Could not find a viable next password"),
         Some(pwd) => println!("{}", pwd),
     };
