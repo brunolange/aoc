@@ -7,7 +7,7 @@ pub fn parse_pwd<const N: usize>(input: &str) -> IResult<&str, &str> {
 
 #[derive(Clone, Debug)]
 pub struct Password<const N: usize> {
-    value: [char; N],
+    pub value: [char; N],
 }
 
 impl<const N: usize> Password<N> {
