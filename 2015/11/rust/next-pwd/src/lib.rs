@@ -5,25 +5,41 @@ use nom::{bytes::complete::take_while_m_n, combinator::all_consuming, IResult};
 
 const BLACKLIST: [char; 3] = ['i', 'o', 'l'];
 
-pub fn is_valid_password<const N: usize>(pwd: &Password<N>) -> bool {
+pub fn next_password(curr: &str) -> Option<String> {
+    let pwd: Password<8> = Password::from_str(curr).expect("invalid password to begin with");
+
+    let mut pi = PasswordIterator { pwd };
+
+    pi.find(is_valid_password).map(|p| p.value.iter().collect())
+}
+
+fn is_valid_password<const N: usize>(pwd: &Password<N>) -> bool {
     debug!(
         "Checking password: {:?}",
         pwd.value.iter().collect::<String>()
     );
-    return password_does_not_contain_blacklisted_characters(pwd)
-        && password_contains_3_characters_in_sequence(pwd)
-        && password_contains_at_least_2_different_pairs_of_letters(pwd);
+    let chars = pwd.value;
+    return password_does_not_contain_blacklisted_characters(&chars)
+        && password_contains_3_characters_in_sequence(&chars)
+        && password_contains_at_least_2_different_pairs_of_letters(&chars);
 }
 
-fn password_does_not_contain_blacklisted_characters<const N: usize>(pwd: &Password<N>) -> bool {
-    let chars = pwd.value;
+fn password_does_not_contain_blacklisted_characters<const N: usize>(chars: &[char; N]) -> bool {
     return !BLACKLIST.iter().any(|c| chars.contains(c));
 }
 
+fn password_contains_3_characters_in_sequence<const N: usize>(chars: &[char; N]) -> bool {
+    return chars.windows(3).any(|window| {
+        let left = window[0] as i32;
+        let middle = window[1] as i32;
+        let right = window[2] as i32;
+        return right - middle == middle - left && right - left == 2;
+    });
+}
+
 fn password_contains_at_least_2_different_pairs_of_letters<const N: usize>(
-    pwd: &Password<N>,
+    chars: &[char; N],
 ) -> bool {
-    let chars = pwd.value;
     return chars
         .windows(2)
         .fold(HashSet::new(), |mut acc, curr| {
@@ -36,23 +52,13 @@ fn password_contains_at_least_2_different_pairs_of_letters<const N: usize>(
         >= 2;
 }
 
-fn password_contains_3_characters_in_sequence<const N: usize>(pwd: &Password<N>) -> bool {
-    let chars = pwd.value;
-    return chars.windows(3).any(|window| {
-        let left = window[0] as i32;
-        let middle = window[1] as i32;
-        let right = window[2] as i32;
-        return right - middle == middle - left && right - left == 2;
-    });
-}
-
-pub fn parse_pwd<const N: usize>(input: &str) -> IResult<&str, &str> {
+fn parse_pwd<const N: usize>(input: &str) -> IResult<&str, &str> {
     let (remaining, pwd) = all_consuming(take_while_m_n(N, N, |c: char| c.is_lowercase()))(input)?;
     Ok((remaining, pwd))
 }
 
 #[derive(Clone, Debug)]
-pub struct Password<const N: usize> {
+struct Password<const N: usize> {
     pub value: [char; N],
 }
 
@@ -66,7 +72,7 @@ impl<const N: usize> Password<N> {
 }
 
 #[derive(Debug)]
-pub struct PasswordIterator<const N: usize> {
+struct PasswordIterator<const N: usize> {
     pub pwd: Password<N>,
 }
 
@@ -120,5 +126,11 @@ mod tests {
         let pwd: Password<3> = Password::from_str("aaa").unwrap();
         let mut pi = PasswordIterator { pwd };
         assert_eq!(pi.next().unwrap().value, ['a', 'a', 'b']);
+    }
+
+    #[test]
+    fn test_next_password() {
+        assert_eq!(next_password("abcdefgh"), Some(String::from("abcdffaa")));
+        assert_eq!(next_password("ghijklmn"), Some(String::from("ghjaabcc")));
     }
 }
