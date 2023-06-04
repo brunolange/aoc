@@ -31,7 +31,7 @@ impl<const N: usize> Iterator for PasswordIterator<N> {
         let mut nxt = self.pwd.clone();
 
         let mut carry = true;
-        let mut i: i32 = 7;
+        let mut i: i32 = N as i32 - 1;
         while carry && i >= 0 {
             let idx = i as usize;
             (nxt.value[idx], carry) = inc(nxt.value[idx]);
