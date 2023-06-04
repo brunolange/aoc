@@ -33,7 +33,11 @@ fn is_valid_password<const N: usize>(pwd: &Password<N>) -> bool {
 }
 
 fn password_does_not_contain_blacklisted_characters<const N: usize>(chars: &[char; N]) -> bool {
-    return !BLACKLIST.iter().any(|c| chars.contains(c));
+    !chars.iter().any(is_blacklisted)
+}
+
+fn is_blacklisted(c: &char) -> bool {
+    BLACKLIST.contains(c)
 }
 
 fn password_contains_3_characters_in_sequence<const N: usize>(chars: &[char; N]) -> bool {
@@ -60,11 +64,6 @@ fn password_contains_at_least_2_different_pairs_of_letters<const N: usize>(
         >= 2;
 }
 
-fn parse_pwd<const N: usize>(input: &str) -> IResult<&str, &str> {
-    let (remaining, pwd) = all_consuming(take_while_m_n(N, N, |c: char| c.is_lowercase()))(input)?;
-    Ok((remaining, pwd))
-}
-
 #[derive(Clone, Debug)]
 struct Password<const N: usize> {
     pub value: [char; N],
@@ -77,6 +76,11 @@ impl<const N: usize> Password<N> {
         let pwd = chars.try_into().ok()?;
         Some(Password { value: pwd })
     }
+}
+
+fn parse_pwd<const N: usize>(input: &str) -> IResult<&str, &str> {
+    let (remaining, pwd) = all_consuming(take_while_m_n(N, N, |c: char| c.is_lowercase()))(input)?;
+    Ok((remaining, pwd))
 }
 
 #[derive(Debug)]
@@ -118,6 +122,30 @@ fn inc(c: char) -> (char, bool) {
     (nxt, carry)
 }
 
+#[derive(Debug)]
+struct FastPasswordIterator<const N: usize> {
+    pub pwd: Password<N>,
+}
+
+impl<const N: usize> Iterator for FastPasswordIterator<N> {
+    type Item = Password<N>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut chars = self.pwd.clone().value;
+
+        while increment(&mut chars) && flip_blacklisted(&mut chars) {
+            if password_contains_3_characters_in_sequence(&chars)
+                && password_contains_at_least_2_different_pairs_of_letters(&chars)
+            {
+                self.pwd = Password { value: chars };
+                return Some(self.pwd.clone());
+            }
+        }
+
+        None
+    }
+}
+
 fn increment<const N: usize>(chars: &mut [char; N]) -> bool {
     let mut carry = true;
     let mut i: i32 = N as i32 - 1;
@@ -128,10 +156,6 @@ fn increment<const N: usize>(chars: &mut [char; N]) -> bool {
     }
 
     !carry || i >= 0
-}
-
-fn is_blacklisted(c: &char) -> bool {
-    BLACKLIST.contains(c)
 }
 
 fn flip_blacklisted<const N: usize>(chars: &mut [char; N]) -> bool {
@@ -166,30 +190,6 @@ fn flip_blacklisted<const N: usize>(chars: &mut [char; N]) -> bool {
     }
 
     return true;
-}
-
-#[derive(Debug)]
-struct FastPasswordIterator<const N: usize> {
-    pub pwd: Password<N>,
-}
-
-impl<const N: usize> Iterator for FastPasswordIterator<N> {
-    type Item = Password<N>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let mut chars = self.pwd.clone().value;
-
-        while increment(&mut chars) && flip_blacklisted(&mut chars) {
-            if password_contains_3_characters_in_sequence(&chars)
-                && password_contains_at_least_2_different_pairs_of_letters(&chars)
-            {
-                self.pwd = Password { value: chars };
-                return Some(self.pwd.clone());
-            }
-        }
-
-        None
-    }
 }
 
 #[cfg(test)]
