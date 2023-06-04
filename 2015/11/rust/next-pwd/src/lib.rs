@@ -57,3 +57,22 @@ fn inc(c: char) -> (char, bool) {
     };
     (nxt, carry)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_inc() {
+        assert_eq!(inc('a'), ('b', false));
+        assert_eq!(inc('l'), ('m', false));
+        assert_eq!(inc('z'), ('a', true));
+    }
+
+    #[test]
+    fn test_password_iterator() {
+        let pwd: Password<3> = Password::from_str("aaa").unwrap();
+        let mut pi = PasswordIterator { pwd };
+        assert_eq!(pi.next().unwrap().value, ['a', 'a', 'b']);
+    }
+}
