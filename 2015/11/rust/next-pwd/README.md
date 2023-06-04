@@ -28,3 +28,14 @@ Your puzzle answer was hxbxxyzz.
 Santa's password expired again. What's the next one?
 
 Your puzzle answer was hxcaabcc.
+
+
+----
+
+
+An example where the fast iterator reeeeeeeally makes a difference:
+
+```
+time ./target/release/next-pwd iaaaaaaa
+time FAST=1 ./target/release/next-pwd iaaaaaaa
+```
