@@ -37,10 +37,11 @@ fn password_contains_at_least_2_different_pairs_of_letters<const N: usize>(
     chars: &[char; N],
 ) -> bool {
     return chars
-        .windows(2)
-        .fold(HashSet::new(), |mut acc, curr| {
-            if curr[0] == curr[1] {
-                acc.insert(&curr[0]);
+        .iter()
+        .zip(chars.iter().skip(1))
+        .fold(HashSet::new(), |mut acc, (left, right)| {
+            if *left == *right {
+                acc.insert(left);
             }
             acc
         })
