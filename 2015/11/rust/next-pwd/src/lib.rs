@@ -13,6 +13,14 @@ pub fn next_password(curr: &str) -> Option<String> {
     pi.find(is_valid_password).map(|p| p.value.iter().collect())
 }
 
+pub fn next_password_fast(curr: &str) -> Option<String> {
+    let pwd: Password<8> = Password::from_str(curr).expect("invalid password to begin with");
+
+    let mut pi = FastPasswordIterator { pwd };
+
+    pi.next().map(|p| p.value.iter().collect())
+}
+
 fn is_valid_password<const N: usize>(pwd: &Password<N>) -> bool {
     debug!(
         "Checking password: {:?}",
@@ -110,6 +118,80 @@ fn inc(c: char) -> (char, bool) {
     (nxt, carry)
 }
 
+fn increment<const N: usize>(chars: &mut [char; N]) -> bool {
+    let mut carry = true;
+    let mut i: i32 = N as i32 - 1;
+    while carry && i >= 0 {
+        let idx = i as usize;
+        (chars[idx], carry) = inc(chars[idx]);
+        i -= 1;
+    }
+
+    !carry || i >= 0
+}
+
+fn is_blacklisted(c: &char) -> bool {
+    BLACKLIST.contains(c)
+}
+
+fn flip_blacklisted<const N: usize>(chars: &mut [char; N]) -> bool {
+    debug!("checking chars: {:?}", chars);
+
+    for i in (0..N).rev() {
+        if is_blacklisted(&chars[i]) {
+            debug!("found blacklisted charater: {} at index {}!", chars[i], i);
+            let (ic, mut carry) = inc(chars[i]);
+            chars[i] = ic;
+
+            // propagate the carry
+            let mut j = i as i32 - 1;
+            while carry && j >= 0 {
+                let idx = j as usize;
+                (chars[idx], carry) = inc(chars[idx]);
+                j -= 1;
+            }
+
+            // did we overflow?
+            if carry && j < 0 {
+                println!("pointless to continue...");
+                return false;
+            }
+
+            // flip over the chars to the right
+            for k in i + 1..N {
+                chars[k] = 'a';
+            }
+            debug!("flipped chars = {:?}", chars);
+        }
+    }
+
+    return true;
+}
+
+#[derive(Debug)]
+struct FastPasswordIterator<const N: usize> {
+    pub pwd: Password<N>,
+}
+
+impl<const N: usize> Iterator for FastPasswordIterator<N> {
+    type Item = Password<N>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let mut chars = self.pwd.clone().value;
+
+        while increment(&mut chars) && flip_blacklisted(&mut chars) {
+            if password_contains_3_characters_in_sequence(&chars)
+                && password_contains_at_least_2_different_pairs_of_letters(&chars)
+            {
+                self.pwd = Password { value: chars };
+                return Some(self.pwd.clone());
+            }
+        }
+
+        None
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -132,5 +214,30 @@ mod tests {
     fn test_next_password() {
         assert_eq!(next_password("abcdefgh"), Some(String::from("abcdffaa")));
         assert_eq!(next_password("ghijklmn"), Some(String::from("ghjaabcc")));
+    }
+
+    #[test]
+    fn test_flip_backlisted() {
+        let mut chars = ['g', 'h', 'i', 'j', 'k', 'l', 'm', 'n'];
+        let ok = flip_blacklisted(&mut chars);
+        assert_eq!(chars, ['g', 'h', 'j', 'a', 'a', 'a', 'a', 'a']);
+        assert!(ok);
+
+        let mut chars = ['i', 'h', 'i', 'j', 'k', 'l', 'm', 'n'];
+        let ok = flip_blacklisted(&mut chars);
+        assert_eq!(chars, ['j', 'a', 'a', 'a', 'a', 'a', 'a', 'a']);
+        assert!(ok);
+    }
+
+    #[test]
+    fn test_password_fast_iterator() {
+        assert_eq!(
+            next_password_fast("abcdefgh"),
+            Some(String::from("abcdffaa"))
+        );
+        assert_eq!(
+            next_password_fast("ghijklmn"),
+            Some(String::from("ghjaabcc"))
+        );
     }
 }
