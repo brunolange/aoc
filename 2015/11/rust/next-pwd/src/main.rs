@@ -3,6 +3,7 @@ use next_pwd::{is_valid_password, Password, PasswordIterator};
 mod io;
 
 fn main() {
+    env_logger::init();
     let pwd: Password<8> =
         Password::from_str(io::read_password().as_str()).expect("invalid password");
 

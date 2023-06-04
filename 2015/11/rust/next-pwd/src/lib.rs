@@ -1,3 +1,4 @@
+use log::debug;
 use std::collections::HashSet;
 
 use nom::{bytes::complete::take_while_m_n, combinator::all_consuming, IResult};
@@ -5,6 +6,10 @@ use nom::{bytes::complete::take_while_m_n, combinator::all_consuming, IResult};
 const BLACKLIST: [char; 3] = ['i', 'o', 'l'];
 
 pub fn is_valid_password<const N: usize>(pwd: &Password<N>) -> bool {
+    debug!(
+        "Checking password: {:?}",
+        pwd.value.iter().collect::<String>()
+    );
     return password_does_not_contain_blacklisted_characters(pwd)
         && password_contains_3_characters_in_sequence(pwd)
         && password_contains_at_least_2_different_pairs_of_letters(pwd);
