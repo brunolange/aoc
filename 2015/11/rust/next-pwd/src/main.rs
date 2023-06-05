@@ -12,7 +12,7 @@ fn main() {
     };
 
     match next(&io::read_password()) {
-        None => panic!("Could not find a viable next password"),
+        None => panic!("There is no viable next password"),
         Some(pwd) => println!("{}", pwd),
     };
 }
