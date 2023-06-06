@@ -22,8 +22,9 @@ def extract_numbers(value: Json) -> Iterator[int|float]:
             for v in value:
                 yield from extract_numbers(v)
         case builtins.dict:
-            for v in value.values():
-                yield from extract_numbers(v)
+            if "red" not in value.values():
+                for v in value.values():
+                    yield from extract_numbers(v)
         case _:
             pass
 
