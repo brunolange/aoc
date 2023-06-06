@@ -1,18 +1,35 @@
-import sys
+from __future__ import annotations
 
-def lines():
+import json
+import sys
+import builtins
+from typing import Iterator
+
+Json = None | int | float | bool | str | list["Json"] | dict[str,"Json"]
+
+def read() -> Json:
     if len(sys.argv) > 1:
         with open(sys.argv[1]) as handle:
-            contents = handle.readlines()
-    else:
-        contents = sys.stdin
+            return json.load(handle)
 
-    return (line.strip() for line in contents)
+    return json.loads(sys.stdin.read())
     
+def extract_numbers(value: Json) -> Iterator[int|float]:
+    match type(value):
+        case builtins.int | builtins.float:
+            yield value
+        case builtins.list:
+            for v in value:
+                yield from extract_numbers(v)
+        case builtins.dict:
+            for v in value.values():
+                yield from extract_numbers(v)
+        case _:
+            pass
 
 def main() -> int:
-    for line in lines():
-        print(f"{line = }")
+    value = read()
+    print(sum(extract_numbers(value)))
     return 0
 
 if __name__ == "__main__":
