@@ -11,10 +11,7 @@ fn add(value: Value) -> f64 {
 
 fn _add(v: Value, acc: f64) -> f64 {
     match v {
-        Value::Null => acc,
-        Value::Bool(_) => acc,
         Value::Number(n) => acc + n.as_f64().unwrap(),
-        Value::String(_) => acc,
         Value::Array(arr) => acc + arr.into_iter().map(|v| _add(v, 0.0)).sum::<f64>(),
         Value::Object(obj) => {
             let contains_red = obj.iter().any(|(_, v)| match v {
@@ -28,6 +25,10 @@ fn _add(v: Value, acc: f64) -> f64 {
             };
             acc + v
         }
+        _ => acc,
+        // Value::Null => acc,
+        // Value::Bool(_) => acc,
+        // Value::String(_) => acc,
     }
 }
 
