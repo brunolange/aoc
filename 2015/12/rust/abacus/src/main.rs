@@ -18,12 +18,10 @@ fn _add(v: Value, acc: f64) -> f64 {
                 Value::String(s) => s == "red",
                 _ => false,
             });
-            let v = if contains_red {
-                0.0
-            } else {
-                obj.into_iter().map(|(_, v)| _add(v, 0.0)).sum::<f64>()
-            };
-            acc + v
+            acc + match contains_red {
+                true => 0.0,
+                false => obj.into_iter().map(|(_, v)| _add(v, 0.0)).sum::<f64>(),
+            }
         }
         _ => acc,
         // Value::Null => acc,
