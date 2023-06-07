@@ -1,5 +1,7 @@
 use serde_json::{Result, Value};
 
+// TODO: iterator for numbers. then do it.sum()
+
 fn parse_json(json_str: &str) -> Result<Value> {
     let parsed_value: Value = serde_json::from_str(json_str)?;
     Ok(parsed_value)
