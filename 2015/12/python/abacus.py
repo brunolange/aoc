@@ -5,7 +5,8 @@ import sys
 import builtins
 from typing import Iterator
 
-Json = None | int | float | bool | str | list["Json"] | dict[str,"Json"]
+Json = None | int | float | bool | str | list["Json"] | dict[str, "Json"]
+
 
 def read() -> Json:
     if len(sys.argv) > 1:
@@ -13,8 +14,8 @@ def read() -> Json:
             return json.load(handle)
 
     return json.loads(sys.stdin.read())
-    
-def extract_numbers(value: Json) -> Iterator[int|float]:
+
+def extract_numbers(value: Json) -> Iterator[Json]:
     match type(value):
         case builtins.int | builtins.float:
             yield value
@@ -28,10 +29,12 @@ def extract_numbers(value: Json) -> Iterator[int|float]:
         case _:
             pass
 
+
 def main() -> int:
     value = read()
     print(sum(extract_numbers(value)))
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())
