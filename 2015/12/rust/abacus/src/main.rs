@@ -59,5 +59,13 @@ mod tests {
             add(parse_json(r#"{"foo": 1, "bar": [2,3,4,{"baz":20}]}"#).unwrap()),
             30.0
         );
+        assert_eq!(
+            add(parse_json(r#"{"foo": "red", "bar": [2,3,4,{"baz":20}]}"#).unwrap()),
+            0.0
+        );
+        assert_eq!(
+            add(parse_json(r#"[{"foo": "red", "v": 1},{"foo": "blue", "v": 2}]"#).unwrap()),
+            2.0
+        );
     }
 }
