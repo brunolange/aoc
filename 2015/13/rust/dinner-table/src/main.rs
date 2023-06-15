@@ -73,4 +73,6 @@ fn main() {
 
     println!("table = {:?}", table);
     println!("# of guests = {}", table.len());
+    let guests: Vec<&str> = table.keys().cloned().collect();
+    println!("guests = {:?}", guests);
 }
