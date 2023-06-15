@@ -72,4 +72,5 @@ fn main() {
     });
 
     println!("table = {:?}", table);
+    println!("# of guests = {}", table.len());
 }
