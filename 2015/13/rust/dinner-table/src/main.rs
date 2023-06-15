@@ -16,10 +16,10 @@ struct Pairing<'a> {
     gain: i32,
 }
 
-fn parse_line(input: &str) -> IResult<&str, Pairing> {
+fn parse_pairing(input: &str) -> IResult<&str, Pairing> {
     let (input, first) = terminated(alpha1, space0)(input)?;
     let (input, mult) = preceded(
-        tuple((tag("would "), space0)),
+        terminated(tag("would"), space1),
         terminated(
             alt((map(tag("gain"), |_| 1), map(tag("lose"), |_| -1))),
             space1,
@@ -28,7 +28,10 @@ fn parse_line(input: &str) -> IResult<&str, Pairing> {
 
     let (input, value) = map_res(digit1, |v: &str| v.parse::<i32>())(input)?;
     let (input, second) = preceded(
-        tuple((space0, tag("happiness units by sitting next to "))),
+        preceded(
+            space0,
+            terminated(tag("happiness units by sitting next to"), space1),
+        ),
         alpha1,
     )(input)?;
     Ok((
@@ -43,10 +46,10 @@ fn parse_line(input: &str) -> IResult<&str, Pairing> {
 
 fn main() {
     let s = "Alice would lose 79 happiness units by sitting next to Carol.";
-    let x = parse_line(s);
+    let x = parse_pairing(s);
     println!("x = {:?}", x);
 
     let s = "Alice would gain 54 happiness units by sitting next to Bob.";
-    let x = parse_line(s);
+    let x = parse_pairing(s);
     println!("x = {:?}", x);
 }
