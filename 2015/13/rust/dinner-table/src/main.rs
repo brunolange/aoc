@@ -64,7 +64,6 @@ fn main() {
     .map(|s| parse_pairing(s).unwrap())
     .map(|(_, pairing)| pairing)
     .fold(HashMap::new(), |mut acc, curr| {
-        println!("curr = {:?}", curr);
         acc.entry(curr.first).or_insert(HashMap::new());
         acc.get_mut(curr.first)
             .unwrap()
