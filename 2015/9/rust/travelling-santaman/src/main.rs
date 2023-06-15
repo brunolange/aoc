@@ -45,7 +45,7 @@ fn parse_line(input: &str) -> Option<(Node, Edge, Node)> {
     let start = trip[0].trim();
     let destination = trip[1].trim();
 
-    if start.len() == 0 || destination.len() == 0 {
+    if start.is_empty() || destination.is_empty() {
         return None;
     }
 
