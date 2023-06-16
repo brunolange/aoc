@@ -77,21 +77,21 @@ fn main() {
             let mut round = guests.clone();
             round.push(guests[0]);
 
-            (
-                guests,
-                round
-                    .clone()
-                    .into_iter()
-                    .zip(round.into_iter().skip(1))
-                    .map(|(l, r)| {
-                        let lr = table.get(l).unwrap().get(r).unwrap();
-                        // println!("{} and {}: {}", l, r, lr);
-                        let rl = table.get(r).unwrap().get(l).unwrap();
-                        // println!("{} and {}: {}", r, l, rl);
-                        lr + rl
-                    })
-                    .sum::<i32>(),
-            )
+            let xs = round
+                .clone()
+                .into_iter()
+                .zip(round.into_iter().skip(1))
+                .map(|(l, r)| {
+                    let lr = table.get(l).unwrap().get(r).unwrap();
+                    let rl = table.get(r).unwrap().get(l).unwrap();
+                    lr + rl
+                });
+
+            let total = xs.clone().sum::<i32>();
+            let min = xs.min().unwrap();
+
+            // the inclusion of the host will break the weakest link
+            (guests, total - min)
         })
         .max_by_key(|(_, tally)| *tally)
         .unwrap();
