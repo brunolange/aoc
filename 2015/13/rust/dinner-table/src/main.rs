@@ -12,6 +12,8 @@ use nom::{
 
 use itertools::Itertools;
 
+mod io;
+
 #[derive(Debug)]
 struct Pairing<'a> {
     first: &'a str,
@@ -48,47 +50,35 @@ fn parse_pairing(input: &str) -> IResult<&str, Pairing> {
 }
 
 fn main() {
-    let table = vec![
-        "Alice would gain 54 happiness units by sitting next to Bob.",
-        "Alice would lose 79 happiness units by sitting next to Carol.",
-        "Alice would lose 2 happiness units by sitting next to David.",
-        "Bob would gain 83 happiness units by sitting next to Alice.",
-        "Bob would lose 7 happiness units by sitting next to Carol.",
-        "Bob would lose 63 happiness units by sitting next to David.",
-        "Carol would lose 62 happiness units by sitting next to Alice.",
-        "Carol would gain 60 happiness units by sitting next to Bob.",
-        "Carol would gain 55 happiness units by sitting next to David.",
-        "David would gain 46 happiness units by sitting next to Alice.",
-        "David would lose 7 happiness units by sitting next to Bob.",
-        "David would gain 41 happiness units by sitting next to Carol.",
-    ]
-    .into_iter()
-    .map(|s| parse_pairing(s).unwrap())
-    .map(|(_, pairing)| pairing)
-    .fold(HashMap::new(), |mut acc, curr| {
-        acc.entry(curr.first).or_insert(HashMap::new());
-        acc.get_mut(curr.first)
-            .unwrap()
-            .insert(curr.second, curr.gain);
-        acc
-    });
+    let lines: Vec<String> = io::lines().collect();
+    let table = lines
+        .iter()
+        .map(|line| {
+            let (_, pairing) = parse_pairing(line).expect("Invalid pairing");
+            pairing
+        })
+        .fold(HashMap::new(), |mut acc, curr| {
+            acc.entry(curr.first).or_insert(HashMap::new());
+            acc.get_mut(curr.first)
+                .unwrap()
+                .insert(curr.second, curr.gain);
+            acc
+        });
 
-    println!("table = {:?}", table);
-    println!("# of guests = {}", table.len());
-    let guests: Vec<&str> = table.keys().cloned().collect();
+    let guests = table.keys();
     let n = guests.len();
-    println!("guests = {:?}", guests);
 
     // circular permutation!
     let result = guests
         .into_iter()
         .permutations(n)
         .take((1..=n - 1).product())
-        .map(|gs| {
-            let mut round = gs.clone();
-            round.push(gs[0]);
+        .map(|guests| {
+            let mut round = guests.clone();
+            round.push(guests[0]);
+
             (
-                gs,
+                guests,
                 round
                     .clone()
                     .into_iter()
