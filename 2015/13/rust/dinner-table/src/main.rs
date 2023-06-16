@@ -10,6 +10,8 @@ use nom::{
     IResult,
 };
 
+use itertools::Itertools;
+
 #[derive(Debug)]
 struct Pairing<'a> {
     first: &'a str,
@@ -74,5 +76,35 @@ fn main() {
     println!("table = {:?}", table);
     println!("# of guests = {}", table.len());
     let guests: Vec<&str> = table.keys().cloned().collect();
+    let n = guests.len();
     println!("guests = {:?}", guests);
+
+    // circular permutation!
+    let result = guests
+        .into_iter()
+        .permutations(n)
+        .take((1..=n - 1).product())
+        .map(|gs| {
+            let mut round = gs.clone();
+            round.push(gs[0]);
+            (
+                gs,
+                round
+                    .clone()
+                    .into_iter()
+                    .zip(round.into_iter().skip(1))
+                    .map(|(l, r)| {
+                        let lr = table.get(l).unwrap().get(r).unwrap();
+                        // println!("{} and {}: {}", l, r, lr);
+                        let rl = table.get(r).unwrap().get(l).unwrap();
+                        // println!("{} and {}: {}", r, l, rl);
+                        lr + rl
+                    })
+                    .sum::<i32>(),
+            )
+        })
+        .max_by_key(|(_, tally)| *tally)
+        .unwrap();
+
+    println!("result = {:?}", result);
 }
