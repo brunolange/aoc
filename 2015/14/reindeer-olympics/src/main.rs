@@ -18,8 +18,10 @@ struct Reindeer {
     rest_time: u16,
 }
 
-fn position_at(reindeer: &Reindeer, t: usize) -> usize {
-    t
+impl Reindeer {
+    fn position_at(&self, t: usize) -> usize {
+        t + 101
+    }
 }
 
 fn parse_line(input: &str) -> IResult<&str, Reindeer> {
@@ -86,8 +88,13 @@ fn main() {
     });
 
     let winner = reindeers
-        .map(|reindeer| (position_at(&reindeer, 2053), reindeer))
+        .map(|reindeer| (reindeer.position_at(2053), reindeer))
         .max_by_key(|(distance, _)| *distance)
         .unwrap();
-    println!("{:?}", winner);
+
+    let (distance, reindeer) = winner;
+    println!(
+        "{} is the winner and has travelled {} kilometers.",
+        reindeer.name, distance
+    );
 }
