@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use nom::branch::alt;
 use nom::bytes::complete::tag;
 use nom::character::complete::space0;
@@ -8,12 +10,16 @@ use nom::{
     IResult,
 };
 
-#[derive(Debug)]
-struct Reindeer<'a> {
-    name: &'a str,
+#[derive(Clone, Debug)]
+struct Reindeer {
+    name: Arc<str>,
     fly_speed: u8,
     fly_duration: u8,
     rest_time: u16,
+}
+
+fn position_at(reindeer: &Reindeer, t: usize) -> usize {
+    t
 }
 
 fn parse_line(input: &str) -> IResult<&str, Reindeer> {
@@ -54,7 +60,7 @@ fn parse_line(input: &str) -> IResult<&str, Reindeer> {
     Ok((
         input,
         Reindeer {
-            name,
+            name: name.into(),
             fly_speed,
             fly_duration,
             rest_time,
@@ -74,8 +80,14 @@ fn main() {
         "Prancer can fly 9 km/s for 12 seconds, but then must rest for 97 seconds.",
         "Dancer can fly 37 km/s for 1 seconds, but then must rest for 36 seconds.",
     ];
-    for line in lines {
-        let reindeer = parse_line(line);
-        println!("reindeer = {:?}", reindeer);
-    }
+    let reindeers = lines.into_iter().map(|line| {
+        let (_, reindeer) = parse_line(line).unwrap();
+        reindeer
+    });
+
+    let winner = reindeers
+        .map(|reindeer| (position_at(&reindeer, 2053), reindeer))
+        .max_by_key(|(distance, _)| *distance)
+        .unwrap();
+    println!("{:?}", winner);
 }
