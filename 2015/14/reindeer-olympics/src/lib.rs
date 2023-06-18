@@ -1,4 +1,4 @@
-use std::collections::{BinaryHeap, HashMap, HashSet};
+use std::collections::{BinaryHeap, HashMap};
 use std::sync::Arc;
 
 use nom::branch::alt;
@@ -20,7 +20,7 @@ pub struct Reindeer {
 }
 
 impl Reindeer {
-    pub fn position_at(&self, t: usize) -> usize {
+    pub fn distance_at(&self, t: usize) -> usize {
         let period = self.fly_duration + self.rest_time;
         let (quotient, remainder) = (t / period, t % period);
 
@@ -77,31 +77,10 @@ pub fn parse_line(input: &str) -> IResult<&str, Reindeer> {
     ))
 }
 
-// fn f(reindeers: &Vec<Reindeer>, t: usize) {
-//     let score_board = (1..=t).fold(
-//         HashMap::from_iter(reindeers.clone().into_iter().map(|r| (r, 0))),
-//         |mut sb: HashMap<Reindeer, usize>, _| {
-//             for (_, score) in sb.iter_mut() {
-//                 *score += 1;
-//             }
-//             sb
-//         },
-//     );
-
-//     println!("{:?}", score_board)
-//     // for i in 1..=t {
-//     //     step(&reindeers, i)
-//     // }
-// }
-
 pub fn race_1(reindeers: &Vec<Reindeer>, t: usize) -> Option<(&Reindeer, usize)> {
     let winner = reindeers
         .iter()
-        .map(|reindeer| (reindeer.position_at(t), reindeer))
-        .map(|(d, r)| {
-            println!("{}: {}", r.name, d);
-            (d, r)
-        })
+        .map(|reindeer| (reindeer.distance_at(t), reindeer))
         .max_by_key(|(distance, _)| *distance)
         .unwrap();
 
@@ -128,25 +107,34 @@ struct Top<'a, const K: usize> {
 }
 
 impl<'a, const K: usize> Iterator for Top<'a, K> {
-    type Item = [(usize, &'a str); K];
+    type Item = [(usize, Vec<&'a Reindeer>); K];
 
     fn next(&mut self) -> Option<Self::Item> {
-        // update
-        self.t += 1;
-
-        let mut max_heap = BinaryHeap::from_iter(
-            self.reindeers
-                .into_iter()
-                .map(|r| (r.position_at(self.t), r.name.as_ref())),
-        );
-
-        if max_heap.len() < K {
+        if self.reindeers.len() < K {
             return None;
         }
 
+        self.t += 1;
+
+        let mut distance_map: HashMap<usize, Vec<&Reindeer>> = HashMap::new();
+        for r in self.reindeers {
+            let distance = r.distance_at(self.t);
+            // println!("- {} @ {}", r.name, distance);
+            distance_map
+                .entry(distance)
+                .and_modify(|rs| rs.push(r))
+                .or_insert_with(|| vec![r]);
+        }
+
+        let mut heap = BinaryHeap::from_iter(distance_map.keys());
         let top_k = (0..K)
-            .map(|_| max_heap.pop().unwrap())
-            .collect::<Vec<(usize, &str)>>()
+            .map(|_| heap.pop().unwrap())
+            .map(|distance| {
+                let d = *distance;
+                let v = distance_map[distance].clone();
+                (d, v)
+            })
+            .collect::<Vec<(usize, Vec<&Reindeer>)>>()
             .try_into()
             .unwrap();
 
@@ -154,25 +142,30 @@ impl<'a, const K: usize> Iterator for Top<'a, K> {
     }
 }
 
-pub fn race_2(reindeers: &Vec<Reindeer>, t: usize) -> (String, usize) {
-    let mut score_board: HashMap<&str, usize> = reindeers
-        .into_iter()
-        .map(|r| (r.name.as_ref(), 0))
-        .collect();
+pub fn race_2(reindeers: &Vec<Reindeer>, t: usize) -> (Vec<String>, usize) {
+    let mut score_board: HashMap<&Reindeer, usize> =
+        reindeers.into_iter().map(|r| (r, 0)).collect();
 
     let race = Race { reindeers };
-    for [(_, first), (_, second), (_, third)] in race.top::<3>().take(t) {
-        // println!("t = {}, winner = {} @ {}", i, first, p1);
-        // i += 1;
-        score_board.entry(first).and_modify(|score| *score += 1);
-        score_board.entry(second).and_modify(|score| *score += 0);
-        score_board.entry(third).and_modify(|score| *score += 0);
+    for (_i, [(_distance, first), (_, second), (_, third)]) in race.top::<3>().take(t).enumerate() {
+        for f in first {
+            // println!("\tt = {}: {} @ {}", i + 1, f.name, distance);
+            score_board.entry(f).and_modify(|score| *score += 1);
+        }
+        for s in second {
+            score_board.entry(s).and_modify(|score| *score += 0);
+        }
+        for t in third {
+            score_board.entry(t).and_modify(|score| *score += 0);
+        }
     }
 
-    let (winner, score) = score_board
-        .into_iter()
-        .max_by_key(|(_, score)| *score)
-        .unwrap();
+    let max_score = *score_board.values().max().unwrap();
+    let winners = score_board
+        .iter()
+        .filter(|(_, &score)| score == max_score)
+        .map(|(r, _)| r.name.as_ref().to_owned())
+        .collect::<Vec<String>>();
 
-    (winner.to_owned(), score)
+    (winners, max_score)
 }

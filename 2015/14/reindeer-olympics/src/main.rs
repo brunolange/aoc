@@ -4,6 +4,8 @@ fn main() {
     let lines = vec![
         // "Comet can fly 14 km/s for 10 seconds, but then must rest for 127 seconds.",
         // "Dancer can fly 16 km/s for 11 seconds, but then must rest for 162 seconds.",
+        // "Slowy can fly 1 km/s for 1 seconds, but then must rest for 162 seconds.",
+        // "SlowyII can fly 1 km/s for 2 seconds, but then must rest for 162 seconds.",
         "Vixen can fly 8 km/s for 8 seconds, but then must rest for 53 seconds.",
         "Blitzen can fly 13 km/s for 4 seconds, but then must rest for 49 seconds.",
         "Rudolph can fly 20 km/s for 7 seconds, but then must rest for 132 seconds.",
@@ -35,10 +37,10 @@ fn main() {
         winner.name, distance
     );
 
-    let (winner, score) = race_2(&reindeers, t);
+    let (winners, score) = race_2(&reindeers, t);
 
     println!(
-        "{} is the winner of part 2 and has scored {} points.",
-        winner, score
+        "[{:?}] are the winners of part 2 with {} points.",
+        winners, score
     );
 }
