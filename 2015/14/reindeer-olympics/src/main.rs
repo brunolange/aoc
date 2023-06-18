@@ -1,4 +1,4 @@
-use reindeer_olympics::{parse_line, race_1, Reindeer};
+use reindeer_olympics::{parse_line, race_1, race_2, Reindeer};
 
 fn main() {
     let lines = vec![
@@ -33,5 +33,12 @@ fn main() {
     println!(
         "{} is the winner of part 1 and has travelled {} kilometers.",
         winner.name, distance
+    );
+
+    let (winner, score) = race_2(&reindeers, t);
+
+    println!(
+        "{} is the winner of part 2 and has scored {} points.",
+        winner, score
     );
 }

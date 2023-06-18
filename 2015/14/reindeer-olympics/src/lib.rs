@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{BinaryHeap, HashMap, HashSet};
 use std::sync::Arc;
 
 use nom::branch::alt;
@@ -30,8 +30,6 @@ impl Reindeer {
         self.fly_speed * (t - total_rest_time)
     }
 }
-
-struct Race {}
 
 pub fn parse_line(input: &str) -> IResult<&str, Reindeer> {
     let (input, name) = terminated(alpha1, space1)(input)?;
@@ -79,22 +77,22 @@ pub fn parse_line(input: &str) -> IResult<&str, Reindeer> {
     ))
 }
 
-fn f(reindeers: &Vec<Reindeer>, t: usize) {
-    let score_board = (1..=t).fold(
-        HashMap::from_iter(reindeers.clone().into_iter().map(|r| (r, 0))),
-        |mut sb: HashMap<Reindeer, usize>, _| {
-            for (_, score) in sb.iter_mut() {
-                *score += 1;
-            }
-            sb
-        },
-    );
+// fn f(reindeers: &Vec<Reindeer>, t: usize) {
+//     let score_board = (1..=t).fold(
+//         HashMap::from_iter(reindeers.clone().into_iter().map(|r| (r, 0))),
+//         |mut sb: HashMap<Reindeer, usize>, _| {
+//             for (_, score) in sb.iter_mut() {
+//                 *score += 1;
+//             }
+//             sb
+//         },
+//     );
 
-    println!("{:?}", score_board)
-    // for i in 1..=t {
-    //     step(&reindeers, i)
-    // }
-}
+//     println!("{:?}", score_board)
+//     // for i in 1..=t {
+//     //     step(&reindeers, i)
+//     // }
+// }
 
 pub fn race_1(reindeers: &Vec<Reindeer>, t: usize) -> Option<(&Reindeer, usize)> {
     let winner = reindeers
@@ -109,4 +107,72 @@ pub fn race_1(reindeers: &Vec<Reindeer>, t: usize) -> Option<(&Reindeer, usize)>
 
     let (distance, reindeer) = winner;
     Some((reindeer, distance))
+}
+
+struct Race<'a> {
+    reindeers: &'a Vec<Reindeer>,
+}
+
+impl<'a> Race<'a> {
+    pub fn top<const K: usize>(&self) -> Top<K> {
+        Top::<K> {
+            reindeers: self.reindeers,
+            t: 0,
+        }
+    }
+}
+
+struct Top<'a, const K: usize> {
+    reindeers: &'a Vec<Reindeer>,
+    t: usize,
+}
+
+impl<'a, const K: usize> Iterator for Top<'a, K> {
+    type Item = [(usize, &'a str); K];
+
+    fn next(&mut self) -> Option<Self::Item> {
+        // update
+        self.t += 1;
+
+        let mut max_heap = BinaryHeap::from_iter(
+            self.reindeers
+                .into_iter()
+                .map(|r| (r.position_at(self.t), r.name.as_ref())),
+        );
+
+        if max_heap.len() < K {
+            return None;
+        }
+
+        let top_k = (0..K)
+            .map(|_| max_heap.pop().unwrap())
+            .collect::<Vec<(usize, &str)>>()
+            .try_into()
+            .unwrap();
+
+        Some(top_k)
+    }
+}
+
+pub fn race_2(reindeers: &Vec<Reindeer>, t: usize) -> (String, usize) {
+    let mut score_board: HashMap<&str, usize> = reindeers
+        .into_iter()
+        .map(|r| (r.name.as_ref(), 0))
+        .collect();
+
+    let race = Race { reindeers };
+    for [(_, first), (_, second), (_, third)] in race.top::<3>().take(t) {
+        // println!("t = {}, winner = {} @ {}", i, first, p1);
+        // i += 1;
+        score_board.entry(first).and_modify(|score| *score += 1);
+        score_board.entry(second).and_modify(|score| *score += 0);
+        score_board.entry(third).and_modify(|score| *score += 0);
+    }
+
+    let (winner, score) = score_board
+        .into_iter()
+        .max_by_key(|(_, score)| *score)
+        .unwrap();
+
+    (winner.to_owned(), score)
 }
