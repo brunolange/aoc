@@ -13,14 +13,20 @@ use nom::{
 #[derive(Clone, Debug)]
 struct Reindeer {
     name: Arc<str>,
-    fly_speed: u8,
-    fly_duration: u8,
-    rest_time: u16,
+    fly_speed: usize,
+    fly_duration: usize,
+    rest_time: usize,
 }
 
 impl Reindeer {
     fn position_at(&self, t: usize) -> usize {
-        t + 101
+        let period = self.fly_duration + self.rest_time;
+        let (quotient, remainder) = (t / period, t % period);
+
+        let total_rest_time = quotient * self.rest_time
+            + std::cmp::max(remainder as i64 - self.fly_duration as i64, 0) as usize;
+
+        self.fly_speed * (t - total_rest_time)
     }
 }
 
@@ -31,7 +37,7 @@ fn parse_line(input: &str) -> IResult<&str, Reindeer> {
             terminated(tag("can fly"), space1),
             terminated(digit1, preceded(space1, terminated(tag("km/s"), space1))),
         ),
-        |v: &str| v.parse::<u8>(),
+        |v: &str| v.parse::<usize>(),
     )(input)?;
 
     let (input, fly_duration) = map_res(
@@ -42,7 +48,7 @@ fn parse_line(input: &str) -> IResult<&str, Reindeer> {
                 preceded(space1, terminated(tag("seconds"), alt((space1, tag(","))))),
             ),
         ),
-        |v: &str| v.parse::<u8>(),
+        |v: &str| v.parse::<usize>(),
     )(input)?;
 
     let (input, rest_time) = map_res(
@@ -56,7 +62,7 @@ fn parse_line(input: &str) -> IResult<&str, Reindeer> {
                 ),
             ),
         ),
-        |v: &str| v.parse::<u16>(),
+        |v: &str| v.parse::<usize>(),
     )(input)?;
 
     Ok((
@@ -72,6 +78,8 @@ fn parse_line(input: &str) -> IResult<&str, Reindeer> {
 
 fn main() {
     let lines = vec![
+        // "Comet can fly 14 km/s for 10 seconds, but then must rest for 127 seconds.",
+        // "Dancer can fly 16 km/s for 11 seconds, but then must rest for 162 seconds.",
         "Vixen can fly 8 km/s for 8 seconds, but then must rest for 53 seconds.",
         "Blitzen can fly 13 km/s for 4 seconds, but then must rest for 49 seconds.",
         "Rudolph can fly 20 km/s for 7 seconds, but then must rest for 132 seconds.",
@@ -87,8 +95,18 @@ fn main() {
         reindeer
     });
 
+    let t = std::env::args()
+        .nth(1)
+        .unwrap_or("1000".to_owned())
+        .parse::<usize>()
+        .unwrap();
+
     let winner = reindeers
-        .map(|reindeer| (reindeer.position_at(2053), reindeer))
+        .map(|reindeer| (reindeer.position_at(t), reindeer))
+        .map(|(d, r)| {
+            println!("{}: {}", r.name, d);
+            (d, r)
+        })
         .max_by_key(|(distance, _)| *distance)
         .unwrap();
 
