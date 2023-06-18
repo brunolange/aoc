@@ -1,80 +1,4 @@
-use std::sync::Arc;
-
-use nom::branch::alt;
-use nom::bytes::complete::tag;
-use nom::character::complete::space0;
-use nom::combinator::map_res;
-use nom::{
-    character::complete::{alpha1, digit1, space1},
-    sequence::{preceded, terminated},
-    IResult,
-};
-
-#[derive(Clone, Debug)]
-struct Reindeer {
-    name: Arc<str>,
-    fly_speed: usize,
-    fly_duration: usize,
-    rest_time: usize,
-}
-
-impl Reindeer {
-    fn position_at(&self, t: usize) -> usize {
-        let period = self.fly_duration + self.rest_time;
-        let (quotient, remainder) = (t / period, t % period);
-
-        let total_rest_time = quotient * self.rest_time
-            + std::cmp::max(remainder as i64 - self.fly_duration as i64, 0) as usize;
-
-        self.fly_speed * (t - total_rest_time)
-    }
-}
-
-fn parse_line(input: &str) -> IResult<&str, Reindeer> {
-    let (input, name) = terminated(alpha1, space1)(input)?;
-    let (input, fly_speed) = map_res(
-        preceded(
-            terminated(tag("can fly"), space1),
-            terminated(digit1, preceded(space1, terminated(tag("km/s"), space1))),
-        ),
-        |v: &str| v.parse::<usize>(),
-    )(input)?;
-
-    let (input, fly_duration) = map_res(
-        preceded(
-            preceded(space0, terminated(tag("for"), space1)),
-            terminated(
-                digit1,
-                preceded(space1, terminated(tag("seconds"), alt((space1, tag(","))))),
-            ),
-        ),
-        |v: &str| v.parse::<usize>(),
-    )(input)?;
-
-    let (input, rest_time) = map_res(
-        preceded(
-            preceded(space0, terminated(tag("but then must rest for"), space1)),
-            terminated(
-                digit1,
-                preceded(
-                    space1,
-                    terminated(tag("seconds"), preceded(space0, tag("."))),
-                ),
-            ),
-        ),
-        |v: &str| v.parse::<usize>(),
-    )(input)?;
-
-    Ok((
-        input,
-        Reindeer {
-            name: name.into(),
-            fly_speed,
-            fly_duration,
-            rest_time,
-        },
-    ))
-}
+use reindeer_olympics::{parse_line, race_1, Reindeer};
 
 fn main() {
     let lines = vec![
@@ -90,10 +14,13 @@ fn main() {
         "Prancer can fly 9 km/s for 12 seconds, but then must rest for 97 seconds.",
         "Dancer can fly 37 km/s for 1 seconds, but then must rest for 36 seconds.",
     ];
-    let reindeers = lines.into_iter().map(|line| {
-        let (_, reindeer) = parse_line(line).unwrap();
-        reindeer
-    });
+    let reindeers = lines
+        .into_iter()
+        .map(|line| {
+            let (_, reindeer) = parse_line(line).unwrap();
+            reindeer
+        })
+        .collect::<Vec<Reindeer>>();
 
     let t = std::env::args()
         .nth(1)
@@ -101,18 +28,10 @@ fn main() {
         .parse::<usize>()
         .unwrap();
 
-    let winner = reindeers
-        .map(|reindeer| (reindeer.position_at(t), reindeer))
-        .map(|(d, r)| {
-            println!("{}: {}", r.name, d);
-            (d, r)
-        })
-        .max_by_key(|(distance, _)| *distance)
-        .unwrap();
+    let (winner, distance) = race_1(&reindeers, t).unwrap();
 
-    let (distance, reindeer) = winner;
     println!(
-        "{} is the winner and has travelled {} kilometers.",
-        reindeer.name, distance
+        "{} is the winner of part 1 and has travelled {} kilometers.",
+        winner.name, distance
     );
 }
