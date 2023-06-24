@@ -5,21 +5,6 @@ use nom::{bytes::complete::take_while_m_n, combinator::all_consuming, IResult};
 
 const BLACKLIST: [char; 3] = ['i', 'o', 'l'];
 
-pub fn is_valid_password<const N: usize>(pwd: &Password<N>) -> bool {
-    debug!(
-        "Checking password: {:?}",
-        pwd.value.iter().collect::<String>()
-    );
-    let chars = pwd.value;
-    return password_does_not_contain_blacklisted_characters(&chars)
-        && password_contains_3_characters_in_sequence(&chars)
-        && password_contains_at_least_2_different_pairs_of_letters(&chars);
-}
-
-fn password_does_not_contain_blacklisted_characters<const N: usize>(chars: &[char; N]) -> bool {
-    !chars.iter().any(is_blacklisted)
-}
-
 fn is_blacklisted(c: &char) -> bool {
     BLACKLIST.contains(c)
 }
@@ -68,35 +53,6 @@ fn parse_pwd<const N: usize>(input: &str) -> IResult<&str, &str> {
     Ok((remaining, pwd))
 }
 
-#[derive(Debug)]
-pub struct PasswordIterator<const N: usize> {
-    pub pwd: Password<N>,
-}
-
-impl<const N: usize> Iterator for PasswordIterator<N> {
-    type Item = Password<N>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let mut nxt = self.pwd.clone();
-
-        let mut carry = true;
-        let mut i: i32 = N as i32 - 1;
-        while carry && i >= 0 {
-            let idx = i as usize;
-            (nxt.value[idx], carry) = inc(nxt.value[idx]);
-            i -= 1;
-        }
-
-        self.pwd = nxt.clone();
-
-        if carry && i == -1 {
-            None
-        } else {
-            Some(nxt)
-        }
-    }
-}
-
 fn inc(c: char) -> (char, bool) {
     let carry = c == 'z';
     let nxt = if carry {
@@ -108,11 +64,11 @@ fn inc(c: char) -> (char, bool) {
 }
 
 #[derive(Debug)]
-pub struct FastPasswordIterator<const N: usize> {
+pub struct PasswordIterator<const N: usize> {
     pub pwd: Password<N>,
 }
 
-impl<const N: usize> Iterator for FastPasswordIterator<N> {
+impl<const N: usize> Iterator for PasswordIterator<N> {
     type Item = Password<N>;
 
     fn next(&mut self) -> Option<Self::Item> {
