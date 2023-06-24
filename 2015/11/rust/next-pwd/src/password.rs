@@ -48,21 +48,6 @@ impl<const N: usize> Password<N> {
     }
 }
 
-fn parse_pwd<const N: usize>(input: &str) -> IResult<&str, &str> {
-    let (remaining, pwd) = all_consuming(take_while_m_n(N, N, |c: char| c.is_lowercase()))(input)?;
-    Ok((remaining, pwd))
-}
-
-fn inc(c: char) -> (char, bool) {
-    let carry = c == 'z';
-    let nxt = if carry {
-        'a'
-    } else {
-        ((c as u32) + 1).try_into().unwrap()
-    };
-    (nxt, carry)
-}
-
 #[derive(Debug)]
 pub struct PasswordIterator<const N: usize> {
     pub pwd: Password<N>,
@@ -97,6 +82,21 @@ fn increment<const N: usize>(chars: &mut [char; N]) -> bool {
     }
 
     !carry || i >= 0
+}
+
+fn parse_pwd<const N: usize>(input: &str) -> IResult<&str, &str> {
+    let (remaining, pwd) = all_consuming(take_while_m_n(N, N, |c: char| c.is_lowercase()))(input)?;
+    Ok((remaining, pwd))
+}
+
+fn inc(c: char) -> (char, bool) {
+    let carry = c == 'z';
+    let nxt = if carry {
+        'a'
+    } else {
+        ((c as u32) + 1).try_into().unwrap()
+    };
+    (nxt, carry)
 }
 
 fn flip_blacklisted<const N: usize>(chars: &mut [char; N]) -> bool {
