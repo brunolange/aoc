@@ -72,6 +72,12 @@ impl<const N: usize> Iterator for PasswordIterator<N> {
     }
 }
 
+impl<const N: usize> Password<N> {
+    pub fn iter(&self) -> PasswordIterator<N> {
+        PasswordIterator { pwd: self.clone() }
+    }
+}
+
 fn increment<const N: usize>(chars: &mut [char; N]) -> bool {
     let mut carry = true;
     let mut i: i32 = N as i32 - 1;
@@ -145,10 +151,14 @@ mod tests {
     }
 
     #[test]
-    fn test_password_iterator() {
-        let pwd: Password<3> = Password::from_str("aaa").unwrap();
-        let mut pi = PasswordIterator { pwd };
-        assert_eq!(pi.next().unwrap().value, ['a', 'a', 'b']);
+    fn test_password_iterator_in_for_loop() {
+        let pwd: Password<8> = Password::from_str("zzzzaaaa").unwrap();
+        let mut next_pwds = vec![];
+        for next_pwd in pwd.iter() {
+            next_pwds.push(next_pwd);
+        }
+
+        assert_eq!(next_pwds.len(), 29);
     }
 
     #[test]
