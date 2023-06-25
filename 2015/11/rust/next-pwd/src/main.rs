@@ -1,12 +1,11 @@
-use next_pwd::next_password;
+use next_pwd::next_passwords;
 
 mod io;
 
 fn main() {
     env_logger::init();
 
-    match next_password(&io::read_password()) {
-        None => panic!("There is no viable next password"),
-        Some(pwd) => println!("{}", pwd),
-    };
+    for next_pwd in next_passwords(&io::read_password(), io::number_of_passwords()) {
+        println!("{}", next_pwd);
+    }
 }
