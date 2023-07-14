@@ -13,7 +13,7 @@ fn main() {
 
     let duration = io::duration();
 
-    let (winner, distance) = race_1(&reindeers, duration).unwrap();
+    let (winner, distance) = race_1(&reindeers, duration);
     println!(
         "{} is the winner of part 1 and has travelled {} kilometers.",
         winner.name, distance

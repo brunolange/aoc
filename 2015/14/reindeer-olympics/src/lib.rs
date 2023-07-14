@@ -77,7 +77,7 @@ pub fn parse_line(input: &str) -> IResult<&str, Reindeer> {
     ))
 }
 
-pub fn race_1(reindeers: &Vec<Reindeer>, t: usize) -> Option<(&Reindeer, usize)> {
+pub fn race_1(reindeers: &Vec<Reindeer>, t: usize) -> (&Reindeer, usize) {
     let winner = reindeers
         .iter()
         .map(|reindeer| (reindeer.distance_at(t), reindeer))
@@ -85,7 +85,7 @@ pub fn race_1(reindeers: &Vec<Reindeer>, t: usize) -> Option<(&Reindeer, usize)>
         .unwrap();
 
     let (distance, reindeer) = winner;
-    Some((reindeer, distance))
+    (reindeer, distance)
 }
 
 struct Race<'a> {
