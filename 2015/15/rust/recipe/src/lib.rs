@@ -1,5 +1,44 @@
 use std::collections::HashMap;
 
+#[derive(Debug, PartialEq)]
+pub struct Ingredient {
+    pub name: String,
+    pub capacity: i64,
+    pub durability: i64,
+    pub flavor: i64,
+    pub texture: i64,
+    pub calories: i64,
+}
+
+#[derive(Debug)]
+pub struct Amount<'a> {
+    pub quantity: usize,
+    pub ingredient: &'a Ingredient,
+}
+
+pub fn score(amounts: &[Amount]) -> usize {
+    amounts
+        .iter()
+        .map(|a| {
+            let ing = a.ingredient;
+            let q = a.quantity;
+            [ing.capacity, ing.durability, ing.flavor, ing.texture].map(|v| v * q as i64)
+        })
+        .reduce(|acc, curr| {
+            acc.into_iter()
+                .zip(curr)
+                .map(|(a, b)| a + b)
+                .collect::<Vec<_>>()
+                .try_into()
+                .unwrap()
+        })
+        .unwrap()
+        .into_iter()
+        .map(|v| std::cmp::max(0, v) as usize)
+        // .fold(1, |acc, curr| acc * curr) clippy FTW!
+        .product()
+}
+
 ///
 /// Non-negative integer solutions to $x_1 + x_2 + ... + x_k = n$.
 /// That is, the k-weak composition of n.
