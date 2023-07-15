@@ -1,3 +1,5 @@
+use recipe::f;
+
 #[derive(Debug)]
 struct Ingredient {
     capacity: i32,
@@ -72,4 +74,6 @@ fn main() {
             }
         ])
     );
+
+    println!("{:?}", f(4, 3));
 }
