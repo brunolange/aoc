@@ -6,14 +6,14 @@ use std::collections::HashMap;
 ///
 /// # Example
 /// ```rust
-/// use recipe::multisubsets;
+/// use recipe::n_multichoose_k;
 /// let empty: Vec<Vec<usize>> = vec![];
-/// assert_eq!(multisubsets(100, 0), empty);
-/// assert_eq!(multisubsets(100, 1), [[100]]);
-/// assert_eq!(multisubsets(3, 2), [[3, 0], [2, 1], [1, 2], [0, 3]]);
+/// assert_eq!(n_multichoose_k(100, 0), empty);
+/// assert_eq!(n_multichoose_k(100, 1), [[100]]);
+/// assert_eq!(n_multichoose_k(3, 2), [[3, 0], [2, 1], [1, 2], [0, 3]]);
 /// ```
 ///
-pub fn multisubsets(n: usize, k: usize) -> Vec<Vec<usize>> {
+pub fn n_multichoose_k(n: usize, k: usize) -> Vec<Vec<usize>> {
     fn _multisubsets(
         n: usize,
         k: usize,
@@ -54,14 +54,14 @@ mod test {
 
     #[test]
     fn test_f() {
-        assert_eq!(multisubsets(0, 1), [[0]]);
+        assert_eq!(n_multichoose_k(0, 1), [[0]]);
 
-        assert_eq!(multisubsets(1, 1), [[1]]);
-        assert_eq!(multisubsets(99, 1), [[99]]);
+        assert_eq!(n_multichoose_k(1, 1), [[1]]);
+        assert_eq!(n_multichoose_k(99, 1), [[99]]);
 
-        assert_eq!(multisubsets(3, 2), [[3, 0], [2, 1], [1, 2], [0, 3]]);
+        assert_eq!(n_multichoose_k(3, 2), [[3, 0], [2, 1], [1, 2], [0, 3]]);
         assert_eq!(
-            multisubsets(4, 3),
+            n_multichoose_k(4, 3),
             [
                 [4, 0, 0],
                 [3, 1, 0],

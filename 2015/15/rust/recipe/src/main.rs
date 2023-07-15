@@ -1,4 +1,4 @@
-use recipe::multisubsets;
+use recipe::n_multichoose_k;
 
 #[derive(Debug)]
 struct Ingredient {
@@ -57,7 +57,7 @@ fn main() {
             calories: 3,
         },
     ];
-    let (max_score, amounts) = multisubsets(100, ingredients.len())
+    let (max_score, amounts) = n_multichoose_k(100, ingredients.len())
         .iter()
         .map(|arrangement| {
             // println!("{:?}", arrangement);
