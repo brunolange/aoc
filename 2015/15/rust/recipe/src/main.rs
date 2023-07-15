@@ -9,9 +9,9 @@ fn main() {
     let ingredients: Vec<Ingredient> = io::lines().map(io::parse_line).collect();
     let (max_score, amounts) = maximize_score(&ingredients);
 
-    for amount in amounts {
-        println!("{}: {}", amount.ingredient.name, amount.quantity);
-    }
+    amounts.iter().for_each(|amount| {
+        println!("{:.<20}: {}", amount.ingredient.name, amount.quantity);
+    });
 
-    println!("Score = {:?}", max_score);
+    println!("{:?}", max_score);
 }
