@@ -16,7 +16,7 @@ struct Amount<'a> {
     ingredient: &'a Ingredient,
 }
 
-fn score(amounts: &Vec<Amount>) -> usize {
+fn score(amounts: &[Amount]) -> usize {
     amounts
         .iter()
         .map(|a| {
@@ -35,7 +35,8 @@ fn score(amounts: &Vec<Amount>) -> usize {
         .unwrap()
         .into_iter()
         .map(|v| std::cmp::max(0, v) as usize)
-        .fold(1, |acc, curr| acc * curr)
+        // .fold(1, |acc, curr| acc * curr) clippy FTW!
+        .product()
 }
 
 fn main() {
