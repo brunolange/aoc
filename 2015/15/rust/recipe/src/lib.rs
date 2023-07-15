@@ -19,15 +19,22 @@ pub struct Amount<'a> {
 pub fn score(amounts: &[Amount]) -> usize {
     amounts
         .iter()
-        .map(|a| {
-            let ing = a.ingredient;
-            let q = a.quantity;
-            [ing.capacity, ing.durability, ing.flavor, ing.texture].map(|v| v * q as i64)
+        // scale
+        .map(|amount| {
+            let ingredient = amount.ingredient;
+            [
+                ingredient.capacity,
+                ingredient.durability,
+                ingredient.flavor,
+                ingredient.texture,
+            ]
+            .map(|value| value * amount.quantity as i64)
         })
+        // add
         .reduce(|acc, curr| {
             acc.into_iter()
                 .zip(curr)
-                .map(|(a, b)| a + b)
+                .map(|(left, right)| left + right)
                 .collect::<Vec<_>>()
                 .try_into()
                 .unwrap()
