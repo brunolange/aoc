@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use log::debug;
+
 #[derive(Debug, PartialEq)]
 pub struct Ingredient {
     pub name: String,
@@ -42,18 +44,21 @@ pub struct Score {
 pub fn maximize_score(ingredients: &Vec<Ingredient>) -> (Score, Vec<Amount>) {
     n_multichoose_k(100, ingredients.len())
         .iter()
-        .map(|arrangement| {
-            // println!("{:?}", arrangement);
+        .map(|composition| {
+            debug!("Evaluating composition {:?}", composition);
             let amounts: Vec<_> = ingredients
                 .iter()
-                .zip(arrangement)
+                .zip(composition)
                 .map(|(a, &b)| Amount {
                     quantity: b,
                     ingredient: a,
                 })
                 .collect();
 
-            (score(&amounts), amounts)
+            let score = score(&amounts);
+            debug!("{:?}", score);
+
+            (score, amounts)
         })
         .filter(|(score, _)| score.calories == 500)
         .max_by_key(|(score, _amounts)| score.value)
