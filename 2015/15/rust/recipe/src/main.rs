@@ -75,5 +75,7 @@ fn main() {
         ])
     );
 
-    println!("{:?}", f(4, 3));
+    for arrangement in f(10, 3) {
+        println!("{:?}", arrangement);
+    }
 }
