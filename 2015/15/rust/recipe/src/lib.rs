@@ -1,21 +1,41 @@
+use std::collections::HashMap;
+
 // Solutions to a_1 + a_2 + ... + a_n = s
 // where a_i and n are natural numbers
 pub fn f(s: usize, n: usize) -> Vec<Vec<usize>> {
-    if n == 0 {
-        return vec![];
+    let mut memo: HashMap<(usize, usize), Vec<Vec<usize>>> = HashMap::new();
+    fprime(s, n, &mut memo)
+}
+
+// Memoized version
+fn fprime(
+    s: usize,
+    n: usize,
+    memo: &mut HashMap<(usize, usize), Vec<Vec<usize>>>,
+) -> Vec<Vec<usize>> {
+    let key = (s, n);
+    if let Some(payload) = memo.get(&key) {
+        return payload.to_owned();
     }
-    if n == 1 {
-        return vec![vec![s]];
+    let payload;
+    if n == 0 {
+        payload = vec![];
+    } else if n == 1 {
+        payload = vec![vec![s]];
+    } else {
+        payload = (0..=s)
+            .flat_map(|i| {
+                fprime(s - i, n - 1, memo).into_iter().map(move |mut prev| {
+                    prev.push(i);
+                    prev
+                })
+            })
+            .collect();
     }
 
-    (0..=s)
-        .flat_map(|i| {
-            f(s - i, n - 1).into_iter().map(move |mut prev| {
-                prev.push(i);
-                prev
-            })
-        })
-        .collect()
+    memo.insert(key, payload.clone());
+
+    payload
 }
 
 #[cfg(test)]
