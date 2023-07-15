@@ -33,7 +33,7 @@ pub fn parse_line(line: String) -> Ingredient {
         durability: properties["durability"],
         flavor: properties["flavor"],
         texture: properties["texture"],
-        calories: properties["calories"],
+        calories: properties["calories"] as usize,
     }
 }
 

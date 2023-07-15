@@ -20,7 +20,8 @@ fn main() {
 
             (score(&amounts), amounts)
         })
-        .max_by_key(|(score, _amounts)| *score)
+        .filter(|(score, _)| score.calories == 500)
+        .max_by_key(|(score, _amounts)| score.value)
         .unwrap();
 
     for amount in amounts {

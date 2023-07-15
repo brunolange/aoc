@@ -7,7 +7,7 @@ pub struct Ingredient {
     pub durability: i64,
     pub flavor: i64,
     pub texture: i64,
-    pub calories: i64,
+    pub calories: usize,
 }
 
 #[derive(Debug)]
@@ -16,35 +16,57 @@ pub struct Amount<'a> {
     pub ingredient: &'a Ingredient,
 }
 
-pub fn score(amounts: &[Amount]) -> usize {
-    amounts
+impl<'a> Amount<'a> {
+    pub fn to_vector(&self) -> [i64; 4] {
+        let ingredient = self.ingredient;
+        [
+            ingredient.capacity,
+            ingredient.durability,
+            ingredient.flavor,
+            ingredient.texture,
+        ]
+        .map(|value| value * self.quantity as i64)
+    }
+
+    pub fn calories(&self) -> usize {
+        self.quantity * self.ingredient.calories
+    }
+}
+
+#[derive(Debug)]
+pub struct Score {
+    pub value: usize,
+    pub calories: usize,
+}
+
+pub fn score(amounts: &[Amount]) -> Score {
+    let (vec, cals) = amounts
         .iter()
         // scale
-        .map(|amount| {
-            let ingredient = amount.ingredient;
-            [
-                ingredient.capacity,
-                ingredient.durability,
-                ingredient.flavor,
-                ingredient.texture,
-            ]
-            .map(|value| value * amount.quantity as i64)
-        })
+        .map(|amount| (amount.to_vector(), amount.calories()))
         // add
-        .reduce(|acc, curr| {
-            acc.into_iter()
-                .zip(curr)
-                .map(|(left, right)| left + right)
-                .collect::<Vec<_>>()
-                .try_into()
-                .unwrap()
+        .reduce(|(vec, calories), (curr_vec, curr_calories)| {
+            (
+                vec.into_iter()
+                    .zip(curr_vec)
+                    .map(|(left, right)| left + right)
+                    .collect::<Vec<_>>()
+                    .try_into()
+                    .unwrap(),
+                calories + curr_calories,
+            )
         })
-        .unwrap()
-        .into_iter()
-        // reject negative values
-        .map(|v| std::cmp::max(0, v) as usize)
-        // final score
-        .product()
+        .unwrap();
+
+    Score {
+        value: vec
+            .into_iter()
+            // reject negative values
+            .map(|v| std::cmp::max(0, v) as usize)
+            // final score
+            .product(),
+        calories: cals,
+    }
 }
 
 ///
