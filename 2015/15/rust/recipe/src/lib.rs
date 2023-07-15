@@ -41,8 +41,9 @@ pub fn score(amounts: &[Amount]) -> usize {
         })
         .unwrap()
         .into_iter()
+        // reject negative values
         .map(|v| std::cmp::max(0, v) as usize)
-        // .fold(1, |acc, curr| acc * curr) clippy FTW!
+        // final score
         .product()
 }
 
