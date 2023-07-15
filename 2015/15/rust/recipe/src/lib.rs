@@ -7,6 +7,8 @@ use std::collections::HashMap;
 /// # Example
 /// ```rust
 /// use recipe::multisubsets;
+/// let empty: Vec<Vec<usize>> = vec![];
+/// assert_eq!(multisubsets(100, 0), empty);
 /// assert_eq!(multisubsets(100, 1), [[100]]);
 /// assert_eq!(multisubsets(3, 2), [[3, 0], [2, 1], [1, 2], [0, 3]]);
 /// ```
