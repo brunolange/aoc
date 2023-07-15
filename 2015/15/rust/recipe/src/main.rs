@@ -1,4 +1,4 @@
-use recipe::f;
+use recipe::multisubsets;
 
 #[derive(Debug)]
 struct Ingredient {
@@ -75,7 +75,7 @@ fn main() {
         ])
     );
 
-    for arrangement in f(10, 3) {
+    for arrangement in multisubsets(3, 4) {
         println!("{:?}", arrangement);
     }
 }
