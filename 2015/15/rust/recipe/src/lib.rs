@@ -8,16 +8,14 @@ pub fn f(s: usize, n: usize) -> Vec<Vec<usize>> {
         return vec![vec![s]];
     }
 
-    let mut solutions = vec![];
-    for i in 0..=s {
-        let mut prev = f(s - i, n - 1);
-        for prev_solution in prev.iter_mut() {
-            prev_solution.push(i);
-            solutions.push(prev_solution.clone());
-        }
-    }
-
-    solutions
+    (0..=s)
+        .flat_map(|i| {
+            f(s - i, n - 1).into_iter().map(move |mut prev| {
+                prev.push(i);
+                prev
+            })
+        })
+        .collect()
 }
 
 #[cfg(test)]
