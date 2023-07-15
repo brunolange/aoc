@@ -39,6 +39,27 @@ pub struct Score {
     pub calories: usize,
 }
 
+pub fn maximize_score(ingredients: &Vec<Ingredient>) -> (Score, Vec<Amount>) {
+    n_multichoose_k(100, ingredients.len())
+        .iter()
+        .map(|arrangement| {
+            // println!("{:?}", arrangement);
+            let amounts: Vec<_> = ingredients
+                .iter()
+                .zip(arrangement)
+                .map(|(a, &b)| Amount {
+                    quantity: b,
+                    ingredient: a,
+                })
+                .collect();
+
+            (score(&amounts), amounts)
+        })
+        .filter(|(score, _)| score.calories == 500)
+        .max_by_key(|(score, _amounts)| score.value)
+        .unwrap()
+}
+
 pub fn score(amounts: &[Amount]) -> Score {
     let (vec, cals) = amounts
         .iter()
