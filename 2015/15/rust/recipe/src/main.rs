@@ -57,7 +57,7 @@ fn main() {
             calories: 3,
         },
     ];
-    let max_score = multisubsets(100, ingredients.len())
+    let (max_score, amounts) = multisubsets(100, ingredients.len())
         .iter()
         .map(|arrangement| {
             // println!("{:?}", arrangement);
@@ -70,10 +70,14 @@ fn main() {
                 })
                 .collect();
 
-            score(&amounts)
+            (score(&amounts), amounts)
         })
-        .max()
+        .max_by_key(|(score, _amounts)| *score)
         .unwrap();
 
-    println!("max_score = {}", max_score);
+    for amount in amounts {
+        println!("{}: {}", amount.ingredient.name, amount.quantity);
+    }
+
+    println!("Score = {:?}", max_score);
 }
