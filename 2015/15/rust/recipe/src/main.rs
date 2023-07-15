@@ -2,29 +2,27 @@ use recipe::multisubsets;
 
 #[derive(Debug)]
 struct Ingredient {
-    capacity: i32,
-    durability: i32,
-    flavor: i32,
-    texture: i32,
-    calories: i32,
+    name: String,
+    capacity: i64,
+    durability: i64,
+    flavor: i64,
+    texture: i64,
+    calories: i64,
 }
 
+#[derive(Debug)]
 struct Amount<'a> {
     quantity: usize,
     ingredient: &'a Ingredient,
 }
 
 fn score(amounts: &Vec<Amount>) -> usize {
-    let xs = amounts
+    amounts
         .iter()
         .map(|a| {
             let ing = a.ingredient;
             let q = a.quantity;
-            let v = [ing.capacity, ing.durability, ing.flavor, ing.texture].map(|v| v * q as i32);
-
-            println!("v = {:?}", v);
-
-            v
+            [ing.capacity, ing.durability, ing.flavor, ing.texture].map(|v| v * q as i64)
         })
         .reduce(|acc, curr| {
             acc.into_iter()
@@ -34,18 +32,16 @@ fn score(amounts: &Vec<Amount>) -> usize {
                 .try_into()
                 .unwrap()
         })
-        .unwrap();
-
-    println!("xs = {:?}", xs);
-
-    let ys = xs.into_iter().fold(1, |acc, curr| acc * curr);
-
-    std::cmp::max(0, ys) as usize
+        .unwrap()
+        .into_iter()
+        .map(|v| std::cmp::max(0, v) as usize)
+        .fold(1, |acc, curr| acc * curr)
 }
 
 fn main() {
     let ingredients = vec![
         Ingredient {
+            name: "Butterscotch".to_string(),
             capacity: -1,
             durability: -2,
             flavor: 6,
@@ -53,6 +49,7 @@ fn main() {
             calories: 8,
         },
         Ingredient {
+            name: "Cinnamon".to_string(),
             capacity: 2,
             durability: 3,
             flavor: -2,
@@ -60,22 +57,23 @@ fn main() {
             calories: 3,
         },
     ];
+    let max_score = multisubsets(100, ingredients.len())
+        .iter()
+        .map(|arrangement| {
+            // println!("{:?}", arrangement);
+            let amounts: Vec<_> = ingredients
+                .iter()
+                .zip(arrangement)
+                .map(|(a, &b)| Amount {
+                    quantity: b,
+                    ingredient: a,
+                })
+                .collect();
 
-    println!(
-        "{}",
-        score(&vec![
-            Amount {
-                quantity: 44,
-                ingredient: &ingredients[0],
-            },
-            Amount {
-                quantity: 56,
-                ingredient: &ingredients[1],
-            }
-        ])
-    );
+            score(&amounts)
+        })
+        .max()
+        .unwrap();
 
-    for arrangement in multisubsets(3, 4) {
-        println!("{:?}", arrangement);
-    }
+    println!("max_score = {}", max_score);
 }
