@@ -17,12 +17,12 @@ pub fn lines() -> Box<dyn Iterator<Item = String>> {
 }
 
 pub fn parse_line(line: String) -> Ingredient {
-    let parts: Vec<_> = line.split(":").collect();
+    let parts: Vec<_> = line.split(':').collect();
     let name = parts[0].trim().to_string();
     let properties: HashMap<&str, i64> = parts[1]
-        .split(",")
+        .split(',')
         .map(|v| {
-            let kv = v.trim().split(" ").collect::<Vec<_>>();
+            let kv = v.trim().split(' ').collect::<Vec<_>>();
             (kv[0].trim(), kv[1].trim().parse::<i64>().unwrap())
         })
         .collect();
