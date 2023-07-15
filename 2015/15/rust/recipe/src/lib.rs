@@ -17,21 +17,18 @@ fn fprime(
     if let Some(payload) = memo.get(&key) {
         return payload.to_owned();
     }
-    let payload;
-    if n == 0 {
-        payload = vec![];
-    } else if n == 1 {
-        payload = vec![vec![s]];
-    } else {
-        payload = (0..=s)
+    let payload = match n {
+        0 => vec![],
+        1 => vec![vec![s]],
+        _ => (0..=s)
             .flat_map(|i| {
                 fprime(s - i, n - 1, memo).into_iter().map(move |mut prev| {
                     prev.push(i);
                     prev
                 })
             })
-            .collect();
-    }
+            .collect(),
+    };
 
     memo.insert(key, payload.clone());
 
