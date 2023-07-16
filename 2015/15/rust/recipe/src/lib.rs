@@ -41,7 +41,7 @@ pub struct Score {
     pub calories: usize,
 }
 
-pub fn maximize_score(ingredients: &Vec<Ingredient>) -> (Score, Vec<Amount>) {
+pub fn maximum_score(ingredients: &Vec<Ingredient>) -> (Score, Vec<Amount>) {
     n_multichoose_k(100, ingredients.len())
         .iter()
         .map(|composition| {
