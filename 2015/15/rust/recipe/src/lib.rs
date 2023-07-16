@@ -41,8 +41,8 @@ pub struct Score {
     pub calories: usize,
 }
 
-pub fn maximum_score(ingredients: &Vec<Ingredient>) -> (Score, Vec<Amount>) {
-    n_multichoose_k(100, ingredients.len())
+pub fn maximum_score(ingredients: &Vec<Ingredient>, teaspoons: usize) -> (Score, Vec<Amount>) {
+    n_multichoose_k(teaspoons, ingredients.len())
         .iter()
         .map(|composition| {
             debug!("Evaluating composition {:?}", composition);

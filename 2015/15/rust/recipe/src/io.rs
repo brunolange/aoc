@@ -16,6 +16,14 @@ pub fn lines() -> Box<dyn Iterator<Item = String>> {
     }
 }
 
+pub fn teaspoons() -> usize {
+    std::env::args()
+        .nth(2)
+        .unwrap_or("100".to_string())
+        .parse()
+        .expect("invalid teaspoons value")
+}
+
 pub fn parse_line(line: String) -> Ingredient {
     let parts: Vec<_> = line.split(':').collect();
     let name = parts[0].trim().to_string();
