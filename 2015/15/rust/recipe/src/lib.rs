@@ -41,7 +41,11 @@ pub struct Score {
     pub calories: usize,
 }
 
-pub fn maximum_score(ingredients: &Vec<Ingredient>, teaspoons: usize) -> (Score, Vec<Amount>) {
+pub fn maximum_score(
+    ingredients: &Vec<Ingredient>,
+    teaspoons: usize,
+    calories: usize,
+) -> (Score, Vec<Amount>) {
     n_multichoose_k(teaspoons, ingredients.len())
         .iter()
         .map(|composition| {
@@ -60,9 +64,9 @@ pub fn maximum_score(ingredients: &Vec<Ingredient>, teaspoons: usize) -> (Score,
 
             (score, amounts)
         })
-        .filter(|(score, _)| score.calories == 500)
+        .filter(|(score, _)| score.calories == calories)
         .max_by_key(|(score, _amounts)| score.value)
-        .unwrap()
+        .expect("The recipe you seek does not exist.")
 }
 
 pub fn score(amounts: &[Amount]) -> Score {

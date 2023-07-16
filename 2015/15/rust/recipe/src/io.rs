@@ -16,12 +16,15 @@ pub fn lines() -> Box<dyn Iterator<Item = String>> {
     }
 }
 
-pub fn teaspoons() -> usize {
-    std::env::args()
-        .nth(2)
-        .unwrap_or("100".to_string())
-        .parse()
-        .expect("invalid teaspoons value")
+#[macro_export]
+macro_rules! cli_arg {
+    ($placement:expr, $default:expr) => {
+        std::env::args()
+            .nth($placement)
+            .unwrap_or($default.to_string())
+            .parse()
+            .unwrap()
+    };
 }
 
 pub fn parse_line(line: String) -> Ingredient {
