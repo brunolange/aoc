@@ -50,6 +50,7 @@ pub fn maximum_score(
         .iter()
         .map(|composition| {
             debug!("Evaluating composition {:?}", composition);
+
             let amounts: Vec<_> = ingredients
                 .iter()
                 .zip(composition)
