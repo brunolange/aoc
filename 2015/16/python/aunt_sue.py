@@ -30,60 +30,79 @@ class AuntSue:
     perfumes: int | None
 
 
+from enum import Enum, auto
+
+
+class MFCSAMPropertyMode(Enum):
+    EQUAL = auto()
+    GREATER_THAN = auto()
+    LESS_THAN = auto()
+
+
+from typing import assert_never
+
+
+@dataclass
+class MFCSAMReading:
+    value: int
+    mode: MFCSAMPropertyMode
+
+
+def match(reading: MFCSAMReading, value: int) -> bool:
+    match reading.mode:
+        case MFCSAMPropertyMode.EQUAL:
+            return reading.value == value
+        case MFCSAMPropertyMode.LESS_THAN:
+            return value < reading.value
+        case MFCSAMPropertyMode.GREATER_THAN:
+            return value > reading.value
+        case other:
+            assert_never(other)
+
+
 @dataclass
 class MFCSAM:
-    children: int
-    cats: int
-    samoyeds: int
-    pomeranians: int
-    akitas: int
-    vizslas: int
-    goldfish: int
-    trees: int
-    cars: int
-    perfumes: int
+    children: MFCSAMReading
+    cats: MFCSAMReading
+    samoyeds: MFCSAMReading
+    pomeranians: MFCSAMReading
+    akitas: MFCSAMReading
+    vizslas: MFCSAMReading
+    goldfish: MFCSAMReading
+    trees: MFCSAMReading
+    cars: MFCSAMReading
+    perfumes: MFCSAMReading
 
     def test(self, aunt_sue: AuntSue) -> bool:
-        left = (
-            self.children,
-            self.cats,
-            self.samoyeds,
-            self.pomeranians,
-            self.akitas,
-            self.vizslas,
-            self.goldfish,
-            self.trees,
-            self.cars,
-            self.perfumes,
+        return all(
+            value is None or match(reading, value)
+            for reading, value in (
+                (self.children, aunt_sue.children),
+                (self.cats, aunt_sue.cats),
+                (self.samoyeds, aunt_sue.samoyeds),
+                (self.pomeranians, aunt_sue.pomeranians),
+                (self.akitas, aunt_sue.akitas),
+                (self.vizslas, aunt_sue.vizslas),
+                (self.goldfish, aunt_sue.goldfish),
+                (self.trees, aunt_sue.trees),
+                (self.cars, aunt_sue.cars),
+                (self.perfumes, aunt_sue.perfumes),
+            )
         )
-        right = (
-            aunt_sue.children,
-            aunt_sue.cats,
-            aunt_sue.samoyeds,
-            aunt_sue.pomeranians,
-            aunt_sue.akitas,
-            aunt_sue.vizslas,
-            aunt_sue.goldfish,
-            aunt_sue.trees,
-            aunt_sue.cars,
-            aunt_sue.perfumes,
-        )
-
-        return all(r is None or l == r for l, r in zip(left, right))
 
 
 def main() -> int:
     mfcsam = MFCSAM(
-        children=3,
-        cats=7,
-        samoyeds=2,
-        pomeranians=3,
-        akitas=0,
-        vizslas=0,
-        goldfish=5,
-        trees=3,
-        cars=2,
-        perfumes=1,
+        children=MFCSAMReading(value=3, mode=MFCSAMPropertyMode.EQUAL),
+        cats=MFCSAMReading(value=7, mode=MFCSAMPropertyMode.GREATER_THAN),
+        samoyeds=MFCSAMReading(value=2, mode=MFCSAMPropertyMode.EQUAL),
+        pomeranians=MFCSAMReading(value=3, mode=MFCSAMPropertyMode.LESS_THAN),
+        akitas=MFCSAMReading(value=0, mode=MFCSAMPropertyMode.EQUAL),
+        vizslas=MFCSAMReading(value=0, mode=MFCSAMPropertyMode.EQUAL),
+        goldfish=MFCSAMReading(value=5, mode=MFCSAMPropertyMode.LESS_THAN),
+        trees=MFCSAMReading(value=3, mode=MFCSAMPropertyMode.GREATER_THAN),
+        cars=MFCSAMReading(value=2, mode=MFCSAMPropertyMode.EQUAL),
+        perfumes=MFCSAMReading(value=1, mode=MFCSAMPropertyMode.EQUAL),
     )
     for i, aunt_sue in enumerate(parse_line()):
         # print(f"{aunt_sue = }")
