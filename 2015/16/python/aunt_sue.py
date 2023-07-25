@@ -10,9 +10,10 @@ trees: 3
 cars: 2
 perfumes: 1
 """
-import z3
 
 from dataclasses import dataclass
+from enum import Enum, auto
+from typing import assert_never
 
 
 @dataclass
@@ -30,16 +31,10 @@ class AuntSue:
     perfumes: int | None
 
 
-from enum import Enum, auto
-
-
 class MFCSAMPropertyMode(Enum):
     EQUAL = auto()
     GREATER_THAN = auto()
     LESS_THAN = auto()
-
-
-from typing import assert_never
 
 
 @dataclass
