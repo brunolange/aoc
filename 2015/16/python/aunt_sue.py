@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import assert_never
+from typing import Iterator, assert_never
 
 
 @dataclass
@@ -91,9 +91,6 @@ def main() -> int:
         if mfcsam.test(aunt_sue):
             print(f"Found Aunt Sue! {i+1}: {aunt_sue}")
     return 0
-
-
-from typing import Iterator
 
 
 def parse_line() -> Iterator[AuntSue]:
