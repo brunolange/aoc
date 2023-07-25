@@ -1,16 +1,3 @@
-"""
-children: 3
-cats: 7
-samoyeds: 2
-pomeranians: 3
-akitas: 0
-vizslas: 0
-goldfish: 5
-trees: 3
-cars: 2
-perfumes: 1
-"""
-
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import assert_never
@@ -43,18 +30,6 @@ class MFCSAMReading:
     mode: MFCSAMPropertyMode
 
 
-def match(reading: MFCSAMReading, value: int) -> bool:
-    match reading.mode:
-        case MFCSAMPropertyMode.EQUAL:
-            return reading.value == value
-        case MFCSAMPropertyMode.LESS_THAN:
-            return value < reading.value
-        case MFCSAMPropertyMode.GREATER_THAN:
-            return value > reading.value
-        case other:
-            assert_never(other)
-
-
 @dataclass
 class MFCSAM:
     children: MFCSAMReading
@@ -68,9 +43,21 @@ class MFCSAM:
     cars: MFCSAMReading
     perfumes: MFCSAMReading
 
+    @staticmethod
+    def match(reading: MFCSAMReading, value: int) -> bool:
+        match reading.mode:
+            case MFCSAMPropertyMode.EQUAL:
+                return reading.value == value
+            case MFCSAMPropertyMode.LESS_THAN:
+                return value < reading.value
+            case MFCSAMPropertyMode.GREATER_THAN:
+                return value > reading.value
+            case other:
+                assert_never(other)
+
     def test(self, aunt_sue: AuntSue) -> bool:
         return all(
-            value is None or match(reading, value)
+            value is None or MFCSAM.match(reading, value)
             for reading, value in (
                 (self.children, aunt_sue.children),
                 (self.cats, aunt_sue.cats),
