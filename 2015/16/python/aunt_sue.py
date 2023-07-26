@@ -2,20 +2,22 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Iterator, assert_never
 
+OptionalInt = int | None
+
 
 @dataclass
 class AuntSue:
     name: str
-    children: int | None
-    cats: int | None
-    samoyeds: int | None
-    pomeranians: int | None
-    akitas: int | None
-    vizslas: int | None
-    goldfish: int | None
-    trees: int | None
-    cars: int | None
-    perfumes: int | None
+    children: OptionalInt
+    cats: OptionalInt
+    samoyeds: OptionalInt
+    pomeranians: OptionalInt
+    akitas: OptionalInt
+    vizslas: OptionalInt
+    goldfish: OptionalInt
+    trees: OptionalInt
+    cars: OptionalInt
+    perfumes: OptionalInt
 
 
 class Mode(Enum):
@@ -86,9 +88,9 @@ def main() -> int:
         cars=Attribute(value=2, mode=Mode.EQUAL),
         perfumes=Attribute(value=1, mode=Mode.EQUAL),
     )
-    for i, aunt_sue in enumerate(parse_line()):
+    for aunt_sue in parse_line():
         if mfcsam.test(aunt_sue):
-            print(f"Found Aunt Sue! {i+1}: {aunt_sue}")
+            print(f"Found Aunt Sue! {aunt_sue}")
     return 0
 
 
