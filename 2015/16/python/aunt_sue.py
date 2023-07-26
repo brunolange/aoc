@@ -18,46 +18,46 @@ class AuntSue:
     perfumes: int | None
 
 
-class MFCSAMPropertyMode(Enum):
+class Mode(Enum):
     EQUAL = auto()
-    GREATER_THAN = auto()
-    LESS_THAN = auto()
+    OVERSHOOT = auto()
+    UNDERSHOOT = auto()
 
 
 @dataclass
-class MFCSAMReading:
+class Attribute:
     value: int
-    mode: MFCSAMPropertyMode
+    mode: Mode
 
 
 @dataclass
-class MFCSAM:
-    children: MFCSAMReading
-    cats: MFCSAMReading
-    samoyeds: MFCSAMReading
-    pomeranians: MFCSAMReading
-    akitas: MFCSAMReading
-    vizslas: MFCSAMReading
-    goldfish: MFCSAMReading
-    trees: MFCSAMReading
-    cars: MFCSAMReading
-    perfumes: MFCSAMReading
+class Machine:
+    children: Attribute
+    cats: Attribute
+    samoyeds: Attribute
+    pomeranians: Attribute
+    akitas: Attribute
+    vizslas: Attribute
+    goldfish: Attribute
+    trees: Attribute
+    cars: Attribute
+    perfumes: Attribute
 
     @staticmethod
-    def match(reading: MFCSAMReading, value: int) -> bool:
+    def match(reading: Attribute, value: int) -> bool:
         match reading.mode:
-            case MFCSAMPropertyMode.EQUAL:
+            case Mode.EQUAL:
                 return reading.value == value
-            case MFCSAMPropertyMode.LESS_THAN:
+            case Mode.UNDERSHOOT:
                 return value < reading.value
-            case MFCSAMPropertyMode.GREATER_THAN:
+            case Mode.OVERSHOOT:
                 return value > reading.value
             case other:
                 assert_never(other)
 
     def test(self, aunt_sue: AuntSue) -> bool:
         return all(
-            value is None or MFCSAM.match(reading, value)
+            value is None or Machine.match(reading, value)
             for reading, value in (
                 (self.children, aunt_sue.children),
                 (self.cats, aunt_sue.cats),
@@ -74,20 +74,19 @@ class MFCSAM:
 
 
 def main() -> int:
-    mfcsam = MFCSAM(
-        children=MFCSAMReading(value=3, mode=MFCSAMPropertyMode.EQUAL),
-        cats=MFCSAMReading(value=7, mode=MFCSAMPropertyMode.GREATER_THAN),
-        samoyeds=MFCSAMReading(value=2, mode=MFCSAMPropertyMode.EQUAL),
-        pomeranians=MFCSAMReading(value=3, mode=MFCSAMPropertyMode.LESS_THAN),
-        akitas=MFCSAMReading(value=0, mode=MFCSAMPropertyMode.EQUAL),
-        vizslas=MFCSAMReading(value=0, mode=MFCSAMPropertyMode.EQUAL),
-        goldfish=MFCSAMReading(value=5, mode=MFCSAMPropertyMode.LESS_THAN),
-        trees=MFCSAMReading(value=3, mode=MFCSAMPropertyMode.GREATER_THAN),
-        cars=MFCSAMReading(value=2, mode=MFCSAMPropertyMode.EQUAL),
-        perfumes=MFCSAMReading(value=1, mode=MFCSAMPropertyMode.EQUAL),
+    mfcsam = Machine(
+        children=Attribute(value=3, mode=Mode.EQUAL),
+        cats=Attribute(value=7, mode=Mode.OVERSHOOT),
+        samoyeds=Attribute(value=2, mode=Mode.EQUAL),
+        pomeranians=Attribute(value=3, mode=Mode.UNDERSHOOT),
+        akitas=Attribute(value=0, mode=Mode.EQUAL),
+        vizslas=Attribute(value=0, mode=Mode.EQUAL),
+        goldfish=Attribute(value=5, mode=Mode.UNDERSHOOT),
+        trees=Attribute(value=3, mode=Mode.OVERSHOOT),
+        cars=Attribute(value=2, mode=Mode.EQUAL),
+        perfumes=Attribute(value=1, mode=Mode.EQUAL),
     )
     for i, aunt_sue in enumerate(parse_line()):
-        # print(f"{aunt_sue = }")
         if mfcsam.test(aunt_sue):
             print(f"Found Aunt Sue! {i+1}: {aunt_sue}")
     return 0
