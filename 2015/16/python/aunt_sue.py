@@ -22,8 +22,8 @@ class AuntSue:
 
 class Mode(Enum):
     EQUAL = auto()
-    OVERSHOOT = auto()
     UNDERSHOOT = auto()
+    OVERSHOOT = auto()
 
 
 @dataclass
@@ -50,10 +50,10 @@ class Machine:
         match reading.mode:
             case Mode.EQUAL:
                 return reading.value == value
-            case Mode.UNDERSHOOT:
-                return value < reading.value
             case Mode.OVERSHOOT:
-                return value > reading.value
+                return reading.value > value
+            case Mode.UNDERSHOOT:
+                return reading.value < value
             case other:
                 assert_never(other)
 
@@ -78,19 +78,27 @@ class Machine:
 def main() -> int:
     mfcsam = Machine(
         children=Attribute(value=3, mode=Mode.EQUAL),
-        cats=Attribute(value=7, mode=Mode.OVERSHOOT),
+        cats=Attribute(value=7, mode=Mode.UNDERSHOOT),
         samoyeds=Attribute(value=2, mode=Mode.EQUAL),
-        pomeranians=Attribute(value=3, mode=Mode.UNDERSHOOT),
+        pomeranians=Attribute(value=3, mode=Mode.OVERSHOOT),
         akitas=Attribute(value=0, mode=Mode.EQUAL),
         vizslas=Attribute(value=0, mode=Mode.EQUAL),
-        goldfish=Attribute(value=5, mode=Mode.UNDERSHOOT),
-        trees=Attribute(value=3, mode=Mode.OVERSHOOT),
+        goldfish=Attribute(value=5, mode=Mode.OVERSHOOT),
+        trees=Attribute(value=3, mode=Mode.UNDERSHOOT),
         cars=Attribute(value=2, mode=Mode.EQUAL),
         perfumes=Attribute(value=1, mode=Mode.EQUAL),
     )
+
+    match: AuntSue | None = None
     for aunt_sue in parse_line():
         if mfcsam.test(aunt_sue):
-            print(f"Found Aunt Sue! {aunt_sue}")
+            match = aunt_sue
+
+    if not match:
+        print(f"Found no Aunt Sue...")
+        return 1
+
+    print(f"Found Aunt Sue: {match}")
     return 0
 
 
