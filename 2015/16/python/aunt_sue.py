@@ -1,3 +1,4 @@
+import sys
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Iterator, assert_never
@@ -95,7 +96,7 @@ def main() -> int:
             match = aunt_sue
 
     if not match:
-        print(f"Found no Aunt Sue...")
+        print(f"Found no Aunt Sue...", file=sys.stderr)
         return 1
 
     print(f"Found Aunt Sue: {match}")
