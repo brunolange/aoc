@@ -43,36 +43,60 @@ def parse_line(filename) -> Iterator[AuntSue]:
                 perfumes=attrs.get("perfumes"),
             )
 
+@dataclass
+class TickerTape:
+    children: int
+    cats: int
+    samoyeds: int
+    pomeranians: int
+    akitas: int
+    vizslas: int
+    goldfish: int
+    trees: int
+    cars: int
+    perfumes: int
 
 def main() -> int:
     match: AuntSue | None = None
+
+    ticker = TickerTape(
+        children=3,
+        cats=7,
+        samoyeds=2,
+        pomeranians=3,
+        akitas=0,
+        vizslas=0,
+        goldfish=5,
+        trees=3,
+        cars=2,
+        perfumes=1, 
+    )
 
     for aunt_sue in parse_line("input"):
         solver = z3.Solver()
 
         for i, (value, op, reading) in enumerate(
             [
-                (aunt_sue.children, eq, 3),
-                (aunt_sue.cats, gt, 7),
-                (aunt_sue.samoyeds, eq, 2),
-                (aunt_sue.pomeranians, lt, 3),
-                (aunt_sue.akitas, eq, 0),
-                (aunt_sue.vizslas, eq, 0),
-                (aunt_sue.goldfish, lt, 5),
-                (aunt_sue.trees, gt, 3),
-                (aunt_sue.cars, eq, 2),
-                (aunt_sue.perfumes, eq, 1),
+                (aunt_sue.children, eq, ticker.children),
+                (aunt_sue.cats, gt, ticker.cats),
+                (aunt_sue.samoyeds, eq, ticker.samoyeds),
+                (aunt_sue.pomeranians, lt, ticker.pomeranians),
+                (aunt_sue.akitas, eq, ticker.akitas),
+                (aunt_sue.vizslas, eq, ticker.vizslas),
+                (aunt_sue.goldfish, lt, ticker.goldfish),
+                (aunt_sue.trees, gt, ticker.trees),
+                (aunt_sue.cars, eq, ticker.cars),
+                (aunt_sue.perfumes, eq, ticker.perfumes),
             ]
         ):
             literal = z3.Int(f"x_{i}")
             solver.add(op(literal, reading))
+
             if value is None:
                 continue
-
             solver.add(literal == value)
 
         if solver.check() == z3.sat:
-            breakpoint()
             match = aunt_sue
             break
 
