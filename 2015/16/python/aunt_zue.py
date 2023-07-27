@@ -21,8 +21,8 @@ class AuntSue:
     perfumes: int | None
 
 
-def parse_line() -> Iterator[AuntSue]:
-    with open("input") as handle:
+def parse_line(filename) -> Iterator[AuntSue]:
+    with open(filename) as handle:
         for line in handle.readlines():
             line = line.strip()
             name, properties = line.split(": ", 1)
@@ -47,7 +47,7 @@ def parse_line() -> Iterator[AuntSue]:
 def main() -> int:
     match: AuntSue | None = None
 
-    for aunt_sue in parse_line():
+    for aunt_sue in parse_line("input"):
         solver = z3.Solver()
 
         for i, (value, op, reading) in enumerate(
