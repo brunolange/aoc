@@ -76,7 +76,7 @@ def match(reading: Attribute, value: int) -> bool:
 
 
 def main() -> int:
-    mfcsam = Machine(
+    machine = Machine(
         children=Attribute(value=3, mode=Mode.EQUAL),
         cats=Attribute(value=7, mode=Mode.UNDERSHOOT),
         samoyeds=Attribute(value=2, mode=Mode.EQUAL),
@@ -91,7 +91,7 @@ def main() -> int:
 
     match: AuntSue | None = None
     for aunt_sue in parse_line():
-        if mfcsam.test(aunt_sue):
+        if machine.test(aunt_sue):
             match = aunt_sue
 
     if not match:
