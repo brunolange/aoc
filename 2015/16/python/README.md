@@ -16,10 +16,7 @@ x4 = Bool("x4")
 
 """
 SAT Instance (CNF)
-
-        (x1 or x3) 
-    and x3
-    and (x3 or x4)
+    (x1 ∨ x3) ∧ x3 ∧ (x3 ∨ ¬x4)
 """
 s.add(Or(x1, x2))
 s.add(x3)  # unit clause
