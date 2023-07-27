@@ -1,8 +1,10 @@
-import z3
-from dataclasses import dataclass
-from operator import eq, lt, gt
-from typing import Iterator
 import sys
+from dataclasses import dataclass
+from operator import eq, gt, lt
+from typing import Iterator
+
+import z3
+
 
 @dataclass
 class AuntSue:
@@ -41,32 +43,34 @@ def parse_line() -> Iterator[AuntSue]:
                 perfumes=attrs.get("perfumes"),
             )
 
-def main() -> int:
 
+def main() -> int:
     match: AuntSue | None = None
 
-    for aunt_sue in parse_line():    
+    for aunt_sue in parse_line():
         solver = z3.Solver()
 
-        for i, (value, op, reading) in enumerate([
-            (aunt_sue.children, eq, 3),
-            (aunt_sue.cats, gt, 7),
-            (aunt_sue.samoyeds, eq, 2),
-            (aunt_sue.pomeranians, lt, 3),
-            (aunt_sue.akitas, eq, 0),
-            (aunt_sue.vizslas, eq, 0),
-            (aunt_sue.goldfish, lt, 5),
-            (aunt_sue.trees, gt, 3),
-            (aunt_sue.cars, eq, 2),
-            (aunt_sue.perfumes, eq, 1),
-        ]):
+        for i, (value, op, reading) in enumerate(
+            [
+                (aunt_sue.children, eq, 3),
+                (aunt_sue.cats, gt, 7),
+                (aunt_sue.samoyeds, eq, 2),
+                (aunt_sue.pomeranians, lt, 3),
+                (aunt_sue.akitas, eq, 0),
+                (aunt_sue.vizslas, eq, 0),
+                (aunt_sue.goldfish, lt, 5),
+                (aunt_sue.trees, gt, 3),
+                (aunt_sue.cars, eq, 2),
+                (aunt_sue.perfumes, eq, 1),
+            ]
+        ):
             literal = z3.Int(f"x_{i}")
             solver.add(op(literal, reading))
             if value is None:
                 continue
-            
+
             solver.add(literal == value)
-    
+
         if solver.check() == z3.sat:
             breakpoint()
             match = aunt_sue
@@ -75,10 +79,11 @@ def main() -> int:
     if not match:
         print(f"Found no Aunt Sue...", file=sys.stderr)
         return 1
-    
+
     print(f"Found Aunt Sue: {match}")
 
     return 0
+
 
 if __name__ == "__main__":
     raise SystemExit(main())

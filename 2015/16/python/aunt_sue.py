@@ -63,6 +63,7 @@ class Machine:
             )
         )
 
+
 def match(reading: Attribute, value: int) -> bool:
     match reading.mode:
         case Mode.EQUAL:
