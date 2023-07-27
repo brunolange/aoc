@@ -46,21 +46,9 @@ class Machine:
     cars: Attribute
     perfumes: Attribute
 
-    @staticmethod
-    def match(reading: Attribute, value: int) -> bool:
-        match reading.mode:
-            case Mode.EQUAL:
-                return reading.value == value
-            case Mode.OVERSHOOT:
-                return reading.value > value
-            case Mode.UNDERSHOOT:
-                return reading.value < value
-            case other:
-                assert_never(other)
-
     def test(self, aunt_sue: AuntSue) -> bool:
         return all(
-            value is None or Machine.match(reading, value)
+            value is None or match(reading, value)
             for reading, value in (
                 (self.children, aunt_sue.children),
                 (self.cats, aunt_sue.cats),
@@ -74,6 +62,17 @@ class Machine:
                 (self.perfumes, aunt_sue.perfumes),
             )
         )
+
+def match(reading: Attribute, value: int) -> bool:
+    match reading.mode:
+        case Mode.EQUAL:
+            return reading.value == value
+        case Mode.OVERSHOOT:
+            return reading.value > value
+        case Mode.UNDERSHOOT:
+            return reading.value < value
+        case other:
+            assert_never(other)
 
 
 def main() -> int:
