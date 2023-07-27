@@ -43,3 +43,8 @@ s.add(x1 + x2 == -1)
 s.check()  # sat
 s.model()  # [x2 = -4, x1 = 3]
 ```
+
+
+##### TODO
+
+- Avoid recreating solver with tape constraints for each Aunt Sue: https://stackoverflow.com/questions/55099503/save-and-reload-z3py-solver-constraints
