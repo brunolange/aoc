@@ -1,99 +1,64 @@
-use std::collections::{HashMap, HashSet};
+use itertools::Itertools;
 
 fn main() {
-    let volume: u32 = 25;
-    let containers = vec![20, 15, 10, 5, 5];
+    let volume: usize = 150;
+    let containers: Vec<usize> = vec![
+        11, 30, 47, 31, 32, 36, 3, 1, 5, 3, 32, 36, 15, 11, 46, 26, 28, 1, 19, 3,
+    ];
 
-    let answer = ways(volume, &containers);
-    println!("Hello, containers: {:?} -> {}", containers, answer);
+    let part1 = number_of_container_groups_that_add_to_volume(&containers, volume);
+    println!("part 1 = {part1}");
+
+    let part2 = number_of_smallest_container_groups_that_add_to_volume(&containers, volume);
+    println!("part 2 = {part2}");
 }
 
-fn ways(volume: u32, containers: &[u32]) -> usize {
-    fn _ways(
-        volume: i32,
-        containers: &[u32],
-        answers: &mut Vec<Vec<u32>>,
-        candidate: &mut Vec<u32>,
-        depth: usize,
-    ) {
-        let indent = "  ".repeat(depth);
-        println!(
-            "{indent}checking volume = {volume} with containers {:?}",
-            containers
-        );
-        if containers.len() == 0 || volume < 0 {
-            println!("{indent}nope...");
-            _ = candidate.pop();
-        }
-        if volume == 0 {
-            // if seen.contains(candidate) {
-            //     println!("{indent}already seen this one...");
-            //     return 0;
-            // } else {
-            //     seen.insert(&candidate);
-            //     println!("{indent}+1!");
-            //     return 1;
-            // }
-            answers.push(candidate.to_vec());
-            println!("{indent}+1!");
-        }
-
-        containers
-            .iter()
-            .enumerate()
-            .for_each(|(index, container)| {
-                println!("{indent}selected container {container}");
-                let remaining: i32 = volume as i32 - *container as i32;
-                let other_containers = if index < containers.len() {
-                    [&containers[..index], &containers[(index + 1)..]].concat()
-                } else {
-                    (&containers[..index]).to_vec()
-                };
-
-                candidate.push(*container);
-                _ways(
-                    remaining,
-                    // if remaining < 0 {
-                    //     *container as u32
-                    // } else {
-                    //     remaining as u32
-                    // },
-                    &other_containers,
-                    answers,
-                    candidate,
-                    depth + 1,
-                );
-
-                // if go {
-                //     answers.push(container)
-                // }
-            });
-        // println!("{indent}{:?}", output);
-    }
-
-    let mut answers: Vec<Vec<u32>> = vec![vec![]];
-    let mut candidate: Vec<u32> = vec![];
-    _ways(volume as i32, containers, &mut answers, &mut candidate, 0);
-
-    for a in answers {
-        println!("answer = {:?}", a);
-    }
-
-    return 0;
+fn container_groups_that_add_to(
+    containers: &Vec<usize>,
+    volume: usize,
+) -> impl Iterator<Item = Vec<usize>> {
+    containers
+        .clone()
+        .into_iter()
+        .powerset()
+        .filter(move |cs| cs.iter().sum::<usize>() == volume)
 }
+
+fn number_of_container_groups_that_add_to_volume(containers: &Vec<usize>, volume: usize) -> usize {
+    container_groups_that_add_to(containers, volume).count()
+}
+
+fn number_of_smallest_container_groups_that_add_to_volume(
+    containers: &Vec<usize>,
+    volume: usize,
+) -> usize {
+    let groups: Vec<Vec<usize>> = container_groups_that_add_to(containers, volume).collect();
+    let smallest_size = groups
+        .iter()
+        .min_by_key(|group| group.len())
+        .expect("found no groups")
+        .len();
+
+    groups
+        .iter()
+        .filter(|group| group.len() == smallest_size)
+        .count()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn test_something() {
-        // assert_eq!(ways(100, &[0]), 0);
-        assert_eq!(ways(1, &[1]), 1);
-        assert_eq!(ways(2, &[1]), 1);
-        assert_eq!(ways(100, &[1]), 1);
-        assert_eq!(ways(2, &[1, 2]), 2);
-        assert_eq!(ways(3, &[1, 2]), 3);
-        assert_eq!(ways(10, &[2, 3]), 7);
-        assert_eq!(ways(25, &[20, 15, 10, 5, 5]), 4);
+    fn test_part_1() {
+        assert_eq!(
+            number_of_container_groups_that_add_to_volume(&vec![20, 15, 10, 5, 5], 25),
+            4
+        );
+
+        assert_eq!(
+            number_of_smallest_container_groups_that_add_to_volume(&vec![20, 15, 10, 5, 5], 25),
+            3
+        );
     }
 }

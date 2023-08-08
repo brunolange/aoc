@@ -1,0 +1,980 @@
+checking volume = 25 with containers [20, 15, 10, 5, 5]
+selected container 20
+  checking volume = 5 with containers [15, 10, 5, 5]
+  selected container 15
+    checking volume = -10 with containers [10, 5, 5]
+    nope...
+    selected container 10
+      checking volume = -20 with containers [5, 5]
+      nope...
+      selected container 5
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = -15 with containers [10, 5]
+      nope...
+      selected container 10
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = -15 with containers [10, 5]
+      nope...
+      selected container 10
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+  selected container 10
+    checking volume = -5 with containers [15, 5, 5]
+    nope...
+    selected container 15
+      checking volume = -20 with containers [5, 5]
+      nope...
+      selected container 5
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = -10 with containers [15, 5]
+      nope...
+      selected container 15
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = -10 with containers [15, 5]
+      nope...
+      selected container 15
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+  selected container 5
+    checking volume = 0 with containers [15, 10, 5]
+    +1!
+    answers = [[20, 5]]
+    selected container 15
+      checking volume = -15 with containers [10, 5]
+      nope...
+      selected container 10
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+    selected container 10
+      checking volume = -10 with containers [15, 5]
+      nope...
+      selected container 15
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = -5 with containers [15, 10]
+      nope...
+      selected container 15
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+      selected container 10
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+  selected container 5
+    checking volume = 0 with containers [15, 10, 5]
+    +1!
+    answers = [[20, 5], [20, 5, 5]]
+    selected container 15
+      checking volume = -15 with containers [10, 5]
+      nope...
+      selected container 10
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+    selected container 10
+      checking volume = -10 with containers [15, 5]
+      nope...
+      selected container 15
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = -5 with containers [15, 10]
+      nope...
+      selected container 15
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+      selected container 10
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+selected container 15
+  checking volume = 10 with containers [20, 10, 5, 5]
+  selected container 20
+    checking volume = -10 with containers [10, 5, 5]
+    nope...
+    selected container 10
+      checking volume = -20 with containers [5, 5]
+      nope...
+      selected container 5
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = -15 with containers [10, 5]
+      nope...
+      selected container 10
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = -15 with containers [10, 5]
+      nope...
+      selected container 10
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+  selected container 10
+    checking volume = 0 with containers [20, 5, 5]
+    +1!
+    answers = [[20, 5], [20, 5, 5], [20, 5, 5, 15, 10]]
+    selected container 20
+      checking volume = -20 with containers [5, 5]
+      nope...
+      selected container 5
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = -5 with containers [20, 5]
+      nope...
+      selected container 20
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = -5 with containers [20, 5]
+      nope...
+      selected container 20
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+  selected container 5
+    checking volume = 5 with containers [20, 10, 5]
+    selected container 20
+      checking volume = -15 with containers [10, 5]
+      nope...
+      selected container 10
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+    selected container 10
+      checking volume = -5 with containers [20, 5]
+      nope...
+      selected container 20
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = 0 with containers [20, 10]
+      +1!
+      answers = [[20, 5], [20, 5, 5], [20, 5, 5, 15, 10], [20, 5, 5, 15, 10, 5, 5]]
+      selected container 20
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+      selected container 10
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+  selected container 5
+    checking volume = 5 with containers [20, 10, 5]
+    selected container 20
+      checking volume = -15 with containers [10, 5]
+      nope...
+      selected container 10
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+    selected container 10
+      checking volume = -5 with containers [20, 5]
+      nope...
+      selected container 20
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = 0 with containers [20, 10]
+      +1!
+      answers = [[20, 5], [20, 5, 5], [20, 5, 5, 15, 10], [20, 5, 5, 15, 10, 5, 5], [20, 5, 5, 15, 10, 5, 5, 5, 5]]
+      selected container 20
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+      selected container 10
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+selected container 10
+  checking volume = 15 with containers [20, 15, 5, 5]
+  selected container 20
+    checking volume = -5 with containers [15, 5, 5]
+    nope...
+    selected container 15
+      checking volume = -20 with containers [5, 5]
+      nope...
+      selected container 5
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = -10 with containers [15, 5]
+      nope...
+      selected container 15
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = -10 with containers [15, 5]
+      nope...
+      selected container 15
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+  selected container 15
+    checking volume = 0 with containers [20, 5, 5]
+    +1!
+    answers = [[20, 5], [20, 5, 5], [20, 5, 5, 15, 10], [20, 5, 5, 15, 10, 5, 5], [20, 5, 5, 15, 10, 5, 5, 5, 5], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15]]
+    selected container 20
+      checking volume = -20 with containers [5, 5]
+      nope...
+      selected container 5
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = -5 with containers [20, 5]
+      nope...
+      selected container 20
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = -5 with containers [20, 5]
+      nope...
+      selected container 20
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+  selected container 5
+    checking volume = 10 with containers [20, 15, 5]
+    selected container 20
+      checking volume = -10 with containers [15, 5]
+      nope...
+      selected container 15
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+    selected container 15
+      checking volume = -5 with containers [20, 5]
+      nope...
+      selected container 20
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = 5 with containers [20, 15]
+      selected container 20
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+      selected container 15
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+  selected container 5
+    checking volume = 10 with containers [20, 15, 5]
+    selected container 20
+      checking volume = -10 with containers [15, 5]
+      nope...
+      selected container 15
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+    selected container 15
+      checking volume = -5 with containers [20, 5]
+      nope...
+      selected container 20
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = 5 with containers [20, 15]
+      selected container 20
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+      selected container 15
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+selected container 5
+  checking volume = 20 with containers [20, 15, 10, 5]
+  selected container 20
+    checking volume = 0 with containers [15, 10, 5]
+    +1!
+    answers = [[20, 5], [20, 5, 5], [20, 5, 5, 15, 10], [20, 5, 5, 15, 10, 5, 5], [20, 5, 5, 15, 10, 5, 5, 5, 5], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20]]
+    selected container 15
+      checking volume = -15 with containers [10, 5]
+      nope...
+      selected container 10
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+    selected container 10
+      checking volume = -10 with containers [15, 5]
+      nope...
+      selected container 15
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = -5 with containers [15, 10]
+      nope...
+      selected container 15
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+      selected container 10
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+  selected container 15
+    checking volume = 5 with containers [20, 10, 5]
+    selected container 20
+      checking volume = -15 with containers [10, 5]
+      nope...
+      selected container 10
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+    selected container 10
+      checking volume = -5 with containers [20, 5]
+      nope...
+      selected container 20
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = 0 with containers [20, 10]
+      +1!
+      answers = [[20, 5], [20, 5, 5], [20, 5, 5, 15, 10], [20, 5, 5, 15, 10, 5, 5], [20, 5, 5, 15, 10, 5, 5, 5, 5], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20, 15, 5]]
+      selected container 20
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+      selected container 10
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+  selected container 10
+    checking volume = 10 with containers [20, 15, 5]
+    selected container 20
+      checking volume = -10 with containers [15, 5]
+      nope...
+      selected container 15
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+    selected container 15
+      checking volume = -5 with containers [20, 5]
+      nope...
+      selected container 20
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = 5 with containers [20, 15]
+      selected container 20
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+      selected container 15
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+  selected container 5
+    checking volume = 15 with containers [20, 15, 10]
+    selected container 20
+      checking volume = -5 with containers [15, 10]
+      nope...
+      selected container 15
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+      selected container 10
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+    selected container 15
+      checking volume = 0 with containers [20, 10]
+      +1!
+      answers = [[20, 5], [20, 5, 5], [20, 5, 5, 15, 10], [20, 5, 5, 15, 10, 5, 5], [20, 5, 5, 15, 10, 5, 5, 5, 5], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20, 15, 5], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20, 15, 5, 10, 5, 5, 15]]
+      selected container 20
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+      selected container 10
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+    selected container 10
+      checking volume = 5 with containers [20, 15]
+      selected container 20
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+      selected container 15
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+selected container 5
+  checking volume = 20 with containers [20, 15, 10, 5]
+  selected container 20
+    checking volume = 0 with containers [15, 10, 5]
+    +1!
+    answers = [[20, 5], [20, 5, 5], [20, 5, 5, 15, 10], [20, 5, 5, 15, 10, 5, 5], [20, 5, 5, 15, 10, 5, 5, 5, 5], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20, 15, 5], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20, 15, 5, 10, 5, 5, 15], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20, 15, 5, 10, 5, 5, 15, 10, 5, 20]]
+    selected container 15
+      checking volume = -15 with containers [10, 5]
+      nope...
+      selected container 10
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+    selected container 10
+      checking volume = -10 with containers [15, 5]
+      nope...
+      selected container 15
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = -5 with containers [15, 10]
+      nope...
+      selected container 15
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+      selected container 10
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+  selected container 15
+    checking volume = 5 with containers [20, 10, 5]
+    selected container 20
+      checking volume = -15 with containers [10, 5]
+      nope...
+      selected container 10
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+    selected container 10
+      checking volume = -5 with containers [20, 5]
+      nope...
+      selected container 20
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = 0 with containers [20, 10]
+      +1!
+      answers = [[20, 5], [20, 5, 5], [20, 5, 5, 15, 10], [20, 5, 5, 15, 10, 5, 5], [20, 5, 5, 15, 10, 5, 5, 5, 5], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20, 15, 5], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20, 15, 5, 10, 5, 5, 15], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20, 15, 5, 10, 5, 5, 15, 10, 5, 20], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20, 15, 5, 10, 5, 5, 15, 10, 5, 20, 15, 5]]
+      selected container 20
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+      selected container 10
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+  selected container 10
+    checking volume = 10 with containers [20, 15, 5]
+    selected container 20
+      checking volume = -10 with containers [15, 5]
+      nope...
+      selected container 15
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+    selected container 15
+      checking volume = -5 with containers [20, 5]
+      nope...
+      selected container 20
+        checking volume = -25 with containers [5]
+        nope...
+        selected container 5
+          checking volume = -30 with containers []
+          nope...
+      selected container 5
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+    selected container 5
+      checking volume = 5 with containers [20, 15]
+      selected container 20
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+      selected container 15
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+  selected container 5
+    checking volume = 15 with containers [20, 15, 10]
+    selected container 20
+      checking volume = -5 with containers [15, 10]
+      nope...
+      selected container 15
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+      selected container 10
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+    selected container 15
+      checking volume = 0 with containers [20, 10]
+      +1!
+      answers = [[20, 5], [20, 5, 5], [20, 5, 5, 15, 10], [20, 5, 5, 15, 10, 5, 5], [20, 5, 5, 15, 10, 5, 5, 5, 5], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20, 15, 5], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20, 15, 5, 10, 5, 5, 15], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20, 15, 5, 10, 5, 5, 15, 10, 5, 20], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20, 15, 5, 10, 5, 5, 15, 10, 5, 20, 15, 5], [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20, 15, 5, 10, 5, 5, 15, 10, 5, 20, 15, 5, 10, 5, 5, 15]]
+      selected container 20
+        checking volume = -20 with containers [10]
+        nope...
+        selected container 10
+          checking volume = -30 with containers []
+          nope...
+      selected container 10
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+    selected container 10
+      checking volume = 5 with containers [20, 15]
+      selected container 20
+        checking volume = -15 with containers [15]
+        nope...
+        selected container 15
+          checking volume = -30 with containers []
+          nope...
+      selected container 15
+        checking volume = -10 with containers [20]
+        nope...
+        selected container 20
+          checking volume = -30 with containers []
+          nope...
+answer = [20, 5]
+answer = [20, 5, 5]
+answer = [20, 5, 5, 15, 10]
+answer = [20, 5, 5, 15, 10, 5, 5]
+answer = [20, 5, 5, 15, 10, 5, 5, 5, 5]
+answer = [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15]
+answer = [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20]
+answer = [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20, 15, 5]
+answer = [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20, 15, 5, 10, 5, 5, 15]
+answer = [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20, 15, 5, 10, 5, 5, 15, 10, 5, 20]
+answer = [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20, 15, 5, 10, 5, 5, 15, 10, 5, 20, 15, 5]
+answer = [20, 5, 5, 15, 10, 5, 5, 5, 5, 10, 15, 5, 5, 5, 5, 5, 20, 15, 5, 10, 5, 5, 15, 10, 5, 20, 15, 5, 10, 5, 5, 15]
+Hello, containers: [20, 15, 10, 5, 5] -> 0
