@@ -1,30 +1,6 @@
-mod utils;
+use std::collections::{HashMap, HashSet};
 
-use std::{
-    collections::{HashMap, HashSet},
-    str::FromStr,
-};
-
-use utils::split_on_uppercase;
-
-type Atom = String;
-
-#[derive(Debug)]
-struct Molecule {
-    atoms: Vec<Atom>,
-}
-
-impl FromStr for Molecule {
-    type Err = ();
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(Molecule {
-            atoms: split_on_uppercase(s)
-                .into_iter()
-                .map(|s| s.to_owned())
-                .collect(),
-        })
-    }
-}
+use medicine::Molecule;
 
 fn main() {
     // let molecule: Molecule = "HCaOCaliforniA".parse().unwrap();
