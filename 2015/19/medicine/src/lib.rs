@@ -7,8 +7,9 @@ use std::{
 };
 
 pub type Atom = String;
+pub type TransitionMap = HashMap<Atom, HashSet<Molecule>>;
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq, Hash)]
 pub struct Molecule {
     pub atoms: Vec<Atom>,
 }
@@ -25,4 +26,72 @@ impl FromStr for Molecule {
     }
 }
 
-pub type TransitionMap = HashMap<String, HashSet<String>>;
+pub struct MoleculeIter<'a> {
+    transition_map: &'a TransitionMap,
+    stack: Vec<&'a Molecule>,
+}
+
+impl<'a> Iterator for MoleculeIter<'a> {
+    type Item = Vec<Molecule>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(curr) = self.stack.pop() {
+            Some(
+                curr.atoms
+                    .iter()
+                    .enumerate()
+                    .map(|(i, atom)| {
+                        if let Some(transitions) = self.transition_map.get(atom) {
+                            Some(
+                                transitions
+                                    .iter()
+                                    .map(move |transition| {
+                                        let mut nxt = curr.atoms.clone();
+                                        let _ = nxt.splice(i..i + 1, transition.atoms.clone());
+                                        Molecule { atoms: nxt }
+                                    })
+                                    .collect::<Vec<_>>(),
+                            )
+                        } else {
+                            None
+                        }
+                    })
+                    .filter_map(|s| s)
+                    .flatten()
+                    .collect(),
+            )
+        } else {
+            None
+        }
+    }
+}
+
+impl<'a> Molecule {
+    pub fn iter(&'a self, transition_map: &'a TransitionMap) -> MoleculeIter<'a> {
+        MoleculeIter {
+            transition_map,
+            stack: vec![self],
+        }
+    }
+}
+
+// pub fn next_gen(
+//     molecule: Molecule,
+//     transition_map: TransitionMap,
+// ) -> impl Iterator<Item = dyn Iterator<Item = Molecule>> {
+//     let xs = molecule
+//         .atoms
+//         .iter()
+//         .map(|atom| {
+//             let molecules = transition_map.get(atom).unwrap();
+//             molecules
+//         })
+//         .map(|x| x);
+
+//     let w: Vec<Molecule> = ["CaliForNiA", "OReGoN"]
+//         .into_iter()
+//         .map(|s| s.parse::<Molecule>().unwrap())
+//         .collect();
+
+//     // vec![w.iter()].into_iter()
+// }
