@@ -1,7 +1,10 @@
 mod utils;
 
 use crate::utils::split_on_uppercase;
-use std::str::FromStr;
+use std::{
+    collections::{HashMap, HashSet},
+    str::FromStr,
+};
 
 pub type Atom = String;
 
@@ -21,3 +24,5 @@ impl FromStr for Molecule {
         })
     }
 }
+
+pub type TransitionMap = HashMap<String, HashSet<String>>;

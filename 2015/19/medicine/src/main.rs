@@ -1,22 +1,21 @@
 use std::collections::{HashMap, HashSet};
 
-use medicine::Molecule;
+use medicine::{Molecule, TransitionMap};
 
 fn main() {
     // let molecule: Molecule = "HCaOCaliforniA".parse().unwrap();
     let molecule: Molecule = "HOH".parse().unwrap();
-    let replacements = [("H", "HO"), ("H", "OH"), ("O", "HH")];
-    let replacement_map: HashMap<&str, HashSet<&str>> =
-        replacements
-            .into_iter()
-            .fold(HashMap::new(), |mut acc, curr| {
-                let (atom, molecule) = curr;
-                acc.entry(atom)
-                    .or_insert_with(HashSet::new)
-                    .insert(molecule);
-                acc
-            });
+    let transition_map: TransitionMap = [("H", "HO"), ("H", "OH"), ("O", "HH")].into_iter().fold(
+        HashMap::new(),
+        |mut acc, curr| {
+            let (atom, molecule) = curr;
+            acc.entry(atom.to_owned())
+                .or_insert_with(HashSet::new)
+                .insert(molecule.to_owned());
+            acc
+        },
+    );
 
     println!("molecule = {:?}", molecule.atoms);
-    println!("replacement_map = {:?}", replacement_map);
+    println!("transition_map = {:?}", transition_map);
 }
