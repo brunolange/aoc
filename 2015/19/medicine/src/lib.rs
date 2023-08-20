@@ -39,7 +39,7 @@ impl<'a> Iterator for MoleculeIter<'a> {
             curr.atoms
                 .iter()
                 .enumerate()
-                .map(|(i, atom)| {
+                .flat_map(|(i, atom)| {
                     self.transition_map.get(atom).map(|transitions| {
                         transitions
                             .iter()
@@ -48,10 +48,9 @@ impl<'a> Iterator for MoleculeIter<'a> {
                                 let _ = nxt.splice(i..i + 1, transition.atoms.clone());
                                 Molecule { atoms: nxt }
                             })
-                            .collect::<Vec<_>>()
+                            .into_iter()
                     })
                 })
-                .filter_map(|s| s)
                 .flatten()
                 .collect()
         })
