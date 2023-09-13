@@ -180,11 +180,7 @@ fn main() {
         })
         .filter(|player| can_beat(player, &boss))
         .min_by_key(|player| {
-            let armor_cost = if let Some(a) = &player.armor {
-                a.cost
-            } else {
-                0_usize
-            };
+            let armor_cost = player.armor.as_ref().map_or(0, |a| a.cost);
             let rings_cost = match &player.rings {
                 RingSetup::NoRing => 0_usize,
                 RingSetup::OneRing(r) => r.cost,
@@ -224,12 +220,8 @@ fn main() {
             })
         })
         .filter(|player| !can_beat(player, &boss))
-        .max_by_key(|player| {
-            let armor_cost = if let Some(a) = &player.armor {
-                a.cost
-            } else {
-                0_usize
-            };
+        .max_by_key(|player: &Player| {
+            let armor_cost = player.armor.as_ref().map_or(0, |a| a.cost);
             let rings_cost = match &player.rings {
                 RingSetup::NoRing => 0_usize,
                 RingSetup::OneRing(r) => r.cost,
