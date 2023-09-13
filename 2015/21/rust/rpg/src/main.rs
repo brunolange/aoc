@@ -165,7 +165,7 @@ fn main() {
                 .chain(rings.iter().map(|r| RingSetup::OneRing(r.clone())))
                 .chain(
                     iproduct!(rings.iter().enumerate(), rings.iter().enumerate())
-                        .filter(|((i, _), (j, _))| i != j)
+                        .filter(|((i, _), (j, _))| i < j)
                         .map(|((_, left), (_, right))| {
                             RingSetup::TwoRings(left.clone(), right.clone())
                         }),
