@@ -156,7 +156,7 @@ fn main() {
         armor: 2,
     };
 
-    let most_efficient_winning_player: Player = iproduct!(weapons.iter(), armors.iter())
+    let (cost, most_efficient_winning_player) = iproduct!(weapons.iter(), armors.iter())
         .flat_map(|(weapon, armor)| {
             let armor_combinations = vec![None, Some(armor.clone())];
 
@@ -179,17 +179,16 @@ fn main() {
             })
         })
         .filter(|player| can_beat(player, &boss))
-        .min_by_key(|player| player.cost())
+        .map(|player: Player| (player.cost(), player))
+        .min_by_key(|(cost, _)| *cost)
         .unwrap();
 
     println!(
-        "most_efficient_winning_player = {:?}",
-        most_efficient_winning_player
+        "most_efficient_winning_player = {:?} with cost {}",
+        most_efficient_winning_player, cost
     );
 
-    println!("cost = {}", most_efficient_winning_player.cost());
-
-    let least_efficient_losing_player: Player = iproduct!(weapons.iter(), armors.iter())
+    let (cost, least_efficient_losing_player) = iproduct!(weapons.iter(), armors.iter())
         .flat_map(|(weapon, armor)| {
             let armor_combinations = vec![None, Some(armor.clone())];
 
@@ -212,15 +211,14 @@ fn main() {
             })
         })
         .filter(|player| !can_beat(player, &boss))
-        .max_by_key(|player| player.cost())
+        .map(|player: Player| (player.cost(), player))
+        .max_by_key(|(cost, _)| *cost)
         .unwrap();
 
     println!(
-        "least_efficient_losing_player = {:?}",
-        least_efficient_losing_player
+        "least_efficient_losing_player = {:?} with cost {}",
+        least_efficient_losing_player, cost
     );
-
-    println!("cost = {}", least_efficient_losing_player.cost());
 }
 
 fn can_beat(player: &Player, boss: &Boss) -> bool {
