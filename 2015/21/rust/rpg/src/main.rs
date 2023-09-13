@@ -37,6 +37,19 @@ struct Player {
     rings: RingSetup,
 }
 
+impl Player {
+    fn cost(&self) -> usize {
+        let armor = self.armor.as_ref();
+        self.weapon.cost
+            + armor.map_or(0, |a| a.cost)
+            + match &self.rings {
+                RingSetup::NoRing => 0,
+                RingSetup::OneRing(ring) => ring.cost,
+                RingSetup::TwoRings(left, right) => left.cost + right.cost,
+            }
+    }
+}
+
 struct Boss {
     hit_points: usize,
     damage: usize,
@@ -186,14 +199,52 @@ fn main() {
         most_efficient_winning_player
     );
 
-    let cost = most_efficient_winning_player.weapon.cost
-        + most_efficient_winning_player.armor.map_or(0, |a| a.cost)
-        + match most_efficient_winning_player.rings {
-            RingSetup::NoRing => 0,
-            RingSetup::OneRing(ring) => ring.cost,
-            RingSetup::TwoRings(left, right) => left.cost + right.cost,
-        };
-    println!("cost = {}", cost);
+    println!("cost = {}", most_efficient_winning_player.cost());
+
+    let least_efficient_losing_player: Player = iproduct!(weapons.iter(), armors.iter())
+        .flat_map(|(weapon, armor)| {
+            let armor_combinations = vec![None, Some(armor.clone())];
+
+            let ring_combinations = vec![RingSetup::NoRing]
+                .into_iter()
+                .chain(rings.iter().map(|r| RingSetup::OneRing(r.clone())))
+                .chain(
+                    iproduct!(rings.iter().enumerate(), rings.iter().enumerate())
+                        .filter(|((i, _), (j, _))| i != j)
+                        .map(|((_, left), (_, right))| {
+                            RingSetup::TwoRings(left.clone(), right.clone())
+                        }),
+                );
+
+            iproduct!(armor_combinations, ring_combinations).map(|(armor, rings)| Player {
+                hit_points: 100,
+                weapon: weapon.clone(),
+                armor,
+                rings,
+            })
+        })
+        .filter(|player| !can_beat(player, &boss))
+        .max_by_key(|player| {
+            let armor_cost = if let Some(a) = &player.armor {
+                a.cost
+            } else {
+                0_usize
+            };
+            let rings_cost = match &player.rings {
+                RingSetup::NoRing => 0_usize,
+                RingSetup::OneRing(r) => r.cost,
+                RingSetup::TwoRings(left, right) => left.cost + right.cost,
+            };
+            player.weapon.cost + armor_cost + rings_cost
+        })
+        .unwrap();
+
+    println!(
+        "least_efficient_losing_player = {:?}",
+        least_efficient_losing_player
+    );
+
+    println!("cost = {}", least_efficient_losing_player.cost());
 }
 
 fn can_beat(player: &Player, boss: &Boss) -> bool {
