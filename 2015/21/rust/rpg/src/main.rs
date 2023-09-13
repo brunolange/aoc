@@ -15,60 +15,15 @@ struct Armor {
 }
 
 #[derive(Clone, Debug)]
-enum Ring {
-    Damage {
-        name: String,
-        cost: usize,
-        damage: usize,
-    },
-    Defense {
-        name: String,
-        cost: usize,
-        armor: usize,
-    },
-}
-
-impl Ring {
-    fn cost(&self) -> usize {
-        match self {
-            Ring::Damage {
-                name: _,
-                cost,
-                damage: _,
-            } => *cost,
-            Ring::Defense {
-                name: _,
-                cost,
-                armor: _,
-            } => *cost,
-        }
-    }
-
-    fn damage(&self) -> usize {
-        match self {
-            Ring::Damage {
-                name: _,
-                cost: _,
-                damage,
-            } => *damage,
-            _ => 0,
-        }
-    }
-
-    fn armor(&self) -> usize {
-        match self {
-            Ring::Defense {
-                name: _,
-                cost: _,
-                armor,
-            } => *armor,
-            _ => 0,
-        }
-    }
+struct Ring {
+    name: String,
+    cost: usize,
+    damage: usize,
+    armor: usize,
 }
 
 #[derive(Clone, Debug)]
-enum PlayerRing {
+enum RingSetup {
     NoRing,
     OneRing(Ring),
     TwoRings(Ring, Ring),
@@ -79,7 +34,7 @@ struct Player {
     hit_points: usize,
     weapon: Weapon,
     armor: Option<Armor>,
-    rings: PlayerRing,
+    rings: RingSetup,
 }
 
 struct Boss {
@@ -144,34 +99,40 @@ fn main() {
         },
     ];
     let rings = vec![
-        Ring::Damage {
+        Ring {
             name: "Damage +1".to_owned(),
             cost: 25,
             damage: 1,
+            armor: 0,
         },
-        Ring::Damage {
+        Ring {
             name: "Damage +2".to_owned(),
             cost: 50,
             damage: 2,
+            armor: 0,
         },
-        Ring::Damage {
+        Ring {
             name: "Damage +3".to_owned(),
             cost: 100,
             damage: 3,
+            armor: 0,
         },
-        Ring::Defense {
+        Ring {
             name: "Defense +1".to_owned(),
             cost: 20,
+            damage: 0,
             armor: 1,
         },
-        Ring::Defense {
+        Ring {
             name: "Defense +2".to_owned(),
             cost: 40,
+            damage: 0,
             armor: 2,
         },
-        Ring::Defense {
+        Ring {
             name: "Defense +3".to_owned(),
             cost: 80,
+            damage: 0,
             armor: 3,
         },
     ];
@@ -186,14 +147,14 @@ fn main() {
         .flat_map(|(weapon, armor)| {
             let armor_combinations = vec![None, Some(armor.clone())];
 
-            let ring_combinations = vec![PlayerRing::NoRing]
+            let ring_combinations = vec![RingSetup::NoRing]
                 .into_iter()
-                .chain(rings.iter().map(|r| PlayerRing::OneRing(r.clone())))
+                .chain(rings.iter().map(|r| RingSetup::OneRing(r.clone())))
                 .chain(
                     iproduct!(rings.iter().enumerate(), rings.iter().enumerate())
                         .filter(|((i, _), (j, _))| i != j)
                         .map(|((_, left), (_, right))| {
-                            PlayerRing::TwoRings(left.clone(), right.clone())
+                            RingSetup::TwoRings(left.clone(), right.clone())
                         }),
                 );
 
@@ -212,9 +173,9 @@ fn main() {
                 0_usize
             };
             let rings_cost = match &player.rings {
-                PlayerRing::NoRing => 0_usize,
-                PlayerRing::OneRing(r) => r.cost(),
-                PlayerRing::TwoRings(left, right) => left.cost() + right.cost(),
+                RingSetup::NoRing => 0_usize,
+                RingSetup::OneRing(r) => r.cost,
+                RingSetup::TwoRings(left, right) => left.cost + right.cost,
             };
             player.weapon.cost + armor_cost + rings_cost
         })
@@ -224,6 +185,15 @@ fn main() {
         "most_efficient_winning_player = {:?}",
         most_efficient_winning_player
     );
+
+    let cost = most_efficient_winning_player.weapon.cost
+        + most_efficient_winning_player.armor.map_or(0, |a| a.cost)
+        + match most_efficient_winning_player.rings {
+            RingSetup::NoRing => 0,
+            RingSetup::OneRing(ring) => ring.cost,
+            RingSetup::TwoRings(left, right) => left.cost + right.cost,
+        };
+    println!("cost = {}", cost);
 }
 
 fn can_beat(player: &Player, boss: &Boss) -> bool {
@@ -234,14 +204,14 @@ fn can_beat(player: &Player, boss: &Boss) -> bool {
     };
 
     let player_rings_damage = match &player.rings {
-        PlayerRing::OneRing(ring) => ring.damage(),
-        PlayerRing::TwoRings(left, right) => left.damage() + right.damage(),
+        RingSetup::OneRing(ring) => ring.damage,
+        RingSetup::TwoRings(left, right) => left.damage + right.damage,
         _ => 0,
     };
 
     let player_rings_armor = match &player.rings {
-        PlayerRing::OneRing(ring) => ring.armor(),
-        PlayerRing::TwoRings(left, right) => left.armor() + right.armor(),
+        RingSetup::OneRing(ring) => ring.armor,
+        RingSetup::TwoRings(left, right) => left.armor + right.armor,
         _ => 0,
     };
 
