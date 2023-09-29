@@ -5,6 +5,7 @@ type Register = u64;
 
 type Offset = i64;
 
+#[allow(clippy::upper_case_acronyms)]
 #[derive(Debug)]
 enum Instruction {
     HLF(Register),
@@ -56,7 +57,7 @@ impl FromStr for Instruction {
         Ok(instruction)
     }
 }
-// fn run(instruction: Instruction) {}
+
 type Program = Vec<Instruction>;
 
 fn run(program: Program) -> Registers {
