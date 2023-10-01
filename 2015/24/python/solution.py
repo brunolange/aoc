@@ -34,7 +34,7 @@ def find_partitions(weights, k):
                     yield tuple(found_partitions)
 
 def score(partition: list[list[int]]) -> tuple[int, int]:
-    group1, _, _ = partition
+    group1, *_ = partition
     quantum_entanglement = math.prod(group1)
     return len(group1), quantum_entanglement
 
@@ -52,8 +52,7 @@ def read_weights(args) -> list[int]:
     
 def main() -> int:
     weights = read_weights(sys.argv[1:])
-    num_partitions = 3
-    partitions = find_partitions(weights, num_partitions)
+    partitions = find_partitions(weights, 3)
 
     try:
         best_partition = min(partitions, key=score)
