@@ -62,9 +62,11 @@ def main() -> int:
 
     try:
         best_partition = min(partitions, key=score)
-    except ValueError:
-        print("ERROR: There is no solution", file=sys.stderr)
-        return 1
+    except ValueError as err:
+        if "is an empty sequence" in str(err):
+            print("ERROR: There is no solution", file=sys.stderr)
+            return 1
+        raise
 
     print(f"{best_partition = }")
     _, quantum_entanglement = score(best_partition)
