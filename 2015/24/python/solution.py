@@ -51,8 +51,14 @@ def read_weights(args) -> list[int]:
         return list(map(int, handle.readlines()))
     
 def main() -> int:
-    weights = read_weights(sys.argv[1:])
-    partitions = find_partitions(weights, 3)
+    if len(sys.argv) < 2:
+        print("ERROR: need number of partitions", file=sys.stderr)
+        return 1
+
+    number_of_partitions, *args = sys.argv[1:]
+
+    weights = read_weights(args)
+    partitions = find_partitions(weights, int(number_of_partitions))
 
     try:
         best_partition = min(partitions, key=score)
