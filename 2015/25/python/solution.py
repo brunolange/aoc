@@ -1,6 +1,3 @@
-from itertools import count
-
-
 def code(row: int, column: int) -> int:
     assert row > 0 and column > 0
 
