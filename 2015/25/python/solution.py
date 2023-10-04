@@ -4,8 +4,8 @@ def code(row: int, column: int) -> int:
     curr = 20_151_125
 
     max_row = row + column - 1
-    n = max_row * (max_row-1) // 2
-    steps = n + column - 1
+    steps_to_max_row = max_row * (max_row-1) // 2
+    steps = steps_to_max_row + column - 1
 
     for _ in range(steps):
         curr *= 252_533
