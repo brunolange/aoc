@@ -6,17 +6,15 @@ def code(row: int, column: int) -> int:
 
     curr = 20_151_125
 
-    for i in count(start=1, step=1):
-        for j in range(1, i + 1):
-            r = i - j + 1
-            c = j
+    max_row = row + column - 1
+    n = max_row * (max_row-1) // 2
+    steps = n + column - 1
 
-            if (r, c) == (row, column):
-                return curr
+    for _ in range(steps):
+        curr *= 252_533
+        curr %= 33_554_393
 
-            curr *= 252_533
-            curr %= 33_554_393
-
+    return curr
 
 def main() -> int:
     print(code(3_010, 3_019))
