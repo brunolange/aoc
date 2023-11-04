@@ -10,14 +10,33 @@ pub fn lines() -> Box<dyn Iterator<Item = String>> {
     }
 }
 
-pub fn read(s: String) -> (usize, usize, usize) {
-    let sides: [usize; 3] = s
-        .split_whitespace()
+pub fn read_k<const K: usize>(s: String) -> [usize; K] {
+    s.split_whitespace()
         .filter_map(|s| s.parse::<usize>().ok())
         // .take(3)
         .collect::<Vec<usize>>()
         .try_into()
-        .unwrap();
+        .unwrap()
+}
 
-    (sides[0], sides[1], sides[2])
+pub fn read_n(s: String) -> Vec<usize> {
+    s.split_whitespace()
+        .filter_map(|s| s.parse::<usize>().ok())
+        .collect::<Vec<usize>>()
+}
+
+pub enum Part {
+    One,
+    Two,
+}
+
+pub fn part() -> Part {
+    if let Some(part) = std::env::var("PART").ok() {
+        return match part.as_str() {
+            "1" => Part::One,
+            "2" => Part::Two,
+            _ => panic!("invalid part"),
+        };
+    }
+    Part::One
 }
