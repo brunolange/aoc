@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 #[derive(Debug)]
-enum Instruction {
+pub enum Instruction {
     Up,
     Down,
     Left,
@@ -22,6 +22,8 @@ impl FromStr for Instruction {
         Ok(instruction)
     }
 }
+
+pub type Sequence = Vec<Instruction>;
 
 #[derive(Clone, Copy, Debug)]
 pub enum Button {
@@ -111,25 +113,11 @@ fn step(button: Button, instruction: Instruction) -> Button {
     }
 }
 
-pub fn decode_lines(
+pub fn decode(
     starting_button: Button,
-    lines: impl Iterator<Item = String>,
+    sequences: impl Iterator<Item = Sequence>,
 ) -> impl Iterator<Item = Button> {
-    decode(
-        starting_button,
-        lines.map(|line| {
-            line.chars()
-                .map(|c| c.to_string().parse::<Instruction>().unwrap())
-                .collect::<Vec<Instruction>>()
-        }),
-    )
-}
-
-fn decode(
-    starting_button: Button,
-    all_instructions: impl Iterator<Item = Vec<Instruction>>,
-) -> impl Iterator<Item = Button> {
-    all_instructions.scan(starting_button, |state, instructions| {
+    sequences.scan(starting_button, |state, instructions| {
         let nxt = instructions.into_iter().fold(state.clone(), step);
         *state = nxt;
         Some(nxt)
