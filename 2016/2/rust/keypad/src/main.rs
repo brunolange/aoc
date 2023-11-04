@@ -45,60 +45,79 @@ enum Button {
     Seven,
     Eight,
     Nine,
+    A,
+    B,
+    C,
+    D,
 }
 
 fn step(button: Button, instruction: Instruction) -> Button {
     match button {
         Button::One => match instruction {
-            Instruction::Right => Button::Two,
-            Instruction::Down => Button::Four,
+            Instruction::Down => Button::Three,
             _ => Button::One,
         },
         Button::Two => match instruction {
-            Instruction::Left => Button::One,
             Instruction::Right => Button::Three,
-            Instruction::Down => Button::Five,
+            Instruction::Down => Button::Six,
             _ => Button::Two,
         },
         Button::Three => match instruction {
+            Instruction::Up => Button::One,
             Instruction::Left => Button::Two,
-            Instruction::Down => Button::Six,
-            _ => Button::Three,
+            Instruction::Down => Button::Seven,
+            Instruction::Right => Button::Four,
         },
         Button::Four => match instruction {
-            Instruction::Up => Button::One,
-            Instruction::Right => Button::Five,
-            Instruction::Down => Button::Seven,
+            Instruction::Left => Button::Three,
+            Instruction::Down => Button::Eight,
             _ => Button::Four,
         },
         Button::Five => match instruction {
-            Instruction::Up => Button::Two,
             Instruction::Right => Button::Six,
-            Instruction::Down => Button::Eight,
-            Instruction::Left => Button::Four,
+            _ => Button::Five,
         },
         Button::Six => match instruction {
-            Instruction::Up => Button::Three,
-            Instruction::Down => Button::Nine,
+            Instruction::Up => Button::Two,
             Instruction::Left => Button::Five,
-            _ => Button::Six,
+            Instruction::Down => Button::A,
+            Instruction::Right => Button::Seven,
         },
         Button::Seven => match instruction {
-            Instruction::Up => Button::Four,
+            Instruction::Up => Button::Three,
+            Instruction::Left => Button::Six,
+            Instruction::Down => Button::B,
             Instruction::Right => Button::Eight,
-            _ => Button::Seven,
         },
         Button::Eight => match instruction {
-            Instruction::Up => Button::Five,
-            Instruction::Right => Button::Nine,
+            Instruction::Up => Button::Four,
             Instruction::Left => Button::Seven,
-            Instruction::Down => Button::Eight,
+            Instruction::Down => Button::C,
+            Instruction::Right => Button::Nine,
         },
         Button::Nine => match instruction {
-            Instruction::Up => Button::Six,
-            Instruction::Right => Button::Nine,
             Instruction::Left => Button::Eight,
-            Instruction::Down => Button::Nine,
+            _ => Button::Nine,
+        },
+        Button::A => match instruction {
+            Instruction::Up => Button::Six,
+            Instruction::Right => Button::B,
+            _ => Button::A,
+        },
+        Button::B => match instruction {
+            Instruction::Up => Button::Seven,
+            Instruction::Left => Button::A,
+            Instruction::Down => Button::D,
+            Instruction::Right => Button::C,
+        },
+        Button::C => match instruction {
+            Instruction::Up => Button::Eight,
+            Instruction::Left => Button::B,
+            _ => Button::C,
+        },
+        Button::D => match instruction {
+            Instruction::Up => Button::B,
+            _ => Button::D,
         },
     }
 }
