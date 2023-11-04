@@ -21,10 +21,7 @@ struct Graph<'a> {
 
 impl<'a> Graph<'a> {
     fn add_edge(&mut self, start: &'a Node, destination: &'a Node, edge: &'a Edge) {
-        self.adj
-            .entry(start)
-            .or_insert(HashMap::new())
-            .insert(destination, edge);
+        self.adj.entry(start).or_default().insert(destination, edge);
     }
 }
 
