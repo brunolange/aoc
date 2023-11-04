@@ -118,7 +118,7 @@ pub fn decode(
     sequences: impl Iterator<Item = Sequence>,
 ) -> impl Iterator<Item = Button> {
     sequences.scan(starting_button, |state, instructions| {
-        let nxt = instructions.into_iter().fold(state.clone(), step);
+        let nxt = instructions.into_iter().fold(*state, step);
         *state = nxt;
         Some(nxt)
     })
