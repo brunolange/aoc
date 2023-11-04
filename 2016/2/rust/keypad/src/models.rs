@@ -111,16 +111,27 @@ fn step(button: Button, instruction: Instruction) -> Button {
     }
 }
 
-pub fn decode(
+pub fn decode_lines(
     starting_button: Button,
     lines: impl Iterator<Item = String>,
 ) -> impl Iterator<Item = Button> {
-    lines.scan(starting_button, |state, line| {
-        let partial = line
-            .chars()
-            .map(|c| c.to_string().parse::<Instruction>().unwrap())
-            .fold(state.clone(), step);
-        *state = partial;
-        Some(partial)
+    decode(
+        starting_button,
+        lines.map(|line| {
+            line.chars()
+                .map(|c| c.to_string().parse::<Instruction>().unwrap())
+                .collect::<Vec<Instruction>>()
+        }),
+    )
+}
+
+fn decode(
+    starting_button: Button,
+    all_instructions: impl Iterator<Item = Vec<Instruction>>,
+) -> impl Iterator<Item = Button> {
+    all_instructions.scan(starting_button, |state, instructions| {
+        let nxt = instructions.into_iter().fold(state.clone(), step);
+        *state = nxt;
+        Some(nxt)
     })
 }
