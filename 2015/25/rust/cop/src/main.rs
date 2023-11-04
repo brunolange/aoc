@@ -1,4 +1,5 @@
 use itertools::iterate;
+use std::env::args;
 
 const INITIAL_VALUE: usize = 20_151_125;
 const MULTIPLIER: usize = 252_533;
@@ -46,8 +47,6 @@ fn mod_exp(base: usize, exp: usize, modulus: usize) -> usize {
     }
     c
 }
-
-use std::env::args;
 
 fn main() {
     let solver = match args().nth(1).as_deref() {
