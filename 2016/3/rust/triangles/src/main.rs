@@ -1,5 +1,5 @@
 use itertools::Itertools;
-use triangles::can_make_triangle;
+use triangles::{can_make_triangle, vertice};
 
 mod io;
 mod utils;
@@ -12,7 +12,7 @@ fn main() {
             .map(io::read_k::<3>)
             .filter(|[a, b, c]| can_make_triangle(*a, *b, *c))
             .map(|[a, b, c]| {
-                println!("{}, {}, {} => {:?}", a, b, c, triangles::vertice(a, b, c));
+                println!("{}, {}, {} => {:?}", a, b, c, vertice(a, b, c));
             })
             .count(),
 
