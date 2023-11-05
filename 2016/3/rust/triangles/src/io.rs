@@ -31,7 +31,7 @@ pub enum Part {
 }
 
 pub fn part() -> Part {
-    if let Some(part) = std::env::var("PART").ok() {
+    if let Ok(part) = std::env::var("PART") {
         return match part.as_str() {
             "1" => Part::One,
             "2" => Part::Two,
