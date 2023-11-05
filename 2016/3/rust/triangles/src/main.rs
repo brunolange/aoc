@@ -25,7 +25,7 @@ fn main() {
             .filter(|sides| {
                 let [a, b, c]: [usize; 3] = sides[..]
                     .try_into()
-                    .expect(&format!("Needed 3 lines but only got {}", sides.len()));
+                    .unwrap_or_else(|_| panic!("Needed 3 lines but only got {}", sides.len()));
                 can_make_triangle(a, b, c)
             })
             .count(),
