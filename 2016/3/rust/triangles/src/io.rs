@@ -16,7 +16,7 @@ pub fn read_k<const K: usize>(s: String) -> [usize; K] {
         // .take(3)
         .collect::<Vec<usize>>()
         .try_into()
-        .unwrap()
+        .expect("Expected 3 lengths")
 }
 
 pub fn read_n(s: String) -> Vec<usize> {
