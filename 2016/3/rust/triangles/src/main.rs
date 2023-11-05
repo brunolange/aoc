@@ -11,6 +11,9 @@ fn main() {
         io::Part::One => lines
             .map(io::read_k::<3>)
             .filter(|[a, b, c]| can_make_triangle(*a, *b, *c))
+            .map(|[a, b, c]| {
+                println!("{}, {}, {} => {:?}", a, b, c, triangles::vertice(a, b, c));
+            })
             .count(),
 
         io::Part::Two => lines
