@@ -1,5 +1,6 @@
 mod io;
 mod models;
+mod parsers;
 
 use models::Room;
 

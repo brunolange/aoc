@@ -1,11 +1,9 @@
 use nom::bytes::complete::tag;
-use nom::character::complete::{alpha1, digit1};
-use nom::combinator::map_res;
-use nom::multi::separated_list1;
-use nom::sequence::{delimited, preceded};
-use nom::IResult;
+use nom::sequence::preceded;
 use std::collections::{BinaryHeap, HashMap};
 use std::str::FromStr;
+
+use crate::parsers::{parse_checksum, parse_name, parse_usize};
 
 #[derive(Debug)]
 pub struct ParseRoomError(String);
@@ -54,18 +52,6 @@ impl Room {
             .collect::<String>()
             == self.checksum
     }
-}
-
-fn parse_name(s: &str) -> IResult<&str, Vec<&str>> {
-    separated_list1(tag("-"), alpha1)(s)
-}
-
-fn parse_usize(s: &str) -> IResult<&str, usize> {
-    map_res(digit1, str::parse)(s)
-}
-
-fn parse_checksum(s: &str) -> IResult<&str, &str> {
-    delimited(tag("["), alpha1, tag("]"))(s)
 }
 
 impl FromStr for Room {
