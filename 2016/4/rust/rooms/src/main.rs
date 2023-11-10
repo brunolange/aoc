@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use nom::bytes::complete::tag;
 use nom::character::complete::{alpha1, digit1};
 use nom::combinator::map_res;
