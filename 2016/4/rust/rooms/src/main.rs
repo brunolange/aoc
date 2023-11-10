@@ -5,9 +5,9 @@ use nom::multi::separated_list1;
 use nom::sequence::{delimited, preceded};
 use nom::IResult;
 use std::collections::{BinaryHeap, HashMap};
-use std::fs::File;
-use std::io::{self, BufRead};
 use std::str::FromStr;
+
+mod io;
 
 #[derive(Debug)]
 pub struct ParseRoomError(String);
@@ -91,24 +91,8 @@ impl FromStr for Room {
     }
 }
 
-pub fn lines() -> Box<dyn Iterator<Item = String>> {
-    match std::env::args().nth(1) {
-        None => Box::new(
-            io::stdin()
-                .lock()
-                .lines()
-                .map_while(Result::ok)
-                .filter(|line| !line.starts_with("--")),
-        ),
-        Some(path) => {
-            let file = File::open(path).expect("error reading file");
-            Box::new(io::BufReader::new(file).lines().map_while(Result::ok))
-        }
-    }
-}
-
 fn main() {
-    let output = lines()
+    let output = io::lines()
         .map(|line| line.parse::<Room>().unwrap())
         .filter(|room| room.is_real())
         .map(|room| room.sector_id)
