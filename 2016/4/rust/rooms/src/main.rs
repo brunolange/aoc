@@ -21,10 +21,7 @@ struct Room {
 
 impl Room {
     fn is_real(&self) -> bool {
-        // if self.checksum != self.checksum.chars().sorted().collect::<String>() {
-        //     return false;
-        // }
-        let xs: HashMap<char, usize> =
+        let char_count_map: HashMap<char, usize> =
             self.name
                 .chars()
                 .filter(|c| *c != '-')
@@ -33,25 +30,31 @@ impl Room {
                     map
                 });
 
-        let ys: HashMap<usize, Vec<char>> =
-            xs.into_iter().fold(HashMap::new(), |mut map, (c, count)| {
-                map.entry(count).or_default().push(c);
-                map
-            });
-
-        let mut yys = BinaryHeap::from_iter(ys.into_iter().map(|(count, c)| (count, c)));
-
-        let mut cs = Vec::new();
-        while cs.len() < 5 {
-            let (_, mut v) = yys.pop().unwrap();
-            v.sort();
-            cs.append(&mut v);
-        }
-        cs = cs[0..5].to_vec();
-        cs.into_iter().collect::<String>() == self.checksum
+        let count_char_map: HashMap<usize, Vec<char>> =
+            char_count_map
+                .into_iter()
+                .fold(HashMap::new(), |mut map, (c, count)| {
+                    map.entry(count).or_default().push(c);
+                    map
+                });
 
         // TODO: a most_common iterator for strings that yields sorted characters
         // self.name.most_common().take(5)
+        let mut top =
+            BinaryHeap::from_iter(count_char_map.into_iter().map(|(count, c)| (count, c)));
+
+        let mut checksum = Vec::new();
+        while checksum.len() < 5 {
+            let (_, mut v) = top.pop().unwrap();
+            v.sort();
+            checksum.append(&mut v);
+        }
+
+        checksum
+            .into_iter()
+            .take(self.checksum.len())
+            .collect::<String>()
+            == self.checksum
     }
 }
 
