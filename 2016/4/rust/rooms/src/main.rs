@@ -35,7 +35,7 @@ impl Room {
 
         let ys: HashMap<usize, Vec<char>> =
             xs.into_iter().fold(HashMap::new(), |mut map, (c, count)| {
-                map.entry(count).or_insert(Vec::new()).push(c);
+                map.entry(count).or_default().push(c);
                 map
             });
 
@@ -94,12 +94,12 @@ pub fn lines() -> Box<dyn Iterator<Item = String>> {
             io::stdin()
                 .lock()
                 .lines()
-                .filter_map(Result::ok)
+                .map_while(Result::ok)
                 .filter(|line| !line.starts_with("--")),
         ),
         Some(path) => {
             let file = File::open(path).expect("error reading file");
-            Box::new(io::BufReader::new(file).lines().filter_map(Result::ok))
+            Box::new(io::BufReader::new(file).lines().map_while(Result::ok))
         }
     }
 }
