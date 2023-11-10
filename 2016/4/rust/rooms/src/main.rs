@@ -1,9 +1,13 @@
+use itertools::Itertools;
 use nom::bytes::complete::tag;
 use nom::character::complete::{alpha1, digit1};
 use nom::combinator::map_res;
 use nom::multi::separated_list1;
 use nom::sequence::{delimited, preceded};
 use nom::IResult;
+use std::collections::{BinaryHeap, HashMap};
+use std::fs::File;
+use std::io::{self, BufRead};
 use std::str::FromStr;
 
 #[derive(Debug)]
@@ -14,6 +18,42 @@ struct Room {
     name: String,
     sector_id: usize,
     checksum: String,
+}
+
+impl Room {
+    fn is_real(&self) -> bool {
+        // if self.checksum != self.checksum.chars().sorted().collect::<String>() {
+        //     return false;
+        // }
+        let xs: HashMap<char, usize> =
+            self.name
+                .chars()
+                .filter(|c| *c != '-')
+                .fold(HashMap::new(), |mut map, c| {
+                    *map.entry(c).or_insert(0) += 1;
+                    map
+                });
+
+        let ys: HashMap<usize, Vec<char>> =
+            xs.into_iter().fold(HashMap::new(), |mut map, (c, count)| {
+                map.entry(count).or_insert(Vec::new()).push(c);
+                map
+            });
+
+        let mut yys = BinaryHeap::from_iter(ys.into_iter().map(|(count, c)| (count, c)));
+
+        let mut cs = Vec::new();
+        while cs.len() < 5 {
+            let (_, mut v) = yys.pop().unwrap();
+            v.sort();
+            cs.append(&mut v);
+        }
+        cs = cs[0..5].to_vec();
+        cs.into_iter().collect::<String>() == self.checksum
+
+        // TODO: a most_common iterator for strings that yields sorted characters
+        // self.name.most_common().take(5)
+    }
 }
 
 fn parse_name(s: &str) -> IResult<&str, Vec<&str>> {
@@ -49,18 +89,28 @@ impl FromStr for Room {
     }
 }
 
+pub fn lines() -> Box<dyn Iterator<Item = String>> {
+    match std::env::args().nth(1) {
+        None => Box::new(
+            io::stdin()
+                .lock()
+                .lines()
+                .filter_map(Result::ok)
+                .filter(|line| !line.starts_with("--")),
+        ),
+        Some(path) => {
+            let file = File::open(path).expect("error reading file");
+            Box::new(io::BufReader::new(file).lines().filter_map(Result::ok))
+        }
+    }
+}
+
 fn main() {
-    println!("Hello, world!");
+    let output = lines()
+        .map(|line| line.parse::<Room>().unwrap())
+        .filter(|room| room.is_real())
+        .map(|room| room.sector_id)
+        .sum::<usize>();
 
-    let room: Room = "aaaaa-bbb-z-y-x-123[abxyz]".parse().unwrap();
-    println!("{:?}", room);
-
-    let room: Room = "a-b-c-d-e-f-g-h-987[abcde]".parse().unwrap();
-    println!("{:?}", room);
-
-    let room: Room = "not-a-real-room-404[oarel]".parse().unwrap();
-    println!("{:?}", room);
-
-    let room: Room = "totally-real-room-200[decoy]".parse().unwrap();
-    println!("{:?}", room);
+    println!("output = {}", output);
 }
