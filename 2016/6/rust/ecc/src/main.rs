@@ -18,7 +18,8 @@ fn main() {
         });
         let (max_char, _) = count_map
             .into_iter()
-            .max_by_key(|&(_, count)| count)
+            .max_by_key(|&(_, count)| count) // PART 1
+            // .min_by_key(|&(_, count)| count) // PART 2
             .unwrap();
         max_char
     })
