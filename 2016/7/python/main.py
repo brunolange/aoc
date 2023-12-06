@@ -51,15 +51,17 @@ def is_abba(s: str) -> bool:
     return a != b and a == d and b == c or is_abba(s[1:])
 
 
+def count(xs) -> int:
+    return sum(1 for _ in xs)
+
 def main() -> int:
-    count = sum(
-        1
-        for _ in filter(
+    total = count(
+        filter(
             supports_tls, map(lambda line: IP.parse(line.strip()), sys.stdin)
         )
     )
 
-    print(count)
+    print(total)
     return 0
 
 
