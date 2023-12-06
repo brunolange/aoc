@@ -54,11 +54,10 @@ def is_abba(s: str) -> bool:
 def count(xs) -> int:
     return sum(1 for _ in xs)
 
+
 def main() -> int:
     total = count(
-        filter(
-            supports_tls, map(lambda line: IP.parse(line.strip()), sys.stdin)
-        )
+        filter(supports_tls, map(lambda line: IP.parse(line.strip()), sys.stdin))
     )
 
     print(total)
