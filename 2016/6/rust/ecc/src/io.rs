@@ -9,19 +9,3 @@ pub fn lines() -> Box<dyn Iterator<Item = String>> {
         }
     }
 }
-
-pub enum Part {
-    One,
-    Two,
-}
-
-pub fn part() -> Part {
-    if let Ok(part) = std::env::var("PART") {
-        return match part.as_str() {
-            "1" => Part::One,
-            "2" => Part::Two,
-            _ => panic!("invalid part"),
-        };
-    }
-    Part::One
-}
