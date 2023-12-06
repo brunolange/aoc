@@ -16,6 +16,9 @@ fn main() {
             let count = count_map.entry(c).or_insert(0 as usize);
             *count += 1;
         });
+        count_map
+    })
+    .map(|count_map| {
         let (max_char, _) = count_map
             .into_iter()
             .max_by_key(|&(_, count)| count) // PART 1
