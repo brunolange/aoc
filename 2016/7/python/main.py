@@ -28,17 +28,18 @@ class IP:
             extra=pairs_and_rest[-1][0],
         )
 
-    def supports_tls(self):
-        return (
-            self.parts
-            and (
-                any(is_abba(seq) for seq in (part.seq for part in self.parts))
-                or is_abba(self.extra)
-                if self.extra
-                else False
-            )
-            and all(not is_abba(part.hypernet) for part in self.parts)
+
+def supports_tls(ip):
+    return (
+        ip.parts
+        and (
+            any(is_abba(seq) for seq in (part.seq for part in ip.parts))
+            or is_abba(ip.extra)
+            if ip.extra
+            else False
         )
+        and all(not is_abba(part.hypernet) for part in ip.parts)
+    )
 
 
 def is_abba(s: str) -> bool:
@@ -51,11 +52,12 @@ def is_abba(s: str) -> bool:
 
 
 def main() -> int:
-    count = 0
-    for line in sys.stdin:
-        ip = IP.parse(line.strip())
-        if ip.supports_tls():
-            count += 1
+    count = sum(
+        1
+        for _ in filter(
+            supports_tls, map(lambda line: IP.parse(line.strip()), sys.stdin)
+        )
+    )
 
     print(count)
     return 0
