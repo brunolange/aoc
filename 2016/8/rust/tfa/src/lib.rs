@@ -1,14 +1,10 @@
 use std::fmt::Write;
 use std::str::FromStr;
 
-use nom::{
-    branch::alt,
-    bytes::complete::tag,
-    character::complete::{digit1, multispace1},
-    combinator::map_res,
-    sequence::{preceded, separated_pair, terminated},
-    IResult,
-};
+mod parsers;
+
+use nom::branch::alt;
+use parsers::{parse_column_rotation, parse_rect, parse_row_rotation};
 
 #[derive(PartialEq, Eq, Debug)]
 pub struct Rectangle {
@@ -48,33 +44,8 @@ impl FromStr for Instruction {
     }
 }
 
-fn parse_usize(s: &str) -> IResult<&str, usize> {
-    map_res(digit1, str::parse)(s)
-}
-
-fn parse_rect(s: &str) -> IResult<&str, Instruction> {
-    let (s, (width, height)) = preceded(
-        terminated(tag("rect"), multispace1),
-        separated_pair(parse_usize, tag("x"), parse_usize),
-    )(s)?;
-    Ok((s, Instruction::Rect(Rectangle { width, height })))
-}
-
-fn parse_row_rotation(s: &str) -> IResult<&str, Instruction> {
-    let (s, (row, by)) = preceded(
-        tag("rotate row y="),
-        separated_pair(parse_usize, tag(" by "), parse_usize),
-    )(s)?;
-    Ok((s, Instruction::RotateRow(RowRotation { row, by })))
-}
-
-fn parse_column_rotation(s: &str) -> IResult<&str, Instruction> {
-    let (s, (column, by)) = preceded(
-        tag("rotate column x="),
-        separated_pair(parse_usize, tag(" by "), parse_usize),
-    )(s)?;
-    Ok((s, Instruction::RotateColumn(ColumnRotation { column, by })))
-}
+#[derive(Debug)]
+pub struct Grid<const C: usize, const R: usize>(pub [[bool; C]; R]);
 
 impl<const C: usize, const R: usize> Grid<C, R> {
     pub fn apply(&mut self, instruction: &Instruction) {
@@ -103,9 +74,6 @@ impl<const C: usize, const R: usize> Grid<C, R> {
         }
     }
 }
-
-#[derive(Debug)]
-pub struct Grid<const C: usize, const R: usize>(pub [[bool; C]; R]);
 
 impl<const C: usize, const R: usize> std::fmt::Display for Grid<C, R> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
