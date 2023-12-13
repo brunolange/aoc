@@ -133,10 +133,14 @@ impl<const C: usize, const R: usize> Grid<C, R> {
 fn main() {
     let mut grid = Grid([[false; 50]; 6]);
 
-    for line in std::io::stdin().lock().lines().map_while(Result::ok) {
-        let instruction: Instruction = line.parse().expect("invalid instruction");
-        grid.apply(&instruction);
-    }
+    std::io::stdin()
+        .lock()
+        .lines()
+        .map_while(Result::ok)
+        .for_each(|line| {
+            let instruction: Instruction = line.parse().expect("invalid instruction");
+            grid.apply(&instruction);
+        });
 
     println!("{grid}");
 
