@@ -76,9 +76,9 @@ impl FromStr for Instruction {
 }
 
 #[derive(Debug)]
-struct Grid<const R: usize, const C: usize>([[bool; C]; R]);
+struct Grid<const C: usize, const R: usize>([[bool; C]; R]);
 
-impl<const R: usize, const C: usize> std::fmt::Display for Grid<R, C> {
+impl<const C: usize, const R: usize> std::fmt::Display for Grid<C, R> {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let table: String = self
             .0
@@ -102,7 +102,7 @@ impl<const R: usize, const C: usize> std::fmt::Display for Grid<R, C> {
     }
 }
 
-impl<const R: usize, const C: usize> Grid<R, C> {
+impl<const C: usize, const R: usize> Grid<C, R> {
     fn apply(&mut self, instruction: &Instruction) {
         match instruction {
             Instruction::Rect(Rectangle { width, height }) => {
