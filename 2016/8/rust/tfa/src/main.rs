@@ -120,19 +120,12 @@ impl<const R: usize, const C: usize> Grid<R, C> {
 }
 
 fn main() {
-    let mut grid = Grid([[false; 7]; 3]);
+    let mut grid = Grid([[false; 50]; 6]);
 
-    // for line in std::io::stdin().lock().lines().map_while(Result::ok) {
-    //     let instruction: Instruction = line.parse().expect("invalid instruction");
-    //     grid.apply(instruction);
-    // }
-
-    grid.apply(&Instruction::RotateColumn(ColumnRotation {
-        column: 0,
-        by: 1,
-    }));
-    println!();
-    println!("{}", grid);
+    for line in std::io::stdin().lock().lines().map_while(Result::ok) {
+        let instruction: Instruction = line.parse().expect("invalid instruction");
+        grid.apply(&instruction);
+    }
 
     let count = grid
         .0
