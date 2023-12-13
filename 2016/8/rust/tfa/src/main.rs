@@ -82,8 +82,20 @@ impl<const R: usize, const C: usize> std::fmt::Display for Grid<R, C> {
         let table: String = self
             .0
             .map(|row| {
-                let xs: String = row.map(|c| if c { '#' } else { '.' }).into_iter().collect();
-                xs
+                row.into_iter()
+                    .enumerate()
+                    .map(|(i, cell)| {
+                        let c = if cell { '#' } else { '.' };
+                        format!(
+                            "{indent}{c}",
+                            indent = if i != 0 && i % 5 == 0 {
+                                " ".repeat(5)
+                            } else {
+                                "".to_string()
+                            }
+                        )
+                    })
+                    .collect::<String>()
             })
             .join("\n");
 
@@ -126,6 +138,8 @@ fn main() {
         let instruction: Instruction = line.parse().expect("invalid instruction");
         grid.apply(&instruction);
     }
+
+    println!("{grid}");
 
     let count = grid
         .0
