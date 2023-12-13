@@ -1,25 +1,32 @@
+use nom::{
+    branch::alt,
+    bytes::complete::tag,
+    character::complete::{digit1, multispace1},
+    combinator::map_res,
+    sequence::{preceded, separated_pair, terminated},
+    IResult,
+};
 use std::{io::BufRead, str::FromStr};
 
-enum RC {
-    Row,
-    Column,
-}
-
+#[derive(PartialEq, Eq, Debug)]
 struct Rectangle {
     width: usize,
     height: usize,
 }
 
+#[derive(PartialEq, Eq, Debug)]
 struct ColumnRotation {
     column: usize,
     by: usize,
 }
 
+#[derive(PartialEq, Eq, Debug)]
 struct RowRotation {
     row: usize,
     by: usize,
 }
 
+#[derive(PartialEq, Eq, Debug)]
 enum Instruction {
     Rect(Rectangle),
     RotateColumn(ColumnRotation),
@@ -29,14 +36,41 @@ enum Instruction {
 #[derive(Debug)]
 struct InstructionParseError(String);
 
+fn parse_usize(s: &str) -> IResult<&str, usize> {
+    map_res(digit1, str::parse)(s)
+}
+
+fn parse_rect(s: &str) -> IResult<&str, Instruction> {
+    let (s, (width, height)) = preceded(
+        terminated(tag("rect"), multispace1),
+        separated_pair(parse_usize, tag("x"), parse_usize),
+    )(s)?;
+    Ok((s, Instruction::Rect(Rectangle { width, height })))
+}
+
+fn parse_row_rotation(s: &str) -> IResult<&str, Instruction> {
+    let (s, (row, by)) = preceded(
+        tag("rotate row y="),
+        separated_pair(parse_usize, tag(" by "), parse_usize),
+    )(s)?;
+    Ok((s, Instruction::RotateRow(RowRotation { row, by })))
+}
+
+fn parse_column_rotation(s: &str) -> IResult<&str, Instruction> {
+    let (s, (column, by)) = preceded(
+        tag("rotate column x="),
+        separated_pair(parse_usize, tag(" by "), parse_usize),
+    )(s)?;
+    Ok((s, Instruction::RotateColumn(ColumnRotation { column, by })))
+}
+
 impl FromStr for Instruction {
     type Err = InstructionParseError;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        // Ok(Instruction::Rotate(RC::Row, 0, 1))
-        Ok(Instruction::Rect(Rectangle {
-            width: 3,
-            height: 2,
-        }))
+        let mut parser = alt((parse_rect, parse_row_rotation, parse_column_rotation));
+
+        let (_, instruction) = parser(s).map_err(|_| InstructionParseError("err".to_string()))?;
+        Ok(instruction)
     }
 }
 
@@ -163,5 +197,35 @@ mod tests {
 
         grid.apply(&instr);
         assert_eq!(grid.0, [[true, false, false], [false, false, false]]);
+    }
+
+    #[test]
+    fn test_rect_instruction_parser() {
+        assert_eq!(
+            "rect 123x321".parse::<Instruction>().unwrap(),
+            Instruction::Rect(Rectangle {
+                width: 123,
+                height: 321
+            })
+        );
+    }
+
+    #[test]
+    fn test_rotate_column_instruction_parser() {
+        assert_eq!(
+            "rotate column x=32 by 100".parse::<Instruction>().unwrap(),
+            Instruction::RotateColumn(ColumnRotation {
+                column: 32,
+                by: 100
+            })
+        );
+    }
+
+    #[test]
+    fn test_rotate_row_instruction_parser() {
+        assert_eq!(
+            "rotate row y=32 by 100".parse::<Instruction>().unwrap(),
+            Instruction::RotateRow(RowRotation { row: 32, by: 100 })
+        );
     }
 }
