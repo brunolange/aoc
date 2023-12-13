@@ -6,6 +6,7 @@ use nom::{
     sequence::{preceded, separated_pair, terminated},
     IResult,
 };
+use std::fmt::Write;
 use std::{io::BufRead, str::FromStr};
 
 #[derive(PartialEq, Eq, Debug)]
@@ -84,18 +85,16 @@ impl<const R: usize, const C: usize> std::fmt::Display for Grid<R, C> {
             .map(|row| {
                 row.into_iter()
                     .enumerate()
-                    .map(|(i, cell)| {
+                    .fold(String::new(), |mut output, (i, cell)| {
                         let c = if cell { '#' } else { '.' };
-                        format!(
-                            "{indent}{c}",
-                            indent = if i != 0 && i % 5 == 0 {
-                                " ".repeat(5)
-                            } else {
-                                "".to_string()
-                            }
-                        )
+                        let indent = if i != 0 && i % 5 == 0 {
+                            " ".repeat(5)
+                        } else {
+                            "".to_string()
+                        };
+                        let _ = write!(output, "{indent}{c}");
+                        output
                     })
-                    .collect::<String>()
             })
             .join("\n");
 
