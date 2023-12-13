@@ -58,28 +58,28 @@ impl<const R: usize, const C: usize> std::fmt::Display for Grid<R, C> {
 }
 
 impl<const R: usize, const C: usize> Grid<R, C> {
-    fn apply(&mut self, instruction: Instruction) {
+    fn apply(&mut self, instruction: &Instruction) {
         match instruction {
             Instruction::Rect(Rectangle { width, height }) => {
-                for i in 0..height {
-                    for j in 0..width {
+                for i in 0..*height {
+                    for j in 0..*width {
                         self.0[i][j] = true;
                     }
                 }
             }
-            Instruction::RotateRow(RowRotation { row, by }) => self.0[row].rotate_right(by),
+            Instruction::RotateRow(RowRotation { row, by }) => self.0[*row].rotate_right(*by),
             Instruction::RotateColumn(ColumnRotation { column, by }) => {
                 let mut xs: [bool; R] = self
                     .0
                     .iter()
-                    .map(|row| row[column])
+                    .map(|row| row[*column])
                     .collect::<Vec<bool>>()
                     .try_into()
                     .unwrap();
 
-                xs.rotate_right(by);
+                xs.rotate_right(*by);
 
-                (0..R).for_each(|r| self.0[r][column] = xs[r]);
+                (0..R).for_each(|r| self.0[r][*column] = xs[r]);
             }
         }
     }
@@ -92,34 +92,9 @@ fn main() {
     //     let instruction: Instruction = line.parse().expect("invalid instruction");
     //     grid.apply(instruction);
     // }
-    grid.apply(Instruction::Rect(Rectangle {
-        width: 3,
-        height: 2,
-    }));
-    println!();
-    println!("{}", grid);
 
-    // grid.apply(Instruction::RotateRow(RowRotation { row: 0, by: 1 }));
-    // println!();
-    // println!("{}", grid);
-
-    // grid.apply(Instruction::RotateRow(RowRotation { row: 0, by: 1 }));
-    // println!();
-    // println!("{}", grid);
-
-    // grid.apply(Instruction::RotateRow(RowRotation { row: 0, by: 4 }));
-    // println!();
-    // println!("{}", grid);
-
-    grid.apply(Instruction::RotateColumn(ColumnRotation {
+    grid.apply(&Instruction::RotateColumn(ColumnRotation {
         column: 0,
-        by: 1,
-    }));
-    println!();
-    println!("{}", grid);
-
-    grid.apply(Instruction::RotateColumn(ColumnRotation {
-        column: 4,
         by: 1,
     }));
     println!();
@@ -132,4 +107,61 @@ fn main() {
         .count();
 
     println!("{count}");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_rect() {
+        let mut grid = Grid([[false; 3]; 2]);
+        let instr = Instruction::Rect(Rectangle {
+            width: 1,
+            height: 1,
+        });
+        grid.apply(&instr);
+        assert_eq!(grid.0, [[true, false, false], [false, false, false]]);
+
+        grid.apply(&instr);
+        assert_eq!(grid.0, [[true, false, false], [false, false, false]]);
+
+        grid.apply(&Instruction::Rect(Rectangle {
+            width: 3,
+            height: 2,
+        }));
+        assert_eq!(grid.0, [[true, true, true], [true, true, true]]);
+    }
+
+    #[test]
+    fn test_rotate_row() {
+        let mut grid = Grid([[false; 3]; 2]);
+        grid.apply(&Instruction::Rect(Rectangle {
+            width: 1,
+            height: 1,
+        }));
+
+        let instr = Instruction::RotateRow(RowRotation { row: 0, by: 1 });
+        grid.apply(&instr);
+        assert_eq!(grid.0, [[false, true, false], [false, false, false]]);
+
+        grid.apply(&instr);
+        assert_eq!(grid.0, [[false, false, true], [false, false, false]]);
+    }
+
+    #[test]
+    fn test_rotate_column() {
+        let mut grid = Grid([[false; 3]; 2]);
+        grid.apply(&Instruction::Rect(Rectangle {
+            width: 1,
+            height: 1,
+        }));
+
+        let instr = Instruction::RotateColumn(ColumnRotation { column: 0, by: 1 });
+        grid.apply(&instr);
+        assert_eq!(grid.0, [[false, false, false], [true, false, false]]);
+
+        grid.apply(&instr);
+        assert_eq!(grid.0, [[true, false, false], [false, false, false]]);
+    }
 }
