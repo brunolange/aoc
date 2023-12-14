@@ -1,19 +1,19 @@
-use clap::Parser;
+use clap::{Parser, Subcommand};
 
 #[derive(Debug, Parser)]
 #[clap(author, version, about)]
-pub struct MyArgs {
-    /// enable to show animation
-    #[clap(long, default_value_t = false)]
-    pub interactive: bool,
-
-    /// interval in milliseconds to pause between animation frames. Only relevant with --interactive
-    #[clap(long, default_value_t = 10)]
-    pub pause: u64,
+pub struct Cli {
+    #[command(subcommand)]
+    pub command: Option<Command>,
 }
 
-impl MyArgs {
+#[derive(Debug, Subcommand)]
+pub enum Command {
+    Animate { pause: u64 },
+}
+
+impl Cli {
     pub fn new() -> Self {
-        MyArgs::parse()
+        Cli::parse()
     }
 }

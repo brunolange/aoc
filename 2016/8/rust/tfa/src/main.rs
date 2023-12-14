@@ -3,24 +3,28 @@ use tfa::Grid;
 mod args;
 mod io;
 
-use args::MyArgs;
+use args::Cli;
 
 fn main() {
-    let args = MyArgs::new();
+    let args = Cli::new();
 
     let mut grid = Grid([[false; 50]; 6]);
 
-    if args.interactive {
-        io::clear();
-        io::flash(&format!("{grid}"), args.pause);
-    }
+    let pause = match args.command {
+        Some(args::Command::Animate { pause }) => {
+            io::clear();
+            io::flash(&format!("{grid}"), pause);
+            Some(pause)
+        }
+        _ => None,
+    };
 
     io::lines()
         .map(|line| line.parse().expect("invalid instruction"))
         .for_each(|instruction| {
             grid.apply(&instruction);
-            if args.interactive {
-                io::flash(&format!("{grid}"), args.pause);
+            if let Some(duration) = pause {
+                io::flash(&format!("{grid}"), duration);
             }
         });
 
