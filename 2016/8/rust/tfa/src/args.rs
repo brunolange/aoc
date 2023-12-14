@@ -11,3 +11,9 @@ pub struct MyArgs {
     #[clap(long, default_value_t = 10)]
     pub pause: u64,
 }
+
+impl MyArgs {
+    pub fn new() -> Self {
+        MyArgs::parse()
+    }
+}

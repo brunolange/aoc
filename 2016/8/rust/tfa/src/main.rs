@@ -1,11 +1,12 @@
-use clap::Parser;
 use tfa::Grid;
 
 mod args;
 mod io;
 
+use args::MyArgs;
+
 fn main() {
-    let args = args::MyArgs::parse();
+    let args = MyArgs::new();
 
     let mut grid = Grid([[false; 50]; 6]);
 
