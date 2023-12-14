@@ -1,16 +1,17 @@
-use std::io::BufRead;
+use tfa::Grid;
 
-use tfa::{Grid, Instruction};
+mod io;
 
 fn main() {
     let mut grid = Grid([[false; 50]; 6]);
 
-    std::io::stdin()
-        .lock()
-        .lines()
-        .map_while(Result::ok)
-        .for_each(|line| {
-            let instruction: Instruction = line.parse().expect("invalid instruction");
+    io::clear();
+    io::flash(&format!("{grid}"), 1000);
+
+    io::lines()
+        .map(|line| line.parse().expect("invalid instruction"))
+        .for_each(|instruction| {
+            io::flash(&format!("{grid}"), 10);
             grid.apply(&instruction);
         });
 
