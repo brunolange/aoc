@@ -11,7 +11,7 @@ fn main() {
     let mut grid = Grid([[false; 50]; 6]);
 
     let pause = match args.command {
-        Some(args::Command::Animate { pause }) => {
+        Some(args::Command::Animate(args::Animation { pause })) => {
             io::clear();
             io::flash(&format!("{grid}"), pause);
             Some(pause)
