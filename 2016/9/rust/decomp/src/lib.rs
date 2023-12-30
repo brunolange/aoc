@@ -2,27 +2,13 @@ mod parsers;
 
 use std::{fmt::Display, str::FromStr};
 
-use nom::{
-    bytes::complete::tag,
-    sequence::{delimited, separated_pair},
-    IResult, Parser,
-};
-use parsers::parse_usize;
+use nom::Parser;
+use parsers::parse_marker;
 
 #[derive(Debug, PartialEq)]
-struct Marker {
+pub struct Marker {
     take: usize,
     repeat: usize,
-}
-
-fn parse_marker(s: &str) -> IResult<&str, Marker> {
-    let (s, (take, repeat)) = delimited(
-        tag("("),
-        separated_pair(parse_usize, tag("x"), parse_usize),
-        tag(")"),
-    )(s)?;
-
-    Ok((s, Marker { take, repeat }))
 }
 
 impl FromStr for Marker {
@@ -32,16 +18,6 @@ impl FromStr for Marker {
 
         Ok(marker)
     }
-}
-
-pub fn decompress(s: &str) -> String {
-    // let segments = segments(s);
-    // segments
-    //     .into_iter()
-    //     .map(|s| format!("{s}"))
-    //     .collect::<Vec<_>>()
-    //     .join("")
-    todo!()
 }
 
 #[derive(Debug)]
@@ -99,6 +75,10 @@ pub fn decoded_count(s: &str) -> usize {
 pub fn decoded_count_up_to(s: &str, max_depth: usize) -> usize {
     let tree = tree(s, 0, Some(max_depth));
     count(&tree)
+}
+
+pub fn decompress(s: &str) -> String {
+    todo!()
 }
 
 fn count(tree: &Vec<Node>) -> usize {
