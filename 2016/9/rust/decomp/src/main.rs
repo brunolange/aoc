@@ -1,5 +1,8 @@
-mod parsers;
+use decomp::decompress;
+use std::io::BufRead;
 
 fn main() {
-    println!("Hello, world!");
+    for line in std::io::stdin().lock().lines().map_while(Result::ok) {
+        println!("{}", decompress(&line).len());
+    }
 }
