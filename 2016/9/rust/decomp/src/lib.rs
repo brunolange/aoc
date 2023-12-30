@@ -7,7 +7,7 @@ use nom::{
     sequence::{delimited, separated_pair},
     IResult, Parser,
 };
-use parsers::{parse_usize, take_anything_until};
+use parsers::parse_usize;
 
 #[derive(Debug, PartialEq)]
 struct Marker {
@@ -34,160 +34,88 @@ impl FromStr for Marker {
     }
 }
 
-#[derive(Debug, PartialEq)]
-struct Segment<'a> {
+pub fn decompress(s: &str) -> String {
+    // let segments = segments(s);
+    // segments
+    //     .into_iter()
+    //     .map(|s| format!("{s}"))
+    //     .collect::<Vec<_>>()
+    //     .join("")
+    todo!()
+}
+
+#[derive(Debug)]
+struct Node {
     marker: Marker,
-    text: &'a str,
+    children: Vec<Node>,
 }
 
-impl<'a> Display for Segment<'a> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let up_to = self.marker.take.min(self.text.len());
-        write!(
-            f,
-            "{}{}",
-            &self.text[..up_to].repeat(self.marker.repeat),
-            &self.text[up_to..]
-        )
+impl Node {
+    fn is_leaf(&self) -> bool {
+        self.children.len() == 0
     }
-}
 
-fn segments(s: &str) -> Vec<Segment> {
-    let mut s2 = s;
-    let mut output = Vec::new();
-
-    while s2.len() != 0 {
-        if let Ok((rest, marker)) = parse_marker.parse(s2) {
-            let index = marker.take.min(rest.len());
-            if let Ok((_, (excess, _))) = take_anything_until(parse_marker).parse(&rest[index..]) {
-                let text = &rest[..(index + excess.len())];
-                output.push(Segment { marker, text });
-                s2 = &rest[text.len()..];
-            } else {
-                // hit the end
-                output.push(Segment { marker, text: rest });
-                break;
-            }
-        } else {
-            // there's no marker at the beginning!
-            if let Ok((_, (text, _))) = take_anything_until(parse_marker).parse(s2) {
-                output.push(Segment {
-                    marker: Marker {
-                        take: text.len(),
-                        repeat: 1,
-                    },
-                    text,
-                });
-                s2 = &s2[text.len()..];
-            } else {
-                output.push(Segment {
-                    marker: Marker {
-                        take: s2.len(),
-                        repeat: 1,
-                    },
-                    text: s2,
-                });
-                break;
-            }
+    fn print(&self, depth: usize) {
+        println!("{}{self}", "  ".repeat(depth));
+        for child in &self.children {
+            child.print(depth + 1);
         }
     }
+}
 
+impl Display for Node {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", format!("{:?}", self.marker))
+    }
+}
+
+fn tree(s: &str, curr_depth: usize, max_depth: Option<usize>) -> Vec<Node> {
+    let mut output = Vec::new();
+    if curr_depth >= max_depth.unwrap_or(curr_depth + 1) {
+        return output;
+    }
+
+    let mut s2 = s;
+    loop {
+        if let Ok((tail, marker)) = parse_marker.parse(s2) {
+            let index = marker.take;
+            output.push(Node {
+                marker,
+                children: tree(&tail[..index], curr_depth + 1, max_depth),
+            });
+            s2 = &tail[index..];
+        } else {
+            break;
+        }
+    }
     output
 }
 
-pub fn decompress(s: &str) -> String {
-    let segments = segments(s);
-    segments
-        .into_iter()
-        .map(|s| format!("{s}"))
-        .collect::<Vec<_>>()
-        .join("")
+pub fn decoded_count(s: &str) -> usize {
+    let tree = tree(s, 0, None);
+    count(&tree)
+}
+
+pub fn decoded_count_up_to(s: &str, max_depth: usize) -> usize {
+    let tree = tree(s, 0, Some(max_depth));
+    count(&tree)
+}
+
+fn count(tree: &Vec<Node>) -> usize {
+    tree.into_iter()
+        .map(|marker_node| {
+            if marker_node.is_leaf() {
+                marker_node.marker.repeat * marker_node.marker.take
+            } else {
+                marker_node.marker.repeat * count(&marker_node.children)
+            }
+        })
+        .sum()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_segment() {
-        let marker = Marker { take: 5, repeat: 3 };
-        let segment = Segment {
-            marker,
-            text: "ABCDEfg",
-        };
-        assert_eq!(format!("{}", segment), "ABCDEABCDEABCDEfg")
-    }
-
-    #[test]
-    fn test_segments() {
-        assert_eq!(segments(""), vec![]);
-
-        assert_eq!(
-            segments("A"),
-            vec![Segment {
-                marker: Marker { take: 1, repeat: 1 },
-                text: "A"
-            }]
-        );
-
-        assert_eq!(
-            segments("ABCDEFG"),
-            vec![Segment {
-                marker: Marker { take: 7, repeat: 1 },
-                text: "ABCDEFG"
-            }]
-        );
-
-        assert_eq!(
-            segments("(1x5)A"),
-            vec![Segment {
-                marker: Marker { take: 1, repeat: 5 },
-                text: "A"
-            }]
-        );
-
-        assert_eq!(
-            segments("(1x5)AB"),
-            vec![Segment {
-                marker: Marker { take: 1, repeat: 5 },
-                text: "AB"
-            }]
-        );
-
-        assert_eq!(
-            segments("(1x5)AB(2x4)XYZ"),
-            vec![
-                Segment {
-                    marker: Marker { take: 1, repeat: 5 },
-                    text: "AB"
-                },
-                Segment {
-                    marker: Marker { take: 2, repeat: 4 },
-                    text: "XYZ"
-                }
-            ]
-        );
-
-        assert_eq!(
-            segments("(10x9)AB(3x2)HIJ(10x13)LNWIKDMACM"),
-            vec![
-                Segment {
-                    marker: Marker {
-                        take: 10,
-                        repeat: 9
-                    },
-                    text: "AB(3x2)HIJ"
-                },
-                Segment {
-                    marker: Marker {
-                        take: 10,
-                        repeat: 13
-                    },
-                    text: "LNWIKDMACM"
-                }
-            ]
-        );
-    }
 
     #[test]
     fn test_decompress() {
@@ -206,5 +134,17 @@ mod tests {
             decompress("X(8x2)(3x3)ABCY"),
             "X(3x3)ABC(3x3)ABCY".to_string()
         );
+    }
+
+    #[test]
+    fn test_build_tree() {
+        let s = "(6x9)JUORKH(10x13)LNWIKDMACM(126x14)(21x8)QLKUJNVVZIQGGFCJZMPHK(2x1)ZH(59x3)(38x14)KELEPIDYLCGJUBCXACRSOCEZYXLOFJSADZAYXN(8x11)HORSWAQU(21x2)YEZNNYDLDSTGWMQFSMTEZ";
+
+        let tree = tree(s, 0, None);
+        for marker_node in &tree {
+            marker_node.print(0);
+        }
+
+        println!("count = {:?}", count(&tree));
     }
 }
