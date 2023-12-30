@@ -175,7 +175,7 @@ mod tests {
         // let s = "ADVENT";
         let s = "(7x2)(2x3)AB";
 
-        let tree = Tree::from_str(s, 0, None);
+        let tree = Tree::build(s);
         tree.print();
 
         // println!("count = {:?}", tree.count());
