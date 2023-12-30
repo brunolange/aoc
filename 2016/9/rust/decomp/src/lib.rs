@@ -1,6 +1,6 @@
 mod parsers;
 
-use std::{fmt::Display, str::FromStr};
+use std::str::FromStr;
 
 use nom::Parser;
 use parsers::parse_marker;
@@ -32,65 +32,70 @@ impl Node {
     }
 
     fn print(&self, depth: usize) {
-        println!("{}{self}", "  ".repeat(depth));
+        println!("{}{self:?}", "  ".repeat(depth));
         for child in &self.children {
             child.print(depth + 1);
         }
     }
 }
 
-impl Display for Node {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", format!("{:?}", self.marker))
-    }
-}
+struct Tree(Vec<Node>);
 
-fn tree(s: &str, curr_depth: usize, max_depth: Option<usize>) -> Vec<Node> {
-    let mut output = Vec::new();
-    if curr_depth >= max_depth.unwrap_or(curr_depth + 1) {
-        return output;
+impl Tree {
+    fn new(nodes: Vec<Node>) -> Self {
+        Tree(nodes)
     }
 
-    let mut s2 = s;
-    loop {
-        if let Ok((tail, marker)) = parse_marker.parse(s2) {
-            let index = marker.take;
-            output.push(Node {
-                marker,
-                children: tree(&tail[..index], curr_depth + 1, max_depth),
-            });
-            s2 = &tail[index..];
-        } else {
-            break;
+    fn from_str(s: &str, curr_depth: usize, max_depth: Option<usize>) -> Self {
+        let mut nodes = Vec::new();
+        if curr_depth >= max_depth.unwrap_or(curr_depth + 1) {
+            return Self::new(nodes);
         }
+
+        let mut s2 = s;
+        loop {
+            if let Ok((tail, marker)) = parse_marker.parse(s2) {
+                let index = marker.take;
+                let subtree = Self::from_str(&tail[..index], curr_depth + 1, max_depth);
+                nodes.push(Node {
+                    marker,
+                    children: subtree.0,
+                });
+                s2 = &tail[index..];
+            } else {
+                break;
+            }
+        }
+        Self::new(nodes)
     }
-    output
+
+    fn count(&self) -> usize {
+        fn _count(nodes: &Vec<Node>) -> usize {
+            nodes
+                .into_iter()
+                .map(|node| {
+                    if node.is_leaf() {
+                        node.marker.repeat * node.marker.take
+                    } else {
+                        node.marker.repeat * _count(&node.children)
+                    }
+                })
+                .sum()
+        }
+        _count(&self.0)
+    }
 }
 
 pub fn decoded_count(s: &str) -> usize {
-    let tree = tree(s, 0, None);
-    count(&tree)
+    Tree::from_str(s, 0, None).count()
 }
 
 pub fn decoded_count_up_to(s: &str, max_depth: usize) -> usize {
-    let tree = tree(s, 0, Some(max_depth));
-    count(&tree)
+    Tree::from_str(s, 0, Some(max_depth)).count()
 }
 
 pub fn decompress(s: &str) -> String {
     todo!()
-}
-
-fn count(tree: &Vec<Node>) -> usize {
-    tree.into_iter()
-        .map(|marker_node| {
-            if marker_node.is_leaf() {
-                marker_node.marker.repeat * marker_node.marker.take
-            } else {
-                marker_node.marker.repeat * count(&marker_node.children)
-            }
-        })
-        .sum()
 }
 
 #[cfg(test)]
