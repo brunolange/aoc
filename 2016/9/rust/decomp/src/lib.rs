@@ -68,7 +68,7 @@ impl<'a> Tree<'a> {
         }
 
         let mut s2 = s;
-        loop {
+        while s2.len() > 0 {
             if let Ok((tail, marker)) = parse_marker.parse(s2) {
                 let take = marker.take;
                 let text = &tail[..take];
@@ -80,7 +80,13 @@ impl<'a> Tree<'a> {
                 });
                 s2 = &tail[take..];
             } else {
-                break;
+                // push leaf nodes to wrap single character
+                nodes.push(Node {
+                    marker: Marker { take: 1, repeat: 1 },
+                    text: &s2[..1],
+                    children: vec![],
+                });
+                s2 = &s2[1..];
             }
         }
         Self::new(nodes)
@@ -152,33 +158,61 @@ mod tests {
 
     #[test]
     fn test_decompress() {
-        // assert_eq!(decompress(""), "".to_string());
-        // assert_eq!(decompress("A"), "A".to_string());
-        // assert_eq!(decompress("(1x5)A"), "AAAAA".to_string());
-        // assert_eq!(decompress("(1x5)AB"), "AAAAAB".to_string());
-        // assert_eq!(decompress("(1x5)AB(2x4)XYZ"), "AAAAABXYXYXYXYZ".to_string());
+        assert_eq!(decompress(""), "".to_string());
+        assert_eq!(decompress("A"), "A".to_string());
+        assert_eq!(decompress("(1x5)A"), "AAAAA".to_string());
+        assert_eq!(decompress("(1x5)AB"), "AAAAAB".to_string());
+        assert_eq!(decompress("(1x5)AB(2x4)XYZ"), "AAAAABXYXYXYXYZ".to_string());
 
-        // assert_eq!(decompress("ADVENT"), "ADVENT".to_string());
-        // assert_eq!(decompress("A(1x5)BC"), "ABBBBBC".to_string());
-        // assert_eq!(decompress("(3x3)XYZ"), "XYZXYZXYZ".to_string());
-        // assert_eq!(decompress("A(2x2)BCD(2x2)EFG"), "ABCBCDEFEFG".to_string());
-        // assert_eq!(decompress("(6x1)(1x3)A"), "(1x3)A".to_string());
-        // assert_eq!(
-        //     decompress("X(8x2)(3x3)ABCY"),
-        //     "X(3x3)ABC(3x3)ABCY".to_string()
-        // );
+        assert_eq!(decompress("ADVENT"), "ADVENT".to_string());
+        assert_eq!(decompress("A(1x5)BC"), "ABBBBBC".to_string());
+        assert_eq!(decompress("(3x3)XYZ"), "XYZXYZXYZ".to_string());
+        assert_eq!(decompress("A(2x2)BCD(2x2)EFG"), "ABCBCDEFEFG".to_string());
+        assert_eq!(decompress_up_to("(6x1)(1x3)A", 1), "(1x3)A".to_string());
+        assert_eq!(decompress_up_to("(6x1)(1x3)A", 2), "AAA".to_string());
+        assert_eq!(decompress_up_to("(6x1)(1x3)A", 3), "AAA".to_string());
+        assert_eq!(
+            decompress_up_to("X(8x2)(3x3)ABCY", 1),
+            "X(3x3)ABC(3x3)ABCY".to_string()
+        );
+        assert_eq!(
+            decompress_up_to("X(8x2)(3x3)ABCY", 100),
+            "XABCABCABCABCABCABCY".to_string()
+        );
+
+        assert_eq!(
+            decompress("A(2x2)BCdef(2x2)XYzzzzzzz"),
+            "ABCBCdefXYXYzzzzzzz".to_string()
+        );
     }
 
     #[test]
-    fn test_tree() {
-        // let s = "(126x14)(21x8)QLKUJNVVZIQGGFCJZMPHK(2x1)ZH(59x3)(38x14)KELEPIDYLCGJUBCXACRSOCEZYXLOFJSADZAYXN(8x11)HORSWAQU(21x2)YEZNNYDLDSTGWMQFSMTEZ";
-        // let s = "ADVENT";
-        let s = "(7x2)(2x3)AB";
+    fn test_count() {
+        assert_eq!(decoded_count(""), "".len());
+        assert_eq!(decoded_count("A"), "A".len());
+        assert_eq!(decoded_count("(1x5)A"), "AAAAA".len());
+        assert_eq!(decoded_count("(1x5)AB"), "AAAAAB".len());
+        assert_eq!(decoded_count("(1x5)AB(2x4)XYZ"), "AAAAABXYXYXYXYZ".len());
 
-        let tree = Tree::build(s);
-        tree.print();
+        assert_eq!(decoded_count("ADVENT"), "ADVENT".len());
+        assert_eq!(decoded_count("A(1x5)BC"), "ABBBBBC".len());
+        assert_eq!(decoded_count("(3x3)XYZ"), "XYZXYZXYZ".len());
+        assert_eq!(decoded_count("A(2x2)BCD(2x2)EFG"), "ABCBCDEFEFG".len());
+        assert_eq!(decoded_count_up_to("(6x1)(1x3)A", 1), "(1x3)A".len());
+        assert_eq!(decoded_count_up_to("(6x1)(1x3)A", 2), "AAA".len());
+        assert_eq!(decoded_count_up_to("(6x1)(1x3)A", 3), "AAA".len());
+        assert_eq!(
+            decoded_count_up_to("X(8x2)(3x3)ABCY", 1),
+            "X(3x3)ABC(3x3)ABCY".len()
+        );
+        assert_eq!(
+            decoded_count_up_to("X(8x2)(3x3)ABCY", 100),
+            "XABCABCABCABCABCABCY".len()
+        );
 
-        // println!("count = {:?}", tree.count());
-        println!("decompressed = {}", decompress(s));
+        assert_eq!(
+            decoded_count("A(2x2)BCdef(2x2)XYzzzzzzz"),
+            "ABCBCdefXYXYzzzzzzz".len()
+        );
     }
 }

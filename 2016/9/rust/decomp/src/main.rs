@@ -3,10 +3,22 @@ use std::io::BufRead;
 
 fn main() {
     for line in std::io::stdin().lock().lines().map_while(Result::ok) {
-        for max_depth in 1..10 {
-            println!("{}", decoded_count_up_to(&line, max_depth));
+        if std::env::var("SHOW_PROGRESS").is_ok() {
+            (1..)
+                .map(|depth| {
+                    (
+                        decoded_count_up_to(&line, depth),
+                        decoded_count_up_to(&line, depth + 1),
+                    )
+                })
+                .enumerate()
+                .find(|(index, (curr, next))| {
+                    println!("{index}: {curr}");
+                    curr == next
+                })
+                .unwrap();
+        } else {
+            println!("{}", decoded_count(&line));
         }
-        println!();
-        println!("{}", decoded_count(&line));
     }
 }
