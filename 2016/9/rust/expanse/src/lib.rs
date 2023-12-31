@@ -67,9 +67,9 @@ impl<'a> Tree<'a> {
             return Self::new(nodes);
         }
 
-        let mut s2 = s;
-        while !s2.is_empty() {
-            if let Ok((tail, marker)) = parse_marker.parse(s2) {
+        let mut s = s;
+        while !s.is_empty() {
+            if let Ok((tail, marker)) = parse_marker.parse(s) {
                 let take = marker.take;
                 let text = &tail[..take];
                 let subtree = Self::assemble(text, curr_depth + 1, max_depth);
@@ -78,15 +78,15 @@ impl<'a> Tree<'a> {
                     text,
                     children: subtree.0,
                 });
-                s2 = &tail[take..];
+                s = &tail[take..];
             } else {
                 // push leaf nodes to wrap single character
                 nodes.push(Node {
                     marker: Marker { take: 1, repeat: 1 },
-                    text: &s2[..1],
+                    text: &s[..1],
                     children: vec![],
                 });
-                s2 = &s2[1..];
+                s = &s[1..];
             }
         }
         Self::new(nodes)
