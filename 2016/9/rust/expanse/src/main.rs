@@ -1,5 +1,4 @@
 use clap::Parser;
-use expanse::{decoded_count, decoded_count_up_to, decompress, decompress_up_to};
 
 mod args;
 mod io;
@@ -12,21 +11,31 @@ fn main() {
     for line in io::lines() {
         match cli.command {
             Command::Decompress => {
-                let decompressed_line = if let Some(depth) = cli.depth {
-                    decompress_up_to(&line, depth)
-                } else {
-                    decompress(&line)
-                };
-                println!("{decompressed_line}");
+                println!("{}", decompress(cli.depth)(&line));
             }
             Command::Count => {
-                let count = if let Some(depth) = cli.depth {
-                    decoded_count_up_to(&line, depth)
-                } else {
-                    decoded_count(&line)
-                };
-                println!("{count}");
+                println!("{}", count(cli.depth)(&line));
             }
+        }
+    }
+}
+
+fn decompress(depth: Option<usize>) -> impl Fn(&str) -> String {
+    move |s: &str| {
+        if let Some(depth) = depth {
+            expanse::decompress_up_to(s, depth)
+        } else {
+            expanse::decompress(s)
+        }
+    }
+}
+
+fn count(depth: Option<usize>) -> impl Fn(&str) -> usize {
+    move |s: &str| {
+        if let Some(depth) = depth {
+            expanse::decoded_count_up_to(s, depth)
+        } else {
+            expanse::decoded_count(s)
         }
     }
 }
