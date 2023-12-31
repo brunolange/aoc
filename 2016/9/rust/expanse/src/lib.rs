@@ -101,9 +101,9 @@ impl<'a> Tree<'a> {
     }
 
     fn count(&self) -> usize {
-        fn _count(nodes: &Vec<Node>) -> usize {
+        fn _count(nodes: &[Node]) -> usize {
             nodes
-                .into_iter()
+                .iter()
                 .map(|node| {
                     if node.is_leaf() {
                         node.marker.repeat * node.marker.take
@@ -117,7 +117,7 @@ impl<'a> Tree<'a> {
     }
 
     fn decompress(&self) -> String {
-        fn _decompress(nodes: &Vec<Node>) -> String {
+        fn _decompress(nodes: &[Node]) -> String {
             nodes
                 .iter()
                 .map(|node| {
