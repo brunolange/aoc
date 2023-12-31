@@ -29,13 +29,13 @@ struct Node<'a> {
 
 impl<'a> Display for Node<'a> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", format!("{:?}", self.marker))
+        write!(f, "{:?}", self.marker)
     }
 }
 
 impl<'a> Node<'a> {
     fn is_leaf(&self) -> bool {
-        self.children.len() == 0
+        self.children.is_empty()
     }
 
     fn print(&self, depth: usize) {
@@ -68,7 +68,7 @@ impl<'a> Tree<'a> {
         }
 
         let mut s2 = s;
-        while s2.len() > 0 {
+        while !s2.is_empty() {
             if let Ok((tail, marker)) = parse_marker.parse(s2) {
                 let take = marker.take;
                 let text = &tail[..take];
@@ -119,7 +119,7 @@ impl<'a> Tree<'a> {
     fn decompress(&self) -> String {
         fn _decompress(nodes: &Vec<Node>) -> String {
             nodes
-                .into_iter()
+                .iter()
                 .map(|node| {
                     if node.is_leaf() {
                         node.text.repeat(node.marker.repeat)
