@@ -132,6 +132,37 @@ fn shortest_path(passcode: &str) -> Option<Vec<Direction>> {
     None
 }
 
+fn longest_path(passcode: &str) -> Option<Vec<Direction>> {
+    let start = Node {
+        position: (0, 0),
+        code: passcode.to_string(),
+        path: vec![],
+        depth: 0,
+    };
+
+    let mut queue: LinkedList<Node> = LinkedList::new();
+    queue.push_back(start);
+
+    let mut longest_path: Option<Vec<Direction>> = None;
+    while let Some(node) = queue.pop_front() {
+        // println!("{}{:?}", "    ".repeat(node.depth), node);
+
+        if node.position == (3, 3) {
+            let len = node.path.len();
+            let longest_len = longest_path.clone().map(|p| p.len()).unwrap_or(0);
+            if len > longest_len {
+                longest_path = Some(node.path.clone());
+            }
+        } else {
+            for neighbor in node.neighbors() {
+                queue.push_back(neighbor);
+            }
+        }
+    }
+
+    longest_path
+}
+
 fn fmt(directions: &Vec<Direction>) -> String {
     format!(
         "{}",
@@ -146,6 +177,13 @@ fn fmt(directions: &Vec<Direction>) -> String {
 fn main() {
     if let Some(path) = shortest_path("ulqzkmiv") {
         println!("{}", fmt(&path));
+    } else {
+        eprintln!("ERROR: there is no path.");
+        process::exit(1);
+    }
+
+    if let Some(path) = longest_path("ulqzkmiv") {
+        println!("{}", path.len());
     } else {
         eprintln!("ERROR: there is no path.");
         process::exit(1);
