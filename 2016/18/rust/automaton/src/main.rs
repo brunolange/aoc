@@ -87,6 +87,7 @@ impl Iterator for RowIter {
         Some(self.curr.clone())
     }
 }
+
 fn main() {
     let [first_row, number_of_rows]: [String; 2] = std::env::args()
         .skip(1)
