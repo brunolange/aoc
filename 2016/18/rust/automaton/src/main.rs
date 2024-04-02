@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use std::convert::TryInto;
 use std::str::FromStr;
 
@@ -51,25 +50,28 @@ impl Row {
 
 impl std::fmt::Display for Row {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0.iter().map(|t| format!("{}", t)).join(""))
+        let xs = self.0.iter().map(|t| format!("{}", t)).collect::<Vec<_>>();
+        write!(f, "{}", xs.join(""))
     }
 }
 
 fn next(r: &Row) -> Row {
-    let mut xr = vec![];
-    xr.push(Tile::Safe);
-    xr.append(&mut r.0.clone());
-    xr.push(Tile::Safe);
+    Row(r
+        .0
+        .iter()
+        .enumerate()
+        .map(|(i, t)| {
+            let left = r.0.get(i - 1).unwrap_or(&Tile::Safe);
+            let center = t;
+            let right = r.0.get(i + 1).unwrap_or(&Tile::Safe);
 
-    Row(xr
-        .into_iter()
-        .tuple_windows()
-        .map(|triplet| match triplet {
-            (Tile::Trap, Tile::Trap, Tile::Safe) => Tile::Trap,
-            (Tile::Safe, Tile::Trap, Tile::Trap) => Tile::Trap,
-            (Tile::Trap, Tile::Safe, Tile::Safe) => Tile::Trap,
-            (Tile::Safe, Tile::Safe, Tile::Trap) => Tile::Trap,
-            _ => Tile::Safe,
+            match (left, center, right) {
+                (Tile::Trap, Tile::Trap, Tile::Safe) => Tile::Trap,
+                (Tile::Safe, Tile::Trap, Tile::Trap) => Tile::Trap,
+                (Tile::Trap, Tile::Safe, Tile::Safe) => Tile::Trap,
+                (Tile::Safe, Tile::Safe, Tile::Trap) => Tile::Trap,
+                _ => Tile::Safe,
+            }
         })
         .collect())
 }
